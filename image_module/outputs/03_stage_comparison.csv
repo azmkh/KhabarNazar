@@ -1,0 +1,3 @@
+stage,AI vs Real (test) acc,AI vs Real (test) AUC,Tiny-GenImage (val) acc,Tiny-GenImage (val) AUC,Misinfo (unseen) acc,Misinfo (unseen) AUC
+Stage 1: AI vs Real only,0.9395,0.9854,0.5649,0.5932,0.7476,0.8528
+Stage 2: AI vs Real + Tiny-GenImage,0.9383,0.9854,0.9199,0.9757,0.7304,0.8621

@@ -1,0 +1,4 @@
+model,accuracy,precision,recall,F1,ROC AUC
+Simple CNN,0.795,0.798,0.795,0.7945,0.8741
+ResNet18 (final layer),0.8158,0.8175,0.8158,0.8156,0.8995
+ResNet18 (all layers),0.9395,0.9395,0.9395,0.9395,0.9854

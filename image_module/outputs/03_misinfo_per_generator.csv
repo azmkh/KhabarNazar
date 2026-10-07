@@ -1,0 +1,7 @@
+,Stage 1,Stage 1,Stage 2,Stage 2
+label,fake,real,fake,real
+generator,,,,
+FLUX1-dev,0.979,0.64,0.993,0.568
+PixArt-XL-2-1024-MS,0.953,0.644,0.99,0.578
+SDXL1,0.8,0.652,0.875,0.593
+imagen3,0.663,0.65,0.663,0.583

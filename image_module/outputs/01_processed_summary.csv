@@ -1,0 +1,11 @@
+dataset,split,class,images,avg size (first 200)
+ai_vs_real,test,fake,6000,537x552
+ai_vs_real,test,real,6000,611x577
+ai_vs_real,train,fake,24000,530x541
+ai_vs_real,train,real,24000,642x600
+misinfo,test,fake,4000,512x512
+misinfo,test,real,4000,590x498
+tiny_genimage,train,fake,14000,256x256
+tiny_genimage,train,real,14000,473x369
+tiny_genimage,val,fake,3500,256x256
+tiny_genimage,val,real,3500,466x418

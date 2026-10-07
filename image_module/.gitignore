@@ -1,0 +1,11 @@
+# Datasets - far too big for GitHub
+data/
+# Python virtual environment
+venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+# Intermediate experiment weights (re-created by the notebooks); only the main models are pushed
+models/resnet18_head_ai_vs_real.pth
+models/simple_cnn_ai_vs_real.pth
+models/resnet18_tiny_seen4.pth

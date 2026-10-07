@@ -1,0 +1,18 @@
+# 1) Install PyTorch FIRST with the CUDA command from https://pytorch.org/get-started/locally/
+#    e.g.  pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
+# 2) Then:  pip install -r requirements.txt
+numpy
+pandas
+pyarrow
+pillow
+tqdm
+matplotlib
+seaborn
+opencv-python
+scikit-learn
+scikit-image
+lime
+huggingface_hub
+notebook
+ipykernel
+ipywidgets
