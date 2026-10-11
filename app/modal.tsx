@@ -1,47 +1,53 @@
-import { Platform, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
+import { AppText, Card, Icon, type IconName, useAppTheme } from '@/components/ui';
+import { radius, space } from '@/constants/theme';
+import { APP_TAGLINE } from '@/lib/config';
+
+const STEPS: { icon: IconName; title: string; body: string }[] = [
+  { icon: 'type', title: 'Submit', body: 'Paste Urdu or Roman Urdu text, or upload a news screenshot.' },
+  { icon: 'scan-text', title: 'Analyze', body: 'OCR reads text in images; the text model estimates whether the content is fake.' },
+  { icon: 'sparkles', title: 'Explain', body: 'See the words that influenced the model and, for images, any heatmap.' },
+  { icon: 'scale', title: 'Dispute', body: 'Disagree? An administrator reviews it and can override the verdict.' },
+];
 
 export default function ModalScreen() {
+  const { colors } = useAppTheme();
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>About KhabarNazar</Text>
-      <Text style={styles.body}>
-        KhabarNazar is a final-year project at FAST-NUCES Lahore: AI-assisted misinformation detection
-        for Urdu and Roman Urdu, with optional image analysis (OCR + manipulation cues) and planned
-        SHAP / Grad-CAM explanations plus an admin dispute flow.
-      </Text>
-      <Text style={styles.body}>
-        This mobile shell is ready to connect to your FastAPI backend. Until{' '}
-        <Text style={{ fontWeight: '700' }}>EXPO_PUBLIC_API_URL</Text> is set, the app uses on-device
-        mock responses so you can demo navigation and UX.
-      </Text>
-      {Platform.OS === 'web' ? null : (
-        <Text style={[styles.body, styles.muted]}>
-          Use the Check tab to submit text or a gallery image, then open History to revisit analyses.
-        </Text>
-      )}
-    </View>
+    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
+      <AppText variant="title">KhabarNazar</AppText>
+      <AppText variant="body" color="textMuted">{APP_TAGLINE}</AppText>
+
+      <Card padded={false}>
+        {STEPS.map((step, index) => (
+          <View
+            key={step.title}
+            style={[styles.step, index < STEPS.length - 1 && { borderBottomColor: colors.border, borderBottomWidth: StyleSheet.hairlineWidth }]}>
+            <View style={[styles.stepIcon, { backgroundColor: colors.primarySoft }]}>
+              <Icon name={step.icon} size={18} color="primary" />
+            </View>
+            <View style={styles.flex}>
+              <AppText variant="bodyStrong">{step.title}</AppText>
+              <AppText variant="caption" color="textMuted">{step.body}</AppText>
+            </View>
+          </View>
+        ))}
+      </Card>
+
+      <Card tone="muted" title="Project">
+        <AppText variant="body" color="textMuted">
+          A final-year project at FAST-NUCES Lahore on AI-assisted misinformation detection for Urdu and
+          Roman Urdu, supporting SDG 16 (credible information) and SDG 9 (innovation for
+          under-represented languages).
+        </AppText>
+      </Card>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 22,
-    justifyContent: 'center',
-  },
-  title: {
-    fontSize: 22,
-    fontWeight: '800',
-    marginBottom: 14,
-  },
-  body: {
-    fontSize: 16,
-    lineHeight: 24,
-    marginBottom: 12,
-  },
-  muted: {
-    opacity: 0.85,
-  },
+  flex: { flex: 1 },
+  container: { padding: space.xl, gap: space.lg, paddingBottom: space.xxxl },
+  step: { flexDirection: 'row', gap: space.md, padding: space.lg },
+  stepIcon: { width: 36, height: 36, borderRadius: radius.sm + 2, alignItems: 'center', justifyContent: 'center' },
 });

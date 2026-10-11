@@ -39,3 +39,15 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# local env files (backend secrets live in backend/.env)
+.env
+
+# datasets stay local (size and data-sharing permissions); only the folder skeleton is tracked
+dataset/**
+!dataset/**/
+!dataset/**/.gitkeep
+
+# local databases
+*.db
+*.sqlite3

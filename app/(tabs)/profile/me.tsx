@@ -1,108 +1,53 @@
-import { Image, ScrollView, StyleSheet, View } from 'react-native';
+import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { Text } from '@/components/Themed';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
+import { AppText, Avatar, Card, Icon, type IconName, useAppTheme } from '@/components/ui';
+import { space } from '@/constants/theme';
 import { useAuth } from '@/lib/AuthContext';
+import { fullDate } from '@/lib/format';
 
 export default function MyProfileScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const theme = Colors[colorScheme];
+  const { colors } = useAppTheme();
   const { user } = useAuth();
+  const joined = user?.created_at ? Date.parse(user.created_at) : NaN;
 
   return (
-    <ScrollView style={{ backgroundColor: theme.background }} contentContainerStyle={styles.container}>
-      <View style={[styles.avatarCard, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        {user?.avatarUri ? (
-          <Image source={{ uri: user.avatarUri }} style={styles.avatarLarge} />
-        ) : (
-          <View style={[styles.avatarFallback, { borderColor: theme.border }]}>
-            <Text style={[styles.initials, { color: theme.muted }]}>
-              {(user?.displayName || user?.email || '?')
-                .trim()
-                .slice(0, 2)
-                .toUpperCase()}
-            </Text>
-          </View>
-        )}
-        <Text style={[styles.name, { color: theme.text }]}>
-          {user?.displayName || user?.email?.split('@')[0] || 'User'}
-        </Text>
-        <Text style={[styles.emailLine, { color: theme.muted }]}>{user?.email ?? '—'}</Text>
+    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
+      <View style={styles.header}>
+        <Avatar uri={user?.avatarUri} name={user?.name || user?.email} size={96} />
+        <AppText variant="title" align="center">{user?.name || user?.email?.split('@')[0] || 'User'}</AppText>
+        <AppText variant="body" color="textMuted" align="center">{user?.email ?? '—'}</AppText>
       </View>
 
-      <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        <Text style={[styles.label, { color: theme.muted }]}>Display name</Text>
-        <Text style={[styles.value, { color: theme.text }]}>{user?.displayName || '—'}</Text>
-      </View>
-      <View style={[styles.card, { backgroundColor: theme.card, borderColor: theme.border }]}>
-        <Text style={[styles.label, { color: theme.muted }]}>Email</Text>
-        <Text style={[styles.value, { color: theme.text }]}>{user?.email ?? '—'}</Text>
-      </View>
-      <Text style={[styles.note, { color: theme.muted }]}>
-        Password and verification are managed on the server in production.
-      </Text>
+      <Card padded={false}>
+        <Field icon="user" label="Name" value={user?.name || '—'} />
+        <Field icon="mail" label="Email" value={user?.email ?? '—'} />
+        <Field icon="shield-check" label="Role" value={user?.role === 'admin' ? 'Administrator' : 'Standard user'} />
+        <Field icon="calendar" label="Member since" value={Number.isFinite(joined) ? fullDate(joined) : '—'} last />
+      </Card>
+
+      <AppText variant="caption" color="textSubtle" align="center">
+        Name and email are managed by the server and cannot be changed from the app yet.
+      </AppText>
     </ScrollView>
   );
 }
 
+function Field({ icon, label, value, last }: { icon: IconName; label: string; value: string; last?: boolean }) {
+  const { colors } = useAppTheme();
+  return (
+    <View style={[styles.field, !last && { borderBottomColor: colors.border, borderBottomWidth: StyleSheet.hairlineWidth }]}>
+      <Icon name={icon} size={18} color="textMuted" />
+      <View style={styles.fieldText}>
+        <AppText variant="caption" color="textMuted">{label}</AppText>
+        <AppText variant="bodyStrong" selectable>{value}</AppText>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    gap: 14,
-    paddingBottom: 40,
-  },
-  avatarCard: {
-    borderRadius: 16,
-    borderWidth: 1,
-    padding: 20,
-    alignItems: 'center',
-  },
-  avatarLarge: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-  },
-  avatarFallback: {
-    width: 96,
-    height: 96,
-    borderRadius: 48,
-    borderWidth: 2,
-    alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#00000008',
-  },
-  initials: {
-    fontSize: 28,
-    fontWeight: '800',
-  },
-  name: {
-    marginTop: 14,
-    fontSize: 20,
-    fontWeight: '800',
-  },
-  emailLine: {
-    marginTop: 4,
-    fontSize: 14,
-  },
-  card: {
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 16,
-  },
-  label: {
-    fontSize: 12,
-    fontWeight: '700',
-    textTransform: 'uppercase',
-    letterSpacing: 0.5,
-  },
-  value: {
-    marginTop: 8,
-    fontSize: 17,
-    fontWeight: '600',
-  },
-  note: {
-    fontSize: 13,
-    lineHeight: 19,
-  },
+  container: { padding: space.lg, gap: space.lg, paddingBottom: space.xxxl },
+  header: { alignItems: 'center', gap: space.xs, paddingVertical: space.md },
+  field: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg },
+  fieldText: { flex: 1, gap: 2 },
 });

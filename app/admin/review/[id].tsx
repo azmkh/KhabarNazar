@@ -1,266 +1,248 @@
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
-import {
-  Alert,
-  Image,
-  Pressable,
-  ScrollView,
-  StyleSheet,
-  Text,
-  TextInput,
-  View,
-} from 'react-native';
+import { useFocusEffect, useLocalSearchParams, useRouter } from 'expo-router';
+import { useCallback, useState } from 'react';
+import { KeyboardAvoidingView, Linking, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { useSubmissions } from '@/lib/SubmissionsContext';
+import {
+  AppText,
+  AuthImage,
+  Button,
+  Card,
+  ContentText,
+  EmptyState,
+  Icon,
+  Tag,
+  TextField,
+  VerdictBadge,
+  useAppTheme,
+  verdictMeta,
+} from '@/components/ui';
+import { radius, space } from '@/constants/theme';
+import { getDispute, reviewDispute, submissionImageUrl, type ApiDispute } from '@/lib/api';
+import { useAuth } from '@/lib/AuthContext';
+import { fullDate, percent } from '@/lib/format';
+import { showAlert } from '@/lib/alert';
 import type { Verdict } from '@/types/submission';
 
-const verdicts: Verdict[] = ['credible', 'uncertain', 'misleading'];
+const labels: { value: Verdict; api: string }[] = [
+  { value: 'credible', api: 'Real' },
+  { value: 'uncertain', api: 'Uncertain' },
+  { value: 'misleading', api: 'Fake' },
+];
+
+function verdictOf(label?: string | null): Verdict {
+  return labels.find((item) => item.api === label)?.value ?? 'uncertain';
+}
 
 export default function AdminReviewScreen() {
   const { id: idParam } = useLocalSearchParams<{ id?: string | string[] }>();
   const id = Array.isArray(idParam) ? idParam[0] : idParam;
-  const { getById, updateSubmission } = useSubmissions();
+  const { accessToken } = useAuth();
   const router = useRouter();
-
+  const { colors } = useAppTheme();
+  const [dispute, setDispute] = useState<ApiDispute | null>(null);
   const [note, setNote] = useState('');
   const [overrideVerdict, setOverrideVerdict] = useState<Verdict>('uncertain');
+  const [loading, setLoading] = useState(true);
+  const [busy, setBusy] = useState<'uphold_ai' | 'override' | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const row = id ? getById(id) : undefined;
+  const load = useCallback(async () => {
+    if (!accessToken || !id) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const result = await getDispute(accessToken, id);
+      setDispute(result);
+      setNote(result.admin_comment ?? '');
+      const current = labels.find((item) => item.api === result.override_label);
+      if (current) setOverrideVerdict(current.value);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not load dispute.');
+    } finally {
+      setLoading(false);
+    }
+  }, [accessToken, id]);
 
-  if (!row || !row.dispute) {
+  useFocusEffect(useCallback(() => { void load(); }, [load]));
+
+  async function saveReview(resolution: 'uphold_ai' | 'override') {
+    const trimmed = note.trim();
+    if (trimmed.length < 3) {
+      showAlert('Admin review', 'A comment is required (at least 3 characters).');
+      return;
+    }
+    if (!accessToken || !id) return;
+    try {
+      setBusy(resolution);
+      const result = await reviewDispute(accessToken, id, {
+        admin_decision: resolution,
+        admin_comment: trimmed,
+        ...(resolution === 'override' ? { override_label: labels.find((item) => item.value === overrideVerdict)?.api } : {}),
+      });
+      setDispute(result);
+      showAlert('Review saved', 'The decision was recorded.', [{ text: 'OK', onPress: () => router.back() }]);
+    } catch (err) {
+      showAlert('Admin review', err instanceof Error ? err.message : 'Could not save the review.');
+    } finally {
+      setBusy(null);
+    }
+  }
+
+  if (!dispute) {
     return (
-      <View style={styles.center}>
-        <Text style={styles.muted}>Dispute not found or has no user message.</Text>
+      <View style={[styles.center, { backgroundColor: colors.background }]}>
+        {loading ? <EmptyState icon="scale" title="Loading dispute…" loading /> : (
+          <EmptyState icon="circle-alert" title="Dispute not found" message={error ?? undefined} actionLabel="Back" onAction={() => router.back()} />
+        )}
       </View>
     );
   }
 
-  const s = row;
-  const d = s.dispute!;
-
-  function saveReview(resolution: 'uphold_ai' | 'override') {
-    const trimmed = note.trim();
-    if (trimmed.length < 8) {
-      Alert.alert('Admin review', 'A mandatory comment is required (at least 8 characters).');
-      return;
-    }
-    updateSubmission(s.id, {
-      adminReview: {
-        note: trimmed,
-        resolution,
-        overrideVerdict: resolution === 'override' ? overrideVerdict : undefined,
-        reviewedAt: Date.now(),
-      },
-    });
-    Alert.alert('Saved', 'Review recorded on this device (demo).', [
-      { text: 'OK', onPress: () => router.back() },
-    ]);
-  }
+  const submission = dispute.submission;
+  const image = submission?.image_submission;
+  const content = submission?.text_submission?.input_text ?? image?.ocr_text;
+  const version = submission?.explainability?.model_version;
+  const confidence = version === 'text-model-unavailable' || version?.startsWith('stub')
+    ? null
+    : submission?.text_submission?.text_confidence ?? image?.text_confidence;
+  const canReview = dispute.status === 'pending';
 
   return (
-    <ScrollView contentContainerStyle={styles.container} style={styles.root}>
-      <View style={styles.card}>
-        <Text style={styles.kicker}>User dispute</Text>
-        <Text style={styles.body}>{d.message}</Text>
-        {s.submitterEmail ? (
-          <Text style={styles.meta}>Reporter: {s.submitterEmail}</Text>
-        ) : null}
-        <Text style={styles.meta}>{new Date(d.createdAt).toLocaleString()}</Text>
-      </View>
+    <KeyboardAvoidingView style={styles.flex} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
+        {error ? <AppText variant="caption" color="misleading">{error}</AppText> : null}
 
-      <View style={styles.card}>
-        <Text style={styles.kicker}>Model output</Text>
-        <Text style={styles.body}>
-          Verdict: <Text style={styles.bold}>{s.verdict}</Text> · Confidence{' '}
-          {(s.confidence * 100).toFixed(1)}%
-        </Text>
-        <Text style={styles.bodySmall}>{s.summary}</Text>
-      </View>
-
-      {s.textPreview ? (
-        <View style={styles.card}>
-          <Text style={styles.kicker}>Content</Text>
-          <Text style={styles.body}>{s.textPreview}</Text>
-        </View>
-      ) : null}
-
-      {s.imageUri ? (
-        <Image source={{ uri: s.imageUri }} style={styles.image} resizeMode="contain" />
-      ) : null}
-
-      {s.adminReview ? (
-        <View style={[styles.card, styles.doneCard]}>
-          <Text style={styles.kicker}>Already reviewed</Text>
-          <Text style={styles.body}>{s.adminReview.note}</Text>
-          <Text style={styles.meta}>
-            {s.adminReview.resolution === 'uphold_ai' ? 'Uphold AI' : `Override → ${s.adminReview.overrideVerdict}`}
-          </Text>
-        </View>
-      ) : (
-        <>
-          <Text style={styles.label}>Admin comment (required)</Text>
-          <TextInput
-            value={note}
-            onChangeText={setNote}
-            multiline
-            placeholder="Explain your decision for the audit trail…"
-            placeholderTextColor="#94a3b8"
-            style={styles.input}
-          />
-
-          <Text style={[styles.label, { marginTop: 14 }]}>If overriding, new verdict</Text>
-          <View style={styles.verdictRow}>
-            {verdicts.map((v) => (
-              <Pressable
-                key={v}
-                onPress={() => setOverrideVerdict(v)}
-                style={[
-                  styles.verdictChip,
-                  overrideVerdict === v && styles.verdictChipOn,
-                ]}>
-                <Text style={[styles.verdictChipText, overrideVerdict === v && styles.verdictChipTextOn]}>
-                  {v}
-                </Text>
-              </Pressable>
-            ))}
+        <Card>
+          <View style={styles.between}>
+            <AppText variant="overline" color="textMuted">User's dispute</AppText>
+            <Tag label={dispute.status} tone={canReview ? 'uncertain' : 'credible'} />
           </View>
+          <AppText variant="body" style={styles.mt8}>{dispute.justification}</AppText>
+          {dispute.evidence_link ? (
+            <Pressable onPress={() => void Linking.openURL(dispute.evidence_link!)} style={styles.link} accessibilityRole="link">
+              <Icon name="external-link" size={14} color="info" />
+              <AppText variant="caption" color="info" numberOfLines={1} style={styles.flex}>{dispute.evidence_link}</AppText>
+            </Pressable>
+          ) : null}
+          <AppText variant="caption" color="textSubtle" style={styles.mt8}>
+            {dispute.user?.email ?? `User ${dispute.user_id}`} · {fullDate(Date.parse(dispute.created_at))}
+          </AppText>
+        </Card>
 
-          <Pressable style={[styles.btn, styles.uphold]} onPress={() => saveReview('uphold_ai')}>
-            <Text style={styles.btnText}>Uphold AI verdict</Text>
-          </Pressable>
-          <Pressable style={[styles.btn, styles.override]} onPress={() => saveReview('override')}>
-            <Text style={styles.btnText}>Override with selected verdict</Text>
-          </Pressable>
-        </>
-      )}
-    </ScrollView>
+        <Card title="Model output">
+          <View style={styles.between}>
+            <VerdictBadge verdict={verdictOf(submission?.final_label)} />
+            <AppText variant="caption" color="textMuted">Confidence {percent(confidence)}</AppText>
+          </View>
+          {submission?.explainability?.explanation_summary ? (
+            <AppText variant="caption" color="textMuted" style={styles.mt8}>{submission.explainability.explanation_summary}</AppText>
+          ) : null}
+        </Card>
+
+        {image || content ? (
+          <Card title={image ? 'Submitted image' : 'Submitted text'}>
+            {image ? (
+              <View style={[styles.imageFrame, { backgroundColor: colors.surfaceMuted }]}>
+                <AuthImage uri={submissionImageUrl(submission!.id)} style={styles.image} resizeMode="contain" />
+              </View>
+            ) : null}
+            {content ? <ContentText style={image ? styles.mt8 : undefined}>{content}</ContentText> : null}
+          </Card>
+        ) : null}
+
+        {!canReview ? (
+          <Card tone="muted">
+            <View style={styles.row}>
+              <Icon name="badge-check" size={18} color="credible" />
+              <View style={styles.flex}>
+                <AppText variant="bodyStrong">
+                  {dispute.admin_decision === 'uphold_ai'
+                    ? 'AI verdict upheld'
+                    : `Changed to ${verdictMeta(verdictOf(dispute.override_label), colors).label.toLowerCase()}`}
+                </AppText>
+                {dispute.admin_comment ? <AppText variant="body" color="textMuted" style={styles.mt4}>“{dispute.admin_comment}”</AppText> : null}
+                {dispute.reviewed_at ? (
+                  <AppText variant="caption" color="textSubtle" style={styles.mt4}>{fullDate(Date.parse(dispute.reviewed_at))}</AppText>
+                ) : null}
+              </View>
+            </View>
+          </Card>
+        ) : (
+          <Card title="Your decision" style={styles.decision}>
+            <TextField
+              label="Comment (required, shown to the user)"
+              value={note}
+              onChangeText={setNote}
+              multiline
+              placeholder="Explain your decision for the audit trail…"
+            />
+            <Button
+              label="Uphold AI verdict"
+              icon="check"
+              variant="secondary"
+              loading={busy === 'uphold_ai'}
+              disabled={busy !== null}
+              onPress={() => void saveReview('uphold_ai')}
+            />
+            <View style={[styles.divider, { backgroundColor: colors.border }]} />
+            <AppText variant="caption" color="textMuted">Or override with a new verdict</AppText>
+            <View style={styles.choices}>
+              {labels.map(({ value }) => {
+                const meta = verdictMeta(value, colors);
+                const selected = overrideVerdict === value;
+                return (
+                  <Pressable
+                    key={value}
+                    onPress={() => setOverrideVerdict(value)}
+                    accessibilityRole="radio"
+                    accessibilityState={{ selected }}
+                    style={[
+                      styles.choice,
+                      {
+                        borderColor: selected ? meta.color : colors.border,
+                        backgroundColor: selected ? meta.soft : colors.surface,
+                      },
+                    ]}>
+                    <Icon name={meta.icon} size={18} color={selected ? meta.color : 'textMuted'} />
+                    <AppText variant="caption" color={selected ? meta.color : 'textMuted'}>{meta.short}</AppText>
+                  </Pressable>
+                );
+              })}
+            </View>
+            <Button
+              label="Override verdict"
+              icon="pencil"
+              loading={busy === 'override'}
+              disabled={busy !== null}
+              onPress={() => void saveReview('override')}
+            />
+          </Card>
+        )}
+      </ScrollView>
+    </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
+  flex: { flex: 1 },
+  center: { flex: 1, justifyContent: 'center' },
+  container: { padding: space.lg, paddingBottom: space.xxxl, gap: space.md },
+  between: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: space.sm },
+  row: { flexDirection: 'row', gap: space.md },
+  mt4: { marginTop: 4 },
+  mt8: { marginTop: space.sm },
+  link: { flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: space.sm },
+  imageFrame: { borderRadius: radius.md, overflow: 'hidden', height: 230 },
+  image: { width: '100%', height: '100%' },
+  decision: { gap: space.md },
+  divider: { height: StyleSheet.hairlineWidth, marginVertical: space.xs },
+  choices: { flexDirection: 'row', gap: space.sm },
+  choice: {
     flex: 1,
-    backgroundColor: '#ecfdf5',
-  },
-  container: {
-    padding: 20,
-    paddingBottom: 40,
-    gap: 14,
-  },
-  center: {
-    flex: 1,
-    backgroundColor: '#ecfdf5',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 24,
-  },
-  muted: {
-    color: '#64748b',
-    fontSize: 15,
-  },
-  card: {
-    backgroundColor: '#fff',
-    borderRadius: 14,
-    padding: 16,
-    borderWidth: 1,
-    borderColor: '#a7f3d0',
-  },
-  doneCard: {
-    borderColor: '#86efac',
-    backgroundColor: '#f0fdf4',
-  },
-  kicker: {
-    fontSize: 11,
-    fontWeight: '800',
-    color: '#0f766e',
-    textTransform: 'uppercase',
-    letterSpacing: 0.8,
-    marginBottom: 8,
-  },
-  body: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#0f172a',
-  },
-  bodySmall: {
-    marginTop: 8,
-    fontSize: 13,
-    lineHeight: 19,
-    color: '#475569',
-  },
-  meta: {
-    marginTop: 8,
-    fontSize: 12,
-    color: '#64748b',
-  },
-  bold: {
-    fontWeight: '800',
-  },
-  image: {
-    width: '100%',
-    height: 200,
-    borderRadius: 12,
-    backgroundColor: '#e2e8f0',
-  },
-  label: {
-    fontSize: 14,
-    fontWeight: '700',
-    color: '#042f2e',
-  },
-  input: {
-    marginTop: 8,
-    borderWidth: 1,
-    borderColor: '#cbd5e1',
-    borderRadius: 12,
-    padding: 12,
-    minHeight: 100,
-    textAlignVertical: 'top',
-    fontSize: 15,
-    color: '#0f172a',
-    backgroundColor: '#fff',
-  },
-  verdictRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginTop: 8,
-  },
-  verdictChip: {
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 10,
-    backgroundColor: '#f1f5f9',
-    borderWidth: 1,
-    borderColor: '#e2e8f0',
-  },
-  verdictChipOn: {
-    backgroundColor: '#ccfbf1',
-    borderColor: '#0d9488',
-  },
-  verdictChipText: {
-    fontSize: 13,
-    fontWeight: '600',
-    color: '#64748b',
-    textTransform: 'capitalize',
-  },
-  verdictChipTextOn: {
-    color: '#0f766e',
-  },
-  btn: {
-    borderRadius: 12,
-    paddingVertical: 14,
-    alignItems: 'center',
-    marginTop: 10,
-  },
-  uphold: {
-    backgroundColor: '#0f766e',
-  },
-  override: {
-    backgroundColor: '#b45309',
-  },
-  btnText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '800',
+    gap: 4,
+    borderWidth: 1.5,
+    borderRadius: radius.md,
+    paddingVertical: space.md,
   },
 });

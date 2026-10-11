@@ -1,5 +1,8 @@
 import { Redirect } from 'expo-router';
-import { ActivityIndicator, StyleSheet, Text, View } from 'react-native';
+import { ActivityIndicator, StyleSheet, View } from 'react-native';
+
+import { AppText, Wordmark, useAppTheme } from '@/components/ui';
+import { space } from '@/constants/theme';
 import { useAuth } from '@/lib/AuthContext';
 
 /**
@@ -7,13 +10,14 @@ import { useAuth } from '@/lib/AuthContext';
  */
 export default function Index() {
   const { user, ready } = useAuth();
+  const { colors } = useAppTheme();
 
   if (!ready) {
     return (
-      <View style={styles.boot}>
-        <Text style={styles.wordmark}>KhabarNazar</Text>
-        <ActivityIndicator size="large" color="#fff" style={styles.spinner} />
-        <Text style={styles.caption}>Loading your session…</Text>
+      <View style={[styles.boot, { backgroundColor: colors.ink }]}>
+        <Wordmark size="lg" />
+        <ActivityIndicator color={colors.onInk} style={styles.spinner} />
+        <AppText variant="caption" color="onInkMuted">Loading your session…</AppText>
       </View>
     );
   }
@@ -22,29 +26,16 @@ export default function Index() {
     return <Redirect href="/(tabs)" />;
   }
 
-  return <Redirect href="/register" />;
+  return <Redirect href="/login" />;
 }
 
 const styles = StyleSheet.create({
   boot: {
     flex: 1,
-    backgroundColor: '#0f766e',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 24,
+    padding: space.xl,
+    gap: space.lg,
   },
-  wordmark: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#fff',
-    letterSpacing: -0.5,
-    marginBottom: 28,
-  },
-  spinner: {
-    marginBottom: 16,
-  },
-  caption: {
-    fontSize: 15,
-    color: '#ecfdf5',
-  },
+  spinner: { marginTop: space.xl },
 });

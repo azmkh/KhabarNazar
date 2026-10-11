@@ -1,11 +1,14 @@
 export type Verdict = 'credible' | 'uncertain' | 'misleading';
 
-/** 0–100 scale for UI (mock or API). */
+/** 0–100 scale for values supplied by an API. */
 export type Score100 = number;
 
 export type SubmissionDispute = {
+  id: string;
   message: string;
   createdAt: number;
+  status: 'pending' | 'reviewed' | 'closed' | string;
+  evidenceLink?: string | null;
 };
 
 export type AdminReview = {
@@ -23,13 +26,17 @@ export type Submission = {
   imageUri?: string | null;
   verdict: Verdict;
   /** Calibrated model confidence 0–1 (display with extra precision). */
-  confidence: number;
+  confidence: number | null;
+  /** Probability the content is fake (0–1), combining text and image signals; null when no model ran. */
+  riskScore: number | null;
   summary: string;
+  highlightedWords?: Array<{ word: string; contribution: number; direction: string }>;
+  heatmapPath?: string | null;
   /** OCR / script clarity and normalization quality (0–100). */
-  languageQuality: Score100;
+  languageQuality: Score100 | null;
   languageQualityLabel: string;
   /** How well the content matches known reputable patterns (0–100). */
-  sourceCredibility: Score100;
+  sourceCredibility: Score100 | null;
   sourceCredibilityLabel: string;
   /** Image tampering / synthetic cues; null when no image was analyzed. */
   manipulationLikelihood: Score100 | null;

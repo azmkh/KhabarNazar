@@ -7,21 +7,14 @@
     "icon": "./assets/images/icon.png",
     "scheme": "khabarnazar",
     "userInterfaceStyle": "automatic",
-    "newArchEnabled": true,
-    "splash": {
-      "image": "./assets/images/splash-icon.png",
-      "resizeMode": "contain",
-      "backgroundColor": "#0f766e"
-    },
     "ios": {
       "supportsTablet": true
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
-        "backgroundColor": "#0f766e"
+        "backgroundColor": "#111827"
       },
-      "edgeToEdgeEnabled": true,
       "predictiveBackGestureEnabled": false
     },
     "web": {
@@ -37,7 +30,20 @@
           "photosPermission": "KhabarNazar needs photo access to analyze news screenshots you choose from your library.",
           "cameraPermission": "KhabarNazar can use the camera when you capture a news image to analyze."
         }
-      ]
+      ],
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/images/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#111827"
+        }
+      ],
+      "expo-status-bar",
+      "expo-web-browser",
+      "@react-native-vector-icons/lucide"
     ],
     "experiments": {
       "typedRoutes": true

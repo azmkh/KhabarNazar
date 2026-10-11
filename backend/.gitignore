@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+*$py.class
+.venv/
+.cache/
+env/
+venv/
+.env
+uploads/*
+!uploads/.gitkeep
+khabarnazar.db
+*.sqlite3
+.pytest_cache/
+tests/_test.db
+tests/_uploads/

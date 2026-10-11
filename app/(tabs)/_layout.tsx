@@ -1,63 +1,32 @@
-import React from 'react';
-import FontAwesome from '@expo/vector-icons/FontAwesome';
-import { Link, Tabs } from 'expo-router';
-import { Pressable } from 'react-native';
+import { Tabs } from 'expo-router';
+import type { ColorValue } from 'react-native';
 
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
-import { useClientOnlyValue } from '@/components/useClientOnlyValue';
+import { Icon, type IconName, useAppTheme } from '@/components/ui';
+import { fonts } from '@/constants/theme';
 
-function TabBarIcon(props: {
-  name: React.ComponentProps<typeof FontAwesome>['name'];
-  color: string;
-}) {
-  return <FontAwesome size={26} style={{ marginBottom: -2 }} {...props} />;
+function tabIcon(name: IconName) {
+  return ({ color }: { color: ColorValue }) => <Icon name={name} size={22} color={color} />;
 }
 
 export default function TabLayout() {
-  const colorScheme = useColorScheme();
+  const { colors } = useAppTheme();
 
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: Colors[colorScheme ?? 'light'].tint,
-        headerShown: useClientOnlyValue(false, true),
+        headerShown: false,
+        tabBarActiveTintColor: colors.primary,
+        tabBarInactiveTintColor: colors.textSubtle,
+        tabBarLabelStyle: { fontFamily: fonts.semibold, fontSize: 11 },
+        tabBarStyle: {
+          backgroundColor: colors.surface,
+          borderTopColor: colors.border,
+        },
+        sceneStyle: { backgroundColor: colors.background },
       }}>
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Check',
-          tabBarIcon: ({ color }) => <TabBarIcon name="search" color={color} />,
-          headerRight: () => (
-            <Link href="/modal" asChild>
-              <Pressable accessibilityRole="button">
-                {({ pressed }) => (
-                  <FontAwesome
-                    name="info-circle"
-                    size={22}
-                    color={Colors[colorScheme ?? 'light'].text}
-                    style={{ marginRight: 16, opacity: pressed ? 0.5 : 1 }}
-                  />
-                )}
-              </Pressable>
-            </Link>
-          ),
-        }}
-      />
-      <Tabs.Screen
-        name="history"
-        options={{
-          title: 'History',
-          tabBarIcon: ({ color }) => <TabBarIcon name="clock-o" color={color} />,
-        }}
-      />
-      <Tabs.Screen
-        name="profile"
-        options={{
-          title: 'Settings',
-          tabBarIcon: ({ color }) => <TabBarIcon name="cog" color={color} />,
-        }}
-      />
+      <Tabs.Screen name="index" options={{ title: 'Check', tabBarIcon: tabIcon('scan-search') }} />
+      <Tabs.Screen name="history" options={{ title: 'History', tabBarIcon: tabIcon('history') }} />
+      <Tabs.Screen name="profile" options={{ title: 'Account', tabBarIcon: tabIcon('user') }} />
     </Tabs>
   );
 }

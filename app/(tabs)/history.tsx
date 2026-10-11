@@ -1,103 +1,112 @@
-import { useRouter } from 'expo-router';
-import { FlatList, Pressable, StyleSheet } from 'react-native';
+import { useFocusEffect, useRouter } from 'expo-router';
+import { useCallback, useMemo, useState } from 'react';
+import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
-import { Text, View } from '@/components/Themed';
-import Colors from '@/constants/Colors';
-import { useColorScheme } from '@/components/useColorScheme';
+import { SubmissionRow } from '@/components/SubmissionRow';
+import { AppText, EmptyState, Masthead, useAppTheme } from '@/components/ui';
+import { radius, space } from '@/constants/theme';
 import { useSubmissions } from '@/lib/SubmissionsContext';
 import type { Submission } from '@/types/submission';
 
-function verdictLabel(v: Submission['verdict']) {
-  if (v === 'credible') return 'Likely credible';
-  if (v === 'misleading') return 'Likely misleading';
-  return 'Uncertain';
-}
+type Filter = 'all' | Submission['verdict'] | 'disputed';
+
+const FILTERS: { value: Filter; label: string }[] = [
+  { value: 'all', label: 'All' },
+  { value: 'misleading', label: 'Misleading' },
+  { value: 'uncertain', label: 'Uncertain' },
+  { value: 'credible', label: 'Credible' },
+  { value: 'disputed', label: 'Disputed' },
+];
 
 export default function HistoryScreen() {
-  const colorScheme = useColorScheme() ?? 'light';
-  const theme = Colors[colorScheme];
-  const { submissions } = useSubmissions();
+  const { colors } = useAppTheme();
+  const { submissions, refreshSubmissions, loading, loadError } = useSubmissions();
   const router = useRouter();
+  const [filter, setFilter] = useState<Filter>('all');
+
+  useFocusEffect(useCallback(() => {
+    void refreshSubmissions().catch(() => undefined);
+  }, [refreshSubmissions]));
+
+  const visible = useMemo(() => submissions.filter((item) => {
+    if (filter === 'all') return true;
+    if (filter === 'disputed') return Boolean(item.dispute);
+    return item.verdict === filter;
+  }), [submissions, filter]);
 
   return (
-    <View style={[styles.root, { backgroundColor: theme.background }]}>
-      <FlatList
-        data={submissions}
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={submissions.length === 0 ? styles.emptyWrap : styles.list}
-        ListEmptyComponent={
-          <Text style={[styles.empty, { color: theme.muted }]}>
-            No checks yet. Run an analysis from the Check tab — items are kept for this session on
-            your device (wire up AsyncStorage or your API for persistence).
-          </Text>
-        }
-        renderItem={({ item }) => (
-          <Pressable
-            onPress={() => router.push(`/result/${item.id}`)}
-            style={({ pressed }) => [
-              styles.row,
-              { backgroundColor: theme.card, borderColor: theme.border, opacity: pressed ? 0.85 : 1 },
-            ]}>
-            <View style={styles.rowTop}>
-              <Text style={[styles.badge, { color: theme[item.verdict] }]}>{verdictLabel(item.verdict)}</Text>
-              <Text style={[styles.date, { color: theme.muted }]}>
-                {new Date(item.createdAt).toLocaleString()}
-              </Text>
-            </View>
-            <Text numberOfLines={2} style={{ color: theme.text, marginTop: 6 }}>
-              {item.textPreview || (item.imageUri ? 'Image submission' : 'Submission')}
-            </Text>
-            {item.dispute ? (
-              <Text style={{ color: theme.tint, marginTop: 8, fontSize: 12, fontWeight: '700' }}>
-                Dispute filed · admin review pending
-              </Text>
-            ) : null}
-            {item.adminReview ? (
-              <Text style={{ color: theme.credible, marginTop: 6, fontSize: 12, fontWeight: '700' }}>
-                Admin: {item.adminReview.resolution === 'uphold_ai' ? 'Uphold AI' : `Override → ${item.adminReview.overrideVerdict}`}
-              </Text>
-            ) : null}
-          </Pressable>
-        )}
-      />
-    </View>
+    <FlatList
+      style={{ backgroundColor: colors.background }}
+      data={visible}
+      keyExtractor={(item) => item.id}
+      contentContainerStyle={styles.content}
+      refreshControl={
+        <RefreshControl
+          refreshing={loading && submissions.length > 0}
+          onRefresh={() => void refreshSubmissions().catch(() => undefined)}
+          tintColor={colors.primary}
+        />
+      }
+      ListHeaderComponent={
+        <>
+          <Masthead
+            kicker="Your activity"
+            title="History"
+            subtitle={`${submissions.length} ${submissions.length === 1 ? 'check' : 'checks'} saved to your account.`}
+          />
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
+            {FILTERS.map((option) => {
+              const selected = option.value === filter;
+              return (
+                <Pressable
+                  key={option.value}
+                  onPress={() => setFilter(option.value)}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  style={[
+                    styles.chip,
+                    {
+                      backgroundColor: selected ? colors.text : colors.surface,
+                      borderColor: selected ? colors.text : colors.border,
+                    },
+                  ]}>
+                  <AppText variant="caption" color={selected ? colors.background : 'textMuted'} style={styles.chipText}>
+                    {option.label}
+                  </AppText>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+        </>
+      }
+      ItemSeparatorComponent={() => <View style={styles.separator} />}
+      ListEmptyComponent={
+        loadError ? (
+          <EmptyState icon="circle-alert" title="Could not load history" message={loadError}
+            actionLabel="Try again" onAction={() => void refreshSubmissions().catch(() => undefined)} />
+        ) : loading ? (
+          <EmptyState icon="history" title="Loading your checks…" loading />
+        ) : submissions.length === 0 ? (
+          <EmptyState icon="scan-search" title="No checks yet"
+            message="Run your first analysis from the Check tab." actionLabel="Start a check" onAction={() => router.push('/')} />
+        ) : (
+          <EmptyState icon="list" title="Nothing here" message="No checks match this filter." />
+        )
+      }
+      renderItem={({ item }) => (
+        <View style={styles.item}>
+          <SubmissionRow item={item} onPress={() => router.push(`/result/${item.id}`)} />
+        </View>
+      )}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  root: {
-    flex: 1,
-  },
-  list: {
-    padding: 16,
-    gap: 12,
-  },
-  emptyWrap: {
-    flexGrow: 1,
-    justifyContent: 'center',
-    padding: 24,
-  },
-  empty: {
-    textAlign: 'center',
-    fontSize: 15,
-    lineHeight: 22,
-  },
-  row: {
-    borderRadius: 14,
-    borderWidth: 1,
-    padding: 14,
-  },
-  rowTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    gap: 8,
-  },
-  badge: {
-    fontWeight: '700',
-    fontSize: 14,
-  },
-  date: {
-    fontSize: 12,
-  },
+  content: { paddingBottom: space.xxxl },
+  filters: { gap: space.sm, paddingHorizontal: space.lg, paddingVertical: space.lg },
+  chip: { borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: space.lg, paddingVertical: 8 },
+  chipText: { fontFamily: 'PlusJakartaSans_700Bold' },
+  item: { paddingHorizontal: space.lg },
+  separator: { height: space.sm },
 });

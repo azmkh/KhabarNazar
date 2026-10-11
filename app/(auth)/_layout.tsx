@@ -1,13 +1,20 @@
 import { Stack } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+
+import { useAppTheme } from '@/components/ui';
 
 export default function AuthLayout() {
+  const { colors } = useAppTheme();
   return (
-    <Stack
-      screenOptions={{
-        headerShown: false,
-        animation: 'fade',
-        contentStyle: { backgroundColor: '#0f766e' },
-      }}
-    />
+    <>
+      <StatusBar style="light" />
+      <Stack
+        screenOptions={{
+          headerShown: false,
+          animation: 'fade',
+          contentStyle: { backgroundColor: colors.ink },
+        }}
+      />
+    </>
   );
 }

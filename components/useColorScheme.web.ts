@@ -1,8 +1,12 @@
-// NOTE: The default React Native styling doesn't support server rendering.
-// Server rendered styles should not change between the first render of the HTML
-// and the first render on the client. Typically, web developers will use CSS media queries
-// to render different styles on the client and server, these aren't directly supported in React Native
-// but can be achieved using a styling library like Nativewind.
+import { useEffect, useState } from 'react';
+import { useColorScheme as useSystemColorScheme } from 'react-native';
+
+// The web build is pre-rendered to static HTML, where the user's colour scheme
+// is unknown. Render 'light' first so the server HTML and the first client
+// render match (avoiding a hydration mismatch), then follow the system setting.
 export function useColorScheme() {
-  return 'light';
+  const system = useSystemColorScheme();
+  const [hydrated, setHydrated] = useState(false);
+  useEffect(() => setHydrated(true), []);
+  return hydrated ? system : 'light';
 }

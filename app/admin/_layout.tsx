@@ -1,40 +1,31 @@
 import { Redirect, Stack } from 'expo-router';
-import { StatusBar } from 'expo-status-bar';
 
-import { useColorScheme } from '@/components/useColorScheme';
-
+import { useAppTheme } from '@/components/ui';
+import { fonts } from '@/constants/theme';
 import { useAuth } from '@/lib/AuthContext';
-import { isAdminEmail } from '@/lib/admin';
-
-const headerTeal = '#0d4f4a';
-const headerTint = '#f0fdfa';
 
 export default function AdminLayout() {
   const { user } = useAuth();
-  const scheme = useColorScheme();
+  const { colors } = useAppTheme();
 
-  if (!isAdminEmail(user?.email)) {
+  if (user?.role !== 'admin') {
     return <Redirect href="/(tabs)" />;
   }
 
   return (
-    <>
-      <StatusBar style="light" />
-      <Stack
-        screenOptions={{
-          headerStyle: { backgroundColor: headerTeal },
-          headerTintColor: headerTint,
-          headerTitleStyle: { fontWeight: '700', fontSize: 17 },
-          headerShadowVisible: false,
-          contentStyle: {
-            backgroundColor: scheme === 'dark' ? '#0f172a' : '#ecfdf5',
-          },
-        }}>
-        <Stack.Screen name="index" options={{ title: 'Admin · Overview' }} />
-        <Stack.Screen name="disputes" options={{ title: 'Dispute queue' }} />
-        <Stack.Screen name="submissions" options={{ title: 'All submissions' }} />
-        <Stack.Screen name="review/[id]" options={{ title: 'Review dispute' }} />
-      </Stack>
-    </>
+    <Stack
+      screenOptions={{
+        headerShadowVisible: false,
+        headerStyle: { backgroundColor: colors.background },
+        headerTintColor: colors.text,
+        headerTitleStyle: { fontFamily: fonts.bold, fontSize: 17 },
+        headerBackButtonDisplayMode: 'minimal',
+        contentStyle: { backgroundColor: colors.background },
+      }}>
+      <Stack.Screen name="index" options={{ headerShown: false, title: 'Moderation desk' }} />
+      <Stack.Screen name="disputes" options={{ title: 'Dispute queue' }} />
+      <Stack.Screen name="submissions" options={{ title: 'All submissions' }} />
+      <Stack.Screen name="review/[id]" options={{ title: 'Review dispute' }} />
+    </Stack>
   );
 }
