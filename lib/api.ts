@@ -76,6 +76,14 @@ export class ApiError extends Error {
   }
 }
 
+type UnauthorizedHandler = (failedToken: string) => void;
+let onUnauthorized: UnauthorizedHandler | null = null;
+
+/** Called (by AuthContext) when a request made with a token gets 401, i.e. the session expired. */
+export function setUnauthorizedHandler(handler: UnauthorizedHandler | null) {
+  onUnauthorized = handler;
+}
+
 function apiUrl(path: string) {
   if (!API_BASE_URL) {
     throw new Error('Backend URL is not configured. Set EXPO_PUBLIC_API_URL and restart Expo.');
@@ -99,6 +107,8 @@ async function request<T>(path: string, options: RequestInit = {}, token?: strin
   }
 
   if (!response.ok) {
+    // Login itself sends no token, so a wrong password never triggers a sign-out here.
+    if (response.status === 401 && token) onUnauthorized?.(token);
     let message = `Request failed (${response.status})`;
     try {
       const payload = await response.json();

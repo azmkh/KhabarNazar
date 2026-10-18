@@ -23,6 +23,11 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 1440
 
+    # Failed-login limits (per device+email, and per device across all emails)
+    LOGIN_MAX_FAILURES_PER_ACCOUNT: int = 5
+    LOGIN_MAX_FAILURES_PER_CLIENT: int = 20
+    LOGIN_LOCKOUT_MINUTES: int = 15
+
     # File uploads
     UPLOAD_DIR: str = str(BASE_DIR / "uploads")
     MAX_UPLOAD_SIZE_MB: int = 10

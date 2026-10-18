@@ -1,3 +1,4 @@
+from functools import lru_cache
 from typing import Optional
 from fastapi import HTTPException, status
 from sqlalchemy.exc import IntegrityError
@@ -51,10 +52,18 @@ def register_user(db: Session, user_in: UserCreate) -> User:
     return new_user
 
 
+@lru_cache(maxsize=1)
+def _dummy_password_hash() -> str:
+    return get_password_hash("not-a-real-password")
+
+
 def authenticate_user(db: Session, email: str, password: str) -> Optional[User]:
     """Authenticates credentials against stored password hash."""
     user = get_user_by_email(db, email)
     if not user:
+        # Spend the same bcrypt time as a real check, so response timing does
+        # not reveal whether an email is registered.
+        verify_password(password, _dummy_password_hash())
         return None
     if not verify_password(password, user.password_hash):
         return None

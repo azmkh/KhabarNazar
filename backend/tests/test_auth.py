@@ -126,7 +126,7 @@ def test_role_based_access_control():
     )
     user_token = login_user.json()["access_token"]
     forbidden_res = client.get(
-        "/users/admin-test",
+        "/admin/submissions",
         headers={"Authorization": f"Bearer {user_token}"},
     )
     assert forbidden_res.status_code == 403
@@ -142,17 +142,17 @@ def test_role_based_access_control():
     assert reg_admin.status_code == 201
     assert reg_admin.json()["user"]["role"] == "user"
     admin_token = reg_admin.json()["access_token"]
-    assert client.get("/users/admin-test", headers={"Authorization": f"Bearer {admin_token}"}).status_code == 403
+    assert client.get("/admin/submissions", headers={"Authorization": f"Bearer {admin_token}"}).status_code == 403
 
     # 3. Promote the account the same way scripts/set_user_role.py does.
     _set_role(admin_payload["email"], "admin")
 
     allowed_res = client.get(
-        "/users/admin-test",
+        "/admin/submissions",
         headers={"Authorization": f"Bearer {admin_token}"},
     )
     assert allowed_res.status_code == 200
-    assert allowed_res.json()["role"] == "admin"
+    assert client.get("/users/me", headers={"Authorization": f"Bearer {admin_token}"}).json()["role"] == "admin"
 
 
 def test_demoted_admin_loses_access_with_existing_token():
@@ -161,7 +161,7 @@ def test_demoted_admin_loses_access_with_existing_token():
         "/auth/login",
         json={"email": "officer+admin@example.com", "password": "AdminPassword123!"},
     ).json()["access_token"]
-    response = client.get("/users/admin-test", headers={"Authorization": f"Bearer {token}"})
+    response = client.get("/admin/submissions", headers={"Authorization": f"Bearer {token}"})
     assert response.status_code == 403
 
 

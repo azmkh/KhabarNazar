@@ -49,3 +49,17 @@ def _enforce_string_lengths(session, flush_context, instances):
                 raise AssertionError(
                     f"{obj.__tablename__}.{column.key} is limited to {limit} characters, got {len(value)}: {value!r}"
                 )
+
+
+import pytest  # noqa: E402
+
+
+@pytest.fixture(autouse=True)
+def _reset_login_limiter():
+    """Every test request comes from the same fake client, so failed logins in
+    one test must not lock out the next."""
+    from app.utils.login_limiter import login_limiter
+
+    login_limiter.clear()
+    yield
+    login_limiter.clear()

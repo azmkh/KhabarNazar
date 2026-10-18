@@ -317,6 +317,18 @@ model attention and does not establish image authenticity or claim truth.
   (`Fake`, `Real`, or `Uncertain`) and updates the submission's final label and
   label source. A dispute can only be reviewed once.
 
+**Failed-login limits.** After 5 wrong passwords for the same email from the
+same device (or 20 across any emails from one device) within 15 minutes,
+`POST /auth/login` answers `429` with a `Retry-After` header until the window
+passes; a successful login clears that email's count. Adjust with
+`LOGIN_MAX_FAILURES_PER_ACCOUNT`, `LOGIN_MAX_FAILURES_PER_CLIENT` and
+`LOGIN_LOCKOUT_MINUTES`. The counts are kept in memory, so they reset when the
+server restarts and are not shared between multiple server processes.
+
+**App sessions.** The app keeps the login token in the iOS Keychain / Android
+Keystore (`expo-secure-store`; browser storage on web). Any `401` on an
+authenticated request signs the user out and shows "Session expired".
+
 Registration always assigns the `user` role; clients cannot grant themselves
 admin access by setting a role or using a special email address. To promote an
 existing account from a trusted local environment, run this ORM-based command
