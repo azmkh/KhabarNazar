@@ -45,18 +45,29 @@ pip install -r requirements.txt
 
 ## 4. Configuring PostgreSQL
 
-1. Ensure your PostgreSQL service is installed and running.
-2. Create a dedicated database and user (or use default `postgres`):
-   ```sql
-   CREATE DATABASE khabarnazar;
-   CREATE USER khabarnazar_user WITH ENCRYPTED PASSWORD 'your_secure_password';
-   GRANT ALL PRIVILEGES ON DATABASE khabarnazar TO khabarnazar_user;
+1. Install PostgreSQL 17 (Windows, from an **Administrator** PowerShell), keeping
+   port 5432 and choosing a password for the `postgres` superuser:
+   ```powershell
+   winget install --id PostgreSQL.PostgreSQL.17 -e --interactive
    ```
-3. Set your connection string format:
+2. Create the app's own database user and databases, and point `.env` at them.
+   From `backend/` (after creating `.env` from `.env.example`, see section 5):
+   ```powershell
+   .\.venv\Scripts\python.exe scripts\setup_postgres.py
    ```
-   postgresql+psycopg://khabarnazar_user:your_secure_password@localhost:5432/khabarnazar
-   ```
-   *(Note: For local prototyping without PostgreSQL running, SQLite is also supported via `sqlite:///./khabarnazar.db`)*
+   It asks for the `postgres` password (used once, never saved), then creates a
+   non-superuser role `khabarnazar_app` with a random password, the databases
+   `khabarnazar` and `khabarnazar_test`, and writes `DATABASE_URL` and
+   `TEST_DATABASE_URL` into `.env` after saving a timestamped `.env.backup-*`
+   copy. Re-running it is safe (databases are kept; the role gets a new password).
+3. Create the tables with `alembic upgrade head` (section 6).
+
+By default PostgreSQL only accepts password logins from this computer, and
+Windows Firewall blocks port 5432 from other devices, so the database is not
+reachable from the network; the phone talks only to the FastAPI server.
+
+*(For quick prototyping without PostgreSQL, SQLite also works:
+`DATABASE_URL="sqlite:///./khabarnazar.db"`.)*
 
 ---
 
@@ -133,6 +144,16 @@ To run the automated test suite from the `backend/` directory:
 ```bash
 pytest
 ```
+
+That uses a temporary SQLite file. To run the same tests against PostgreSQL
+(the `TEST_DATABASE_URL` database created by `scripts/setup_postgres.py`):
+
+```bash
+pytest --postgres
+```
+
+The PostgreSQL test database is **wiped at the start of every run**, so the
+suite refuses any database whose name does not end in `_test`.
 
 Tests use an isolated SQLite database and do not write to your development PostgreSQL instance.
 The test schema is built by running the real Alembic migrations, and string

@@ -6,6 +6,9 @@ __pycache__/
 env/
 venv/
 .env
+# backups made by scripts/setup_postgres.py hold secrets too; only the template is shared
+.env.*
+!.env.example
 uploads/*
 !uploads/.gitkeep
 khabarnazar.db
