@@ -1,0 +1,10 @@
+# Datasets: downloaded by the notebook, too big for GitHub and owned by their authors
+data/
+# Merged CSV, splits and training checkpoints (re-created by the notebook)
+work/
+# Python virtual environment
+venv/
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/

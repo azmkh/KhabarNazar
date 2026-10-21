@@ -1,0 +1,22 @@
+# 1) Install PyTorch FIRST with the CUDA command from https://pytorch.org/get-started/locally/
+#    e.g.  pip install torch --index-url https://download.pytorch.org/whl/cu128
+#    (a plain "pip install torch" on Windows gives a CPU-only version: training would take days)
+# 2) Then:  pip install -r requirements.txt
+# 3) Then:  pip install urduhack --no-deps
+#    (--no-deps on purpose: urduhack's full install pins an old TensorFlow; only its normalization is used)
+transformers>=4.41
+datasets
+accelerate
+sentencepiece
+regex
+scikit-learn
+pandas
+numpy
+openpyxl
+matplotlib
+seaborn
+notebook
+ipykernel
+huggingface_hub
+# optional, for the SHAP figures in step 24:
+# shap

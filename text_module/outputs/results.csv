@@ -1,0 +1,9 @@
+,accuracy,f1_macro,f1_fake,precision_fake,recall_fake
+Length only (test),0.6009,0.5167,0.315,0.548,0.221
+Length only (external),0.5527,0.356,0.0,0.0,0.0
+TF-IDF char + LogReg (test),0.897,0.8942,0.877,0.8697,0.8845
+TF-IDF char + LogReg (external),0.5448,0.4974,0.343,0.4818,0.2663
+Punctuation only (test),0.795,0.7896,0.7558,0.748,0.7637
+XLM-R (test),0.9439,0.942,0.9315,0.9458,0.9176
+XLM-R (external),0.5594,0.5552,0.5118,0.5061,0.5176
+"XLM-R (external, whole article)",0.5448,0.4894,0.3211,0.48,0.2412

@@ -1,12 +1,20 @@
-"""Feature attribution for the project's word/character TF-IDF classifier."""
+"""Feature attribution for the text models.
+
+Urdu-script text handled by the XLM-RoBERTa model is explained by word occlusion
+(transformer_model.explain_with_transformer); everything else uses the TF-IDF model's weights.
+"""
 
 from __future__ import annotations
 
+import logging
 import re
 from typing import Any
 
-from app.ai.text.predict import load_text_model
+from app.ai.text.predict import load_text_model, uses_transformer
 from app.ai.text.preprocess import normalize_text
+from app.ai.text.transformer_model import explain_with_transformer
+
+logger = logging.getLogger(__name__)
 
 
 TOKEN_PATTERN = re.compile(r"\w+", flags=re.UNICODE)
@@ -19,6 +27,21 @@ def explain_text(text: str, top_k: int = 12) -> dict[str, Any]:
     is true or false. Offsets are intentionally omitted because Unicode
     normalization can change character positions.
     """
+    transformer = uses_transformer(text)
+    if transformer is not None:
+        try:
+            highlights = explain_with_transformer(transformer, text, top_k=top_k)
+            p_fake = transformer.fake_probabilities([transformer.clean(text)])[0]
+            label = "Fake" if p_fake >= 0.5 else "Real"
+            summary = (
+                f"The model predicted {label}. Highlights show how much removing each word changes the "
+                "model's output; they are not fact verification."
+                if highlights else f"The model predicted {label}, but it found no words to display."
+            )
+            return {"highlighted_words": highlights, "summary": summary, "is_stub": False}
+        except Exception:
+            logger.exception("Urdu transformer explanation failed; falling back to the TF-IDF model")
+
     bundle, reason = load_text_model()
     if bundle is None:
         return {

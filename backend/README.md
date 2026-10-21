@@ -354,3 +354,20 @@ backend are shown as unavailable rather than filled with demo scores.
 
 Password reset and server-side profile name/email editing are not implemented
 by the current API. Profile photos remain local to the device.
+
+## Urdu transformer text model
+
+Urdu-script text is classified by an XLM-RoBERTa model trained in `text_module/` (see its README).
+`app/ai/text/predict.py` uses it automatically when `models/text/xlmr/` contains the trained model; otherwise
+it falls back to the TF-IDF model above, or to `Uncertain`. Roman Urdu and English always use the TF-IDF path.
+
+To enable it in this backend environment:
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cu128   # use the command from pytorch.org
+pip install -r requirements.txt
+pip install urduhack --no-deps
+```
+
+`KHABARNAZAR_TEXT_TRANSFORMER_DIR` overrides the model folder. `tests/test_text_transformer.py` tests the
+routing with a fake model, so it needs neither torch nor the model files.
