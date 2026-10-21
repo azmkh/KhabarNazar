@@ -1,0 +1,17 @@
+# Dataset files: full article text, not ours to redistribute
+data/*.csv
+data/*.xlsx
+data/splits/
+
+# Model weights and training checkpoints (about 1 GB each)
+model/
+checkpoints/
+*.safetensors
+*.bin
+*.pt
+
+# Python / Jupyter
+__pycache__/
+.ipynb_checkpoints/
+.venv/
+venv/

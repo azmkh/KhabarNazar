@@ -1,0 +1,80 @@
+{
+  "model": "xlm-roberta-base",
+  "gpu": "Tesla T4",
+  "settings": {
+    "max_len": 512,
+    "batch_size": 8,
+    "grad_accum": 2,
+    "learning_rate": 2e-05,
+    "max_epochs": 5,
+    "seed": 42
+  },
+  "epochs_trained": 5.0,
+  "best_checkpoint": "/content/checkpoints/checkpoint-2070",
+  "validation": {
+    "eval_loss": 0.5219,
+    "eval_accuracy": 0.8402,
+    "eval_f1_macro": 0.8401,
+    "eval_precision_fake": 0.8228,
+    "eval_recall_fake": 0.8518,
+    "eval_f1_fake": 0.837
+  },
+  "test_xlmr": {
+    "all": {
+      "accuracy": 0.8329,
+      "f1_macro": 0.8329,
+      "n": 826
+    },
+    "ax_to_grind": {
+      "accuracy": 0.8381,
+      "f1_macro": 0.8381,
+      "n": 247
+    },
+    "bend_the_truth": {
+      "accuracy": 0.6629,
+      "f1_macro": 0.6619,
+      "n": 89
+    },
+    "fire": {
+      "accuracy": 0.7571,
+      "f1_macro": 0.7216,
+      "n": 70
+    },
+    "hook_and_bait": {
+      "accuracy": 0.8786,
+      "f1_macro": 0.8783,
+      "n": 420
+    }
+  },
+  "test_baseline_tfidf_lr": {
+    "all": {
+      "accuracy": 0.8208,
+      "f1_macro": 0.8204,
+      "n": 826
+    },
+    "ax_to_grind": {
+      "accuracy": 0.7935,
+      "f1_macro": 0.7934,
+      "n": 247
+    },
+    "bend_the_truth": {
+      "accuracy": 0.6629,
+      "f1_macro": 0.6577,
+      "n": 89
+    },
+    "fire": {
+      "accuracy": 0.6714,
+      "f1_macro": 0.6234,
+      "n": 70
+    },
+    "hook_and_bait": {
+      "accuracy": 0.8952,
+      "f1_macro": 0.8952,
+      "n": 420
+    }
+  },
+  "versions": {
+    "torch": "2.11.0+cu130",
+    "transformers": "5.20.1"
+  }
+}
