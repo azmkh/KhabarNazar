@@ -50,9 +50,15 @@ that setting from the saved model, so the app cleans text the same way.
 from removing one word at a time and measuring how the model's output changes. Roman Urdu and English still go to the
 TF-IDF model or return "Uncertain" until the Roman Urdu model is trained.
 
-## Model file (not in the repo)
-`models/text/xlmr/` is about 1 GB, over GitHub's 100 MB limit, so it is ignored by git. Re-create it by running the
-notebook, or share it with `scripts/upload_model.py` / `scripts/download_model.py` (private Hugging Face repo).
+## Model file (on the Releases page, not in the folders)
+`models/text/xlmr/` is about 1.1 GB, over GitHub's 100 MB limit for normal files, so git ignores that folder. The trained
+model is attached to the GitHub Release **text-model-v1** (repo page -> **Releases**). To put it where the backend
+looks for it, run from the repo root:
+```
+python text_module/scripts/download_model_from_release.py
+```
+Files: `model.safetensors`, `config.json`, `tokenizer.json`, `tokenizer_config.json`, `khabarnazar_config.json`.
+A copy is also in Google Drive (`KhabarNazar_models/xlmr`). Re-create it from scratch by running the notebook.
 
 ## Setup (Windows)
 ```
