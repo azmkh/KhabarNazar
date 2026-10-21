@@ -1,0 +1,6 @@
+source,n,tfidf_lr_f1,colab_xlmr_f1,gpu_run2_f1,change_vs_colab
+ALL,826,0.8204,0.8329,0.825,-0.008
+ax_to_grind,247,0.7934,0.8381,0.797,-0.041
+bend_the_truth,89,0.6577,0.6619,0.652,-0.01
+fire,70,0.6234,0.7216,0.728,0.006
+hook_and_bait,420,0.8952,0.8783,0.89,0.012
