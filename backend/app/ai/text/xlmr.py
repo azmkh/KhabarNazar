@@ -32,7 +32,7 @@ MODEL_VERSION = {"urdu": "xlmr-urdu", "roman": "xlmr-roman-urdu"}
 
 
 def max_length() -> int:
-    return int(os.environ.get("KHABARNAZAR_XLMR_MAX_LEN", "256"))
+    return int(os.environ.get("KHABARNAZAR_XLMR_MAX_LEN", "512"))  # Roman Urdu model was trained on 512 tokens
 
 
 def model_dir(script: str) -> Path:
