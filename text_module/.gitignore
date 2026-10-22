@@ -1,12 +1,19 @@
-# Datasets - download them from the links in README.md
-**/data/
-# Training checkpoints (folders inside outputs/) and XLM-R models (~1 GB each)
-**/outputs/*/
-**/outputs_parallel/
+# Datasets: full article text, not ours to redistribute
+**/data/*
+!**/data/README.md
+# Model weights and training checkpoints (~1 GB each)
 **/models/xlmr/
+**/models/*_best/
+**/model/
+**/checkpoints/
+**/outputs/*/
 **/urdu_text_module/
+*.safetensors
+*.bin
+*.pt
 # Python / Jupyter
 venv/
+.venv/
 __pycache__/
 *.pyc
 .ipynb_checkpoints/

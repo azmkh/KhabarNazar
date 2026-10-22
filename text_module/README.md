@@ -62,14 +62,14 @@ The backend loads the models from these folders (`backend/app/ai/text/`).
 |---|---|---|---|
 | Urdu script, up to 150 words | **XLM-R base (E1)**, trained on Hook and Bait | `urdu/models/xlmr/` | 0.974 (Hook and Bait test) |
 | Urdu script, over 150 words | TF-IDF + Logistic Regression, trained on FIRE 2021 | `urdu/models/tfidf_long_articles.joblib` | 0.639 (FIRE 2021 test) |
-| Roman Urdu | XLM-R base, trained on the KhabarNazar Roman Urdu dataset | `roman_urdu/models/xlmr/` | see below |
+| Roman Urdu | XLM-R base, trained on the KhabarNazar Roman Urdu dataset | `roman_urdu/models/xlmr/` | 0.833 (Roman Urdu test) |
 
 Long Urdu articles use TF-IDF because every XLM-R model scored 0.30-0.51 on FIRE 2021, while TF-IDF scored 0.64-0.67 (the published best is 0.679). E1 given only an article's first 40 words scored 0.436.
 
 **Download the XLM-R folders** from: *(add the Google Drive / Hugging Face link here)* and place them in `urdu/models/xlmr/` and `roman_urdu/models/xlmr/`.
 
 # Roman Urdu (`roman_urdu/`)
-*(to be added: Roman Urdu notebooks, results and model details)*
+See [roman_urdu/README.md](roman_urdu/README.md): XLM-R fine-tuned on the KhabarNazar Roman Urdu dataset (8,267 articles), test macro-F1 **0.833** vs 0.820 for the TF-IDF baseline. Near-duplicate articles are kept in the same split.
 
 ## Setup
 ```
