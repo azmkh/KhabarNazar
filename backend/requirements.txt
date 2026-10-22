@@ -14,9 +14,14 @@ pillow>=10.0.0
 pandas>=2.2.0
 openpyxl>=3.1.2
 opencv-python-headless>=4.10.0.84
-scikit-learn>=1.5.0
+scikit-learn==1.9.1  # must match the version the .joblib text model was saved with
 joblib>=1.4.2
 easyocr>=1.7.2
 requests>=2.31.0
 httpx>=0.27.0
 pytest>=8.1.0
+# Text models (XLM-R). CPU-only torch is enough for the server:
+#   pip install torch --index-url https://download.pytorch.org/whl/cpu
+torch>=2.2
+transformers>=4.40
+sentencepiece>=0.2.0

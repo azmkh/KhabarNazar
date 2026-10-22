@@ -1,0 +1,41 @@
+model,trained_on,tested_on,accuracy,macro_P,macro_R,macro_F1,F1_fake,F1_real
+TF-IDF + LR,Hook and Bait,Hook and Bait test,0.9574,0.9573,0.9571,0.9572,0.9543,0.9601
+Length-only,Hook and Bait,Hook and Bait test,0.5901,0.5871,0.5852,0.5848,0.5382,0.6315
+TF-IDF + LR,Hook and Bait,Ax-to-Grind test,0.6273,0.6303,0.6232,0.6202,0.5684,0.672
+Length-only,Hook and Bait,Ax-to-Grind test,0.402,0.3665,0.4125,0.3528,0.5313,0.1742
+TF-IDF + LR,Hook and Bait,FIRE 2021 test,0.6633,0.5827,0.5325,0.5013,0.2171,0.7856
+Length-only,Hook and Bait,FIRE 2021 test,0.3333,0.1667,0.5,0.25,0.5,0.0
+TF-IDF + LR,Ax-to-Grind,Hook and Bait test,0.6379,0.6453,0.6431,0.6374,0.6508,0.6241
+Length-only,Ax-to-Grind,Hook and Bait test,0.4816,0.3835,0.4556,0.3663,0.096,0.6366
+TF-IDF + LR,Ax-to-Grind,Ax-to-Grind test,0.8941,0.8946,0.8935,0.8939,0.8886,0.8991
+Length-only,Ax-to-Grind,Ax-to-Grind test,0.4696,0.4682,0.4683,0.4681,0.44,0.4963
+TF-IDF + LR,Ax-to-Grind,FIRE 2021 test,0.4867,0.4889,0.4875,0.4732,0.3889,0.5575
+Length-only,Ax-to-Grind,FIRE 2021 test,0.3333,0.1667,0.5,0.25,0.5,0.0
+TF-IDF + LR,FIRE 2021,Hook and Bait test,0.5106,0.4799,0.4887,0.4353,0.2291,0.6415
+Length-only,FIRE 2021,Hook and Bait test,0.4655,0.2716,0.4983,0.3179,0.6352,0.0005
+TF-IDF + LR,FIRE 2021,Ax-to-Grind test,0.5619,0.5687,0.5535,0.5319,0.4133,0.6505
+Length-only,FIRE 2021,Ax-to-Grind test,0.4077,0.2202,0.4229,0.2896,0.5792,0.0
+TF-IDF + LR,FIRE 2021,FIRE 2021 test,0.76,0.7907,0.6575,0.6679,0.493,0.8428
+Length-only,FIRE 2021,FIRE 2021 test,0.5667,0.6264,0.63,0.5665,0.5578,0.5752
+XLM-R base,Hook and Bait,Hook and Bait test,0.9739,0.974,0.9736,0.9738,0.972,0.9756
+XLM-R base,Hook and Bait,Ax-to-Grind test,0.6498,0.653,0.6517,0.6495,0.6601,0.6388
+XLM-R base,Hook and Bait,FIRE 2021 test,0.3533,0.4911,0.4975,0.3038,0.4895,0.1182
+XLM-R base,Hook and Bait,Ax-to-Grind length-matched,0.6022,0.6022,0.6022,0.6022,0.6031,0.6013
+XLM-R base,Ax-to-Grind,Hook and Bait test,0.6884,0.6931,0.6923,0.6884,0.6926,0.6842
+XLM-R base,Ax-to-Grind,Ax-to-Grind test,0.9167,0.9187,0.9155,0.9163,0.9108,0.9218
+XLM-R base,Ax-to-Grind,FIRE 2021 test,0.36,0.5082,0.5025,0.3136,0.4921,0.1351
+XLM-R base,Ax-to-Grind,Ax-to-Grind length-matched,0.8689,0.871,0.8689,0.8687,0.8637,0.8737
+XLM-R base (H&B → FIRE),Hook and Bait + FIRE 2021,Hook and Bait test,0.9568,0.9601,0.9546,0.9564,0.9522,0.9606
+XLM-R base (H&B → FIRE),Hook and Bait + FIRE 2021,Ax-to-Grind test,0.6419,0.6611,0.6348,0.6236,0.5405,0.7066
+XLM-R base (H&B → FIRE),Hook and Bait + FIRE 2021,FIRE 2021 test,0.6867,0.6773,0.545,0.5042,0.2034,0.805
+XLM-R base (H&B → FIRE),Hook and Bait + FIRE 2021,Ax-to-Grind length-matched,0.6356,0.6492,0.6356,0.627,0.5707,0.6834
+"XLM-R (H&B → FIRE, lr2e-5 ×8)",Hook and Bait + FIRE 2021,Hook and Bait test,0.9476,0.9514,0.9451,0.9471,0.9418,0.9524
+"XLM-R (H&B → FIRE, lr2e-5 ×8)",Hook and Bait + FIRE 2021,Ax-to-Grind test,0.6565,0.6782,0.6495,0.6391,0.5599,0.7184
+"XLM-R (H&B → FIRE, lr2e-5 ×8)",Hook and Bait + FIRE 2021,FIRE 2021 test,0.6733,0.6498,0.5175,0.4467,0.0926,0.8008
+"XLM-R (H&B → FIRE, lr2e-5 ×8)",Hook and Bait + FIRE 2021,Ax-to-Grind length-matched,0.6667,0.6785,0.6667,0.661,0.6173,0.7047
+XLM-R (FIRE only),FIRE 2021,Hook and Bait test,0.6012,0.6105,0.586,0.5698,0.4536,0.686
+XLM-R (FIRE only),FIRE 2021,Ax-to-Grind test,0.5631,0.5667,0.5558,0.5407,0.4393,0.6421
+XLM-R (FIRE only),FIRE 2021,FIRE 2021 test,0.69,0.6975,0.5475,0.5063,0.2051,0.8075
+XLM-R (FIRE only),FIRE 2021,Ax-to-Grind length-matched,0.6244,0.6343,0.6244,0.6174,0.5656,0.6693
+XLM-R base,Hook and Bait,H&B test — no marker words,0.9729,0.9728,0.9715,0.9722,0.9677,0.9766
+XLM-R base,Hook and Bait,H&B test — markers removed,0.9707,0.9709,0.9703,0.9706,0.9685,0.9727

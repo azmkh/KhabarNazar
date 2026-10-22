@@ -1,0 +1,12 @@
+# Install PyTorch first (CUDA build), e.g.:
+#   pip install torch --index-url https://download.pytorch.org/whl/cu128
+transformers
+datasets
+accelerate
+sentencepiece
+scikit-learn==1.9.1   # must match backend/requirements.txt so the .joblib model loads
+pandas
+openpyxl
+matplotlib
+joblib
+jupyter

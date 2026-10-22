@@ -51,3 +51,6 @@ dataset/**
 # local databases
 *.db
 *.sqlite3
+
+# XLM-R text model folders (~1 GB each) are downloaded separately, see text_module/README.md
+text_module/*/models/xlmr/

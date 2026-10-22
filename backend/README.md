@@ -148,7 +148,7 @@ All submission routes require a Bearer JWT from `POST /auth/login` or `POST /aut
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `POST` | `/submissions/text` | Save Urdu / Roman Urdu text. AI prediction is a stub until Stage 5. |
+| `POST` | `/submissions/text` | Save Urdu / Roman Urdu text and classify it (Stage 5 models). |
 | `POST` | `/submissions/image` | Upload JPEG, PNG, or WEBP (max 10 MB). Stored under `backend/uploads/` with a generated filename. |
 | `GET` | `/submissions` | Current user's history, newest first (`skip`, `limit`). |
 | `GET` | `/submissions/{submission_id}` | Full record for a submission owned by the current user. |
@@ -221,27 +221,49 @@ important data; source files remain untouched. Generated files are written to
 `dataset/train/train.csv`, `dataset/validation/validation.csv`, and
 `dataset/test/test.csv`, replacing those generated split files on rerun.
 
-### Stage 5: text model
+### Stage 5: text models
 
-The text classifier uses word and character TF-IDF features with logistic
-regression. Word features cover Urdu and Roman Urdu tokens; character features
-help with spelling variation in transliterated Urdu. Training data must already
-contain real binary labels. The label strings are supplied explicitly so the
-script does not guess their meaning.
+Three models are used, picked per input by `app/ai/text/predict.py`:
 
-From `backend/`, after preparing the workbook splits and confirming the actual
-column and label values:
+| Input | Model | Location | Score (macro-F1) |
+|---|---|---|---|
+| Urdu script, up to 150 words | XLM-R base, trained on Hook and Bait | `text_module/urdu/models/xlmr/` | 0.974 (Hook and Bait test) |
+| Urdu script, longer than 150 words | Word + character TF-IDF + Logistic Regression, trained on FIRE 2021 | `text_module/urdu/models/tfidf_long_articles.joblib` | 0.639 (FIRE 2021 test) |
+| Latin letters (Roman Urdu) | XLM-R base, trained on the KhabarNazar Roman Urdu dataset | `text_module/roman_urdu/models/xlmr/` | see `text_module/README.md` |
 
-```bash
-python scripts/train_text_model.py --text-column ACTUAL_TEXT_COLUMN --label-column ACTUAL_LABEL_COLUMN --fake-label ACTUAL_FAKE_VALUE --real-label ACTUAL_REAL_VALUE
+Training and evaluation notebooks are in `text_module/urdu/` and `text_module/roman_urdu/`.
+
+**Setup.** The XLM-R folders are ~1 GB each and are not in git. Download them
+(link in `text_module/README.md`) so the layout is:
+
+```
+text_module/
+   urdu/models/xlmr/                          config.json, model.safetensors, tokenizer files
+   urdu/models/tfidf_long_articles.joblib     long-article TF-IDF model (in git)
+   roman_urdu/models/xlmr/                    config.json, model.safetensors, tokenizer files
 ```
 
-The script evaluates against validation and test splits and writes
-`models/text/text_classifier.joblib`. The API loads that file automatically;
-set `KHABARNAZAR_TEXT_MODEL_PATH` to use a different artifact path. Until a
-trained artifact exists, API results remain `Uncertain` with `is_stub: true`.
-Only train on data you are authorized to use, and inspect the reported test
-metrics before presenting this model as reliable.
+Then install the ML packages (CPU-only torch is enough for the server):
+
+```bash
+pip install torch --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements.txt
+```
+
+If a model is missing, the next available one is used; with no model at all,
+results stay `Uncertain` with `is_stub: true`. Paths and the long-text limit
+can be changed with `KHABARNAZAR_URDU_XLMR_DIR`, `KHABARNAZAR_ROMAN_XLMR_DIR`,
+`KHABARNAZAR_TEXT_MODEL_PATH` and `KHABARNAZAR_LONG_TEXT_WORDS`. If a model's
+`config.json` labels are `LABEL_0`/`LABEL_1` instead of `real`/`fake`, the Fake
+class is assumed to be index 1 (change with `KHABARNAZAR_URDU_FAKE_INDEX` /
+`KHABARNAZAR_ROMAN_FAKE_INDEX`).
+
+`scripts/train_text_model.py` still trains a TF-IDF model from the workbook
+splits (it writes `models/text/text_classifier.joblib`; point
+`KHABARNAZAR_TEXT_MODEL_PATH` at it to use it). The `.joblib` file must
+be loaded with the same scikit-learn version it was saved with (pinned in
+`requirements.txt`). Inspect the reported test metrics before presenting a
+model as reliable.
 
 ### Stage 6: OCR and image analysis
 
@@ -294,8 +316,10 @@ authenticity or news truth.
 When the trained Stage 5 text model is present, API results include a JSON
 string in `explainability.highlighted_words`. Each entry has a `word`, a signed
 `contribution`, and a `direction` (`supports_prediction` or
-`opposes_prediction`). These are feature attributions from the model, not
-fact-check evidence. The explanation summary states this limitation. With no
+`opposes_prediction`). For the TF-IDF model these come from its
+weights; for the XLM-R models each word is removed in turn and the change in the
+model's output is measured (up to 40 distinct words). These are feature
+attributions from the model, not fact-check evidence. The explanation summary states this limitation. With no
 trained model, highlights remain `null` and the API explains why.
 
 `app.ai.image.explain.save_attribution_heatmap(...)` can render a heatmap from a

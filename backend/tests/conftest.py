@@ -24,6 +24,8 @@ os.environ["UPLOAD_DIR"] = str(TEST_UPLOADS)
 os.environ["ENVIRONMENT"] = "test"
 # Never pick up a locally trained model during tests unless a test opts in.
 os.environ["KHABARNAZAR_TEXT_MODEL_PATH"] = str(TEST_DIR / "_no_model.joblib")
+os.environ["KHABARNAZAR_URDU_XLMR_DIR"] = str(TEST_DIR / "_no_urdu_xlmr")
+os.environ["KHABARNAZAR_ROMAN_XLMR_DIR"] = str(TEST_DIR / "_no_roman_xlmr")
 
 from alembic import command  # noqa: E402
 from alembic.config import Config  # noqa: E402
