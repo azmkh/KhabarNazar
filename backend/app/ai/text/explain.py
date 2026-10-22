@@ -11,6 +11,7 @@ because Unicode normalization can change character positions.
 
 from __future__ import annotations
 
+import math
 import re
 from typing import Any, Optional
 
@@ -103,10 +104,18 @@ def _explain_xlmr(classifier, text: str, top_k: int) -> tuple[list[dict], str]:
         for word in words
     ]
     occluded_fake = classifier.fake_probabilities(variants)
-    # Positive = removing the word lowers the probability of the predicted label,
+    # Compare log-odds, not raw probabilities: when the model is 99.99% sure,
+    # removing a word barely moves the probability but clearly moves the log-odds.
+    # Positive = removing the word makes the predicted label less likely,
     # i.e. the word supported the prediction.
-    totals = {word: sign * (base_fake - fake) for word, fake in zip(words, occluded_fake)}
+    base_logit = _logit(base_fake)
+    totals = {word: sign * (base_logit - _logit(fake)) for word, fake in zip(words, occluded_fake)}
     return _highlights(totals, top_k), label
+
+
+def _logit(probability: float) -> float:
+    probability = min(max(probability, 1e-6), 1 - 1e-6)
+    return math.log(probability / (1 - probability))
 
 
 def explain_text(text: str, top_k: int = 12, language: Optional[str] = None) -> dict[str, Any]:
@@ -121,7 +130,7 @@ def explain_text(text: str, top_k: int = 12, language: Optional[str] = None) -> 
 
     if kind == "xlmr":
         highlights, label = _explain_xlmr(model, text, top_k)
-        method = "Highlights show how much removing each word changes the model's output"
+        method = "Highlights show how much removing each word changes the model's output (in log-odds)"
     else:
         highlights, label = _explain_tfidf(model, text, top_k)
         method = "Highlights show tokens that most influenced this model output"

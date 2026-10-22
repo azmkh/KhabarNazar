@@ -66,7 +66,7 @@ The backend loads the models from these folders (`backend/app/ai/text/`).
 
 Long Urdu articles use TF-IDF because every XLM-R model scored 0.30-0.51 on FIRE 2021, while TF-IDF scored 0.64-0.67 (the published best is 0.679). E1 given only an article's first 40 words scored 0.436.
 
-**Download the XLM-R folders** from: *(add the Google Drive / Hugging Face link here)* and place them in `urdu/models/xlmr/` and `roman_urdu/models/xlmr/`.
+**Download the XLM-R models** from this repo's [Releases](https://github.com/azmkh/KhabarNazar/releases) by running `python text_module/download_models.py` from the repo root. It puts them in `urdu/models/xlmr/` and `roman_urdu/models/xlmr/`.
 
 # Roman Urdu (`roman_urdu/`)
 See [roman_urdu/README.md](roman_urdu/README.md): XLM-R fine-tuned on the KhabarNazar Roman Urdu dataset (8,267 articles), test macro-F1 **0.833** vs 0.820 for the TF-IDF baseline. Near-duplicate articles are kept in the same split.
