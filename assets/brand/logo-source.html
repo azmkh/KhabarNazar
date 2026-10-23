@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+  html, body { margin: 0; padding: 0; background: transparent; }
+  svg { display: block; }
+  .page { display: none; }
+  .page.on { display: block; }
+</style>
+</head>
+<body>
+<!--
+  KhabarNazar mark: a scan frame (four corners) around a magnifying glass, the same
+  "scan + search" idea as the in-app brand tile. Variants are selected with ?v=...
+-->
+<svg width="0" height="0" style="position:absolute">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#4F46E5"/>
+      <stop offset="0.55" stop-color="#6D28D9"/>
+      <stop offset="1" stop-color="#A21CAF"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="0.28" cy="0.22" r="0.75">
+      <stop offset="0" stop-color="#FFFFFF" stop-opacity="0.28"/>
+      <stop offset="0.6" stop-color="#FFFFFF" stop-opacity="0"/>
+    </radialGradient>
+    <g id="glyph" fill="none" stroke="#FFFFFF" stroke-linecap="round" stroke-linejoin="round">
+      <!-- scan frame corners -->
+      <path stroke-width="58" d="M300 400 V330 a30 30 0 0 1 30 -30 H400"/>
+      <path stroke-width="58" d="M624 300 H694 a30 30 0 0 1 30 30 V400"/>
+      <path stroke-width="58" d="M724 624 V694 a30 30 0 0 1 -30 30 H624"/>
+      <path stroke-width="58" d="M400 724 H330 a30 30 0 0 1 -30 -30 V624"/>
+      <!-- magnifying glass -->
+      <circle cx="494" cy="494" r="112" stroke-width="54"/>
+      <path stroke-width="62" d="M576 576 L646 646"/>
+    </g>
+  </defs>
+</svg>
+
+<!-- App icon: full-bleed square (iOS rounds the corners itself) -->
+<div class="page" id="icon">
+  <svg width="1024" height="1024" viewBox="0 0 1024 1024">
+    <rect width="1024" height="1024" fill="url(#bg)"/>
+    <rect width="1024" height="1024" fill="url(#glow)"/>
+    <use href="#glyph"/>
+  </svg>
+</div>
+
+<!-- Android adaptive icon foreground: glyph only, inside the 66% safe zone, transparent -->
+<div class="page" id="adaptive">
+  <svg width="1024" height="1024" viewBox="0 0 1024 1024">
+    <g transform="translate(512 512) scale(0.82) translate(-512 -512)"><use href="#glyph"/></g>
+  </svg>
+</div>
+
+<!-- Splash image: the rounded logo tile, transparent around it (splash background is set in app.json) -->
+<div class="page" id="splash">
+  <svg width="1024" height="1024" viewBox="0 0 1024 1024">
+    <rect x="112" y="112" width="800" height="800" rx="200" fill="url(#bg)"/>
+    <rect x="112" y="112" width="800" height="800" rx="200" fill="url(#glow)"/>
+    <rect x="112" y="112" width="800" height="800" rx="200" fill="none" stroke="#FFFFFF" stroke-opacity="0.35" stroke-width="10"/>
+    <g transform="translate(512 512) scale(0.78) translate(-512 -512)"><use href="#glyph"/></g>
+  </svg>
+</div>
+
+<!-- Favicon: rounded tile -->
+<div class="page" id="favicon">
+  <svg width="1024" height="1024" viewBox="0 0 1024 1024">
+    <rect width="1024" height="1024" rx="230" fill="url(#bg)"/>
+    <g transform="translate(512 512) scale(1.12) translate(-512 -512)"><use href="#glyph"/></g>
+  </svg>
+</div>
+
+<script>
+  const v = new URLSearchParams(location.search).get('v') || 'icon';
+  document.getElementById(v).classList.add('on');
+</script>
+</body>
+</html>

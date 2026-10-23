@@ -7,6 +7,7 @@ Security measures applied:
 - UUID-based filename prevents guessing and collisions
 - Path traversal prevented by using Path.resolve()
 - File size enforced before writing to disk
+- Pixel count capped (decompression bombs) and the image fully decoded before it is stored
 """
 import os
 import uuid
@@ -42,8 +43,6 @@ def _detect_image_mime(data: bytes) -> str:
     try:
         img = PILImage.open(io.BytesIO(data))
         fmt = (img.format or "").lower()
-        # open() only reads the header; verify() checks the file is not truncated/corrupt.
-        img.verify()
         mapping = {"jpeg": "image/jpeg", "jpg": "image/jpeg", "png": "image/png", "webp": "image/webp"}
         mime = mapping.get(fmt)
         if not mime:
@@ -51,6 +50,17 @@ def _detect_image_mime(data: bytes) -> str:
                 status_code=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE,
                 detail=f"Unsupported image format '{fmt}'. Accepted: JPEG, PNG, WEBP.",
             )
+        # open() only reads the header, so the size is known before any pixels are decoded.
+        width, height = img.size
+        if width * height > settings.MAX_IMAGE_PIXELS:
+            raise HTTPException(
+                status_code=status.HTTP_413_CONTENT_TOO_LARGE,
+                detail="Image dimensions are too large to analyze.",
+            )
+        # verify() checks the file structure; a full decode catches truncated or corrupt pixel data.
+        img.verify()
+        with PILImage.open(io.BytesIO(data)) as decoded:
+            decoded.load()
         return mime
     except HTTPException:
         raise
@@ -78,7 +88,7 @@ def save_upload(upload: UploadFile) -> Tuple[str, str, int, str]:
 
     if file_size > MAX_BYTES:
         raise HTTPException(
-            status_code=status.HTTP_413_REQUEST_ENTITY_TOO_LARGE,
+            status_code=status.HTTP_413_CONTENT_TOO_LARGE,
             detail=f"File is larger than the maximum allowed size of {settings.MAX_UPLOAD_SIZE_MB} MB.",
         )
 

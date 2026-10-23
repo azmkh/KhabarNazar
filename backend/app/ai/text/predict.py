@@ -1,91 +1,89 @@
-"""Text classifier interface with an explicit unavailable-model fallback."""
+"""Language-aware routing to the separately trained Urdu and Roman Urdu XLM-R models."""
 
 from __future__ import annotations
 
 import logging
-import os
-from functools import lru_cache
-from pathlib import Path
 from typing import Optional
 
-try:
-    import joblib
-except ImportError:  # Keep the API's explicit stub usable before ML deps are installed.
-    joblib = None
-
+from app.ai.text import xlmr
 from app.ai.text.language_detection import detect_language
-from app.ai.text.preprocess import normalize_text
 
 logger = logging.getLogger(__name__)
-
-DEFAULT_MODEL_PATH = Path(__file__).resolve().parents[4] / "models" / "text" / "text_classifier.joblib"
-# Stored in Explainability.model_version so clients can tell real results from placeholders.
 UNAVAILABLE_MODEL_VERSION = "text-model-unavailable"
+SUPPORTED_TEXT_LANGUAGES = {"urdu", "roman_urdu"}
 
 
-def _model_path() -> Path:
-    return Path(os.environ.get("KHABARNAZAR_TEXT_MODEL_PATH", str(DEFAULT_MODEL_PATH))).expanduser()
-
-
-@lru_cache(maxsize=2)
-def _load_model(path: str, modified_at: int):
-    # Include mtime in the cache key so replacing a trained model activates it.
-    del modified_at
-    return joblib.load(path)
-
-
-def load_text_model() -> tuple[Optional[dict], Optional[str]]:
-    """Return (model bundle, None) or (None, reason it is unavailable)."""
-    model_path = _model_path()
-    if not model_path.is_file():
-        return None, "Text model not connected. Train it with the project dataset before using predictions."
-    if joblib is None:
-        return None, "Text model artifact exists, but joblib is not installed in the backend environment."
-    try:
-        return _load_model(str(model_path.resolve()), model_path.stat().st_mtime_ns), None
-    except Exception:
-        # e.g. scikit-learn missing or the artifact is corrupt / from an incompatible version.
-        logger.exception("Could not load text model from %s", model_path)
-        return None, "Text model artifact could not be loaded. Check the backend log and retrain if needed."
-
-
-def _unavailable(reason: str) -> dict:
+def _unavailable(language: str, reason: str) -> dict:
     return {
         "prediction": "Uncertain",
         "confidence": None,
         "fake_probability": None,
         "summary": reason,
         "model_version": UNAVAILABLE_MODEL_VERSION,
+        "detected_language": language,
         "is_stub": True,
+        "status": "unavailable",
+        "input_truncated": False,
     }
+
+
+def classifier_for_language(language: str):
+    """Return a supported language's classifier without routing English to Roman Urdu."""
+    script = xlmr.LANGUAGE_TO_MODEL.get(language)
+    if script is None:
+        return None, None, None
+    try:
+        classifier, reason = xlmr.get_classifier(script)
+    except Exception:
+        logger.exception("Could not initialize %s XLM-R classifier", script)
+        return script, None, "The trained text model could not be initialized. Check backend logs."
+    return script, classifier, reason
 
 
 def predict_text(text: str, language: Optional[str] = None) -> dict:
-    """Run the trained classifier, or return a clearly marked unavailable result.
+    """Run real inference for detected Urdu/Roman Urdu; report other input unavailable.
 
-    - confidence: probability of the predicted label (how sure the model is).
-    - fake_probability: probability of "Fake"; this, not confidence, is the risk.
+    `language` is accepted for existing callers, but detector output remains authoritative
+    so OCR tags such as `en`/`ur` cannot route text to an incompatible checkpoint.
     """
-    bundle, reason = load_text_model()
-    if bundle is None:
-        return _unavailable(reason)
+    if not isinstance(text, str) or not text.strip():
+        return _unavailable("unknown", "Enter some text before submitting it for analysis.")
 
-    classifier = bundle["model"]
-    label_map = {str(key): value for key, value in bundle["label_map"].items()}
-    classes = [str(value) for value in classifier.classes_]
-    probabilities = classifier.predict_proba([normalize_text(text)])[0]
-    best_index = int(probabilities.argmax())
-    prediction = label_map[classes[best_index]]
-    fake_index = next(index for index, value in enumerate(classes) if label_map[value] == "Fake")
-    resolved_language = language or detect_language(text)
-    return {
-        "prediction": prediction,
-        "confidence": round(float(probabilities[best_index]), 4),
-        "fake_probability": round(float(probabilities[fake_index]), 4),
-        "summary": (
-            f"The trained text classifier predicted {prediction.lower()} "
-            f"for {resolved_language.replace('_', ' ')} text."
-        ),
-        "model_version": bundle.get("model_version", "text-tfidf-logreg"),
-        "is_stub": False,
-    }
+    resolved_language = detect_language(text)
+    script, classifier, reason = classifier_for_language(resolved_language)
+    if script is None:
+        if resolved_language == "english":
+            return _unavailable(resolved_language, "English classification is not connected; only Urdu and Roman Urdu models are available.")
+        if resolved_language == "mixed":
+            return _unavailable(resolved_language, "Mixed Urdu-script and Latin-script text is not supported by either text model.")
+        return _unavailable(resolved_language, "The input language could not be identified reliably, so no model was selected.")
+    if classifier is None:
+        language_name = "Urdu" if script == "urdu" else "Roman Urdu"
+        return _unavailable(resolved_language, reason or f"The trained {language_name} model is unavailable.")
+
+    try:
+        result = classifier.predict(text)
+        if result.get("prediction") not in {"Real", "Fake"}:
+            raise ValueError("XLM-R returned a label outside its verified label mapping")
+        if result.get("confidence") is None or result.get("fake_probability") is None:
+            raise ValueError("XLM-R returned no score")
+        label_language = "Urdu-script" if script == "urdu" else "Roman Urdu"
+        if result.get("input_truncated"):
+            detail = (
+                f" Input was truncated to the model's {result['max_input_tokens']}-token training limit."
+            )
+        else:
+            detail = ""
+        return {
+            **result,
+            "detected_language": resolved_language,
+            "summary": (
+                f"The trained {label_language} XLM-R model predicted {result['prediction'].lower()}. "
+                "Its score is not independent verification of the claim." + detail
+            ),
+            "is_stub": False,
+            "status": "completed",
+        }
+    except Exception:
+        logger.exception("%s XLM-R inference failed", script)
+        return _unavailable(resolved_language, f"The trained {script.replace('_', ' ')} model could not complete inference.")

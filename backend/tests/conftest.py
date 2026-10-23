@@ -29,6 +29,11 @@ def pytest_addoption(parser):
         action="store_true",
         help="run against the PostgreSQL database in TEST_DATABASE_URL (it is wiped first)",
     )
+    parser.addoption(
+        "--real-models",
+        action="store_true",
+        help="also run the smoke tests that load the real text, OCR and image models (slow)",
+    )
 
 
 def _postgres_test_url() -> str:
@@ -71,6 +76,11 @@ def pytest_configure(config):
     os.environ["ENVIRONMENT"] = "test"
     # Never pick up a locally trained model during tests unless a test opts in.
     os.environ["KHABARNAZAR_TEXT_MODEL_PATH"] = str(TEST_DIR / "_no_model.joblib")
+    os.environ["KHABARNAZAR_URDU_XLMR_DIR"] = str(TEST_DIR / "_no_urdu_xlmr")
+    os.environ["KHABARNAZAR_ROMAN_XLMR_DIR"] = str(TEST_DIR / "_no_roman_xlmr")
+    os.environ["KHABARNAZAR_IMAGE_MODEL_DIR"] = str(TEST_DIR / "_no_image_model")
+    os.environ["PRELOAD_MODELS"] = "false"
+    config.addinivalue_line("markers", "real_models: loads the real models; runs only with --real-models")
 
     from alembic import command
     from alembic.config import Config
@@ -107,3 +117,35 @@ def _reset_login_limiter():
     login_limiter.clear()
     yield
     login_limiter.clear()
+
+
+def pytest_collection_modifyitems(config, items):
+    if config.getoption("--real-models"):
+        return
+    skip = pytest.mark.skip(reason="loads the real models; run with --real-models")
+    for item in items:
+        if "real_models" in item.keywords:
+            item.add_marker(skip)
+
+
+@pytest.fixture(autouse=True)
+def _no_real_models(request, monkeypatch):
+    """Tests are mocked by default: EasyOCR is reported unavailable instead of being
+    loaded (and downloaded). Tests marked real_models use the real model folders."""
+    if "real_models" in request.keywords:
+        project_root = TEST_DIR.parent.parent
+        monkeypatch.setenv("KHABARNAZAR_URDU_XLMR_DIR", str(project_root / "models" / "text" / "xlmr"))
+        monkeypatch.setenv(
+            "KHABARNAZAR_ROMAN_XLMR_DIR",
+            str(project_root / "text_module" / "roman_urdu" / "models" / "xlmr"),
+        )
+        monkeypatch.delenv("KHABARNAZAR_IMAGE_MODEL_DIR", raising=False)
+        yield
+        return
+    from app.ai.image import ocr
+
+    def ocr_not_loaded(directory):
+        raise RuntimeError("EasyOCR is not loaded in tests")
+
+    monkeypatch.setattr(ocr, "_get_ocr_reader", ocr_not_loaded)
+    yield

@@ -16,7 +16,7 @@ import {
   verdictMeta,
 } from '@/components/ui';
 import { radius, space } from '@/constants/theme';
-import { fullDate, percent } from '@/lib/format';
+import { fullDate, languageLabel, percent } from '@/lib/format';
 import { hrefDisputeDetail } from '@/lib/navigation';
 import { useSubmissions } from '@/lib/SubmissionsContext';
 
@@ -55,6 +55,9 @@ export default function ResultScreen() {
 
   const meta = verdictMeta(row.verdict, colors);
   const isImage = row.kind !== 'text';
+  // Image checks follow one of two branches; only the image-pair branch classifies a news claim.
+  const pictureChecked = row.analysisBranch === 'ai_or_real';
+  const textInImageChecked = row.analysisBranch === 'image_pair';
   // The backend scores each occurrence of a word; show each word once.
   const words = row.highlightedWords?.filter(
     (item, index, all) => all.findIndex((other) => other.word === item.word) === index,
@@ -79,12 +82,15 @@ export default function ResultScreen() {
           </View>
         </View>
         <View style={styles.heroStats}>
-          <HeroStat label="Model confidence" value={percent(row.confidence)} />
+          <HeroStat label="Model score (uncalibrated)" value={percent(row.confidence)} />
           <HeroStat label="Fake-news risk" value={percent(row.riskScore)} />
         </View>
         <AppText variant="caption" color="textMuted">
-          Confidence is how sure the model is of its own label. Risk is the estimated chance the
-          content is fake. Neither is proof that a claim is true or false.
+          {pictureChecked
+            ? 'This image had no readable text, so no news claim was checked. The picture itself was '
+              + 'checked for signs of AI generation instead (see Image authenticity below).'
+            : 'The model score is an uncalibrated output, not a measure of truth. Risk is the estimated '
+              + 'chance the content is fake. Neither is proof that a claim is true or false.'}
         </AppText>
       </View>
 
@@ -117,11 +123,25 @@ export default function ResultScreen() {
         ) : null}
         {row.textPreview ? (
           <View style={row.imageUri ? styles.ocr : null}>
-            {isImage ? <AppText variant="overline" color="textSubtle" style={styles.mb6}>Text found in image (OCR)</AppText> : null}
+            {isImage ? (
+              <AppText variant="overline" color="textSubtle" style={styles.mb6}>
+                {textInImageChecked ? 'Text found in image (OCR), checked as the claim' : 'Text found in image (OCR)'}
+              </AppText>
+            ) : null}
             <ContentText>{row.textPreview}</ContentText>
           </View>
         ) : isImage ? (
           <AppText variant="caption" color="textMuted" style={styles.ocr}>No readable text was extracted from this image.</AppText>
+        ) : null}
+        {row.detectedLanguage ? (
+          <AppText variant="caption" color="textMuted" style={styles.mt12}>
+            Detected language: {languageLabel(row.detectedLanguage)}
+          </AppText>
+        ) : null}
+        {row.processingStatus === 'unavailable' ? (
+          <AppText variant="caption" color="uncertain" style={styles.mt4}>
+            This text was not classified by a compatible model.
+          </AppText>
         ) : null}
         <AppText variant="caption" color="textSubtle" style={styles.mt12}>Checked {fullDate(row.createdAt)}</AppText>
       </Card>
@@ -152,7 +172,9 @@ export default function ResultScreen() {
         ) : null}
         {row.heatmapPath ? (
           <View style={styles.mt12}>
-            <AppText variant="caption" color="textMuted" style={styles.mb6}>Image regions the model focused on</AppText>
+            <AppText variant="caption" color="textMuted" style={styles.mb6}>
+              Where the AI-image detector looked (it analyses the centre of the image)
+            </AppText>
             <View style={[styles.imageFrame, { backgroundColor: colors.surfaceMuted }]}>
               <AuthImage uri={row.heatmapPath} style={styles.image} resizeMode="contain" />
             </View>
@@ -165,12 +187,18 @@ export default function ResultScreen() {
       <Card title="Signals">
         <View style={styles.signals}>
           <Meter label="Fake-news risk" value={row.riskScore} color={colors.misleading} />
-          {isImage ? (
+          {isImage && textInImageChecked ? (
+            <AppText variant="caption" color="textMuted">
+              AI-generated image check skipped: this image contains text, so its text was checked instead.
+            </AppText>
+          ) : isImage ? (
             <Meter
-              label="Image manipulation"
-              value={row.manipulationLikelihood == null ? null : row.manipulationLikelihood / 100}
+              label={pictureChecked ? 'Image authenticity: chance it is AI-generated' : 'Image analysis'}
+              value={row.aiGeneratedLikelihood == null ? null : row.aiGeneratedLikelihood / 100}
               color={colors.uncertain}
-              note={row.manipulationLabel}
+              note={pictureChecked
+                ? `${row.aiGeneratedLabel}. This is about the picture, not whether any news claim is true.`
+                : row.aiGeneratedLabel}
             />
           ) : null}
           {row.languageQuality != null ? (

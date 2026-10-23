@@ -1,7 +1,7 @@
 import json
 from pathlib import Path
 from typing import List, Union
-from pydantic import field_validator
+from pydantic import Field, field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Base backend directory
@@ -33,9 +33,26 @@ class Settings(BaseSettings):
     MAX_UPLOAD_SIZE_MB: int = 10
     ALLOWED_IMAGE_TYPES: Union[List[str], str] = ["image/jpeg", "image/png", "image/webp"]
 
-    # Weights for the combined risk score (text fake-probability vs image manipulation score)
-    TEXT_RISK_WEIGHT: float = 0.7
-    IMAGE_RISK_WEIGHT: float = 0.3
+    # Largest decoded image (width x height) accepted; guards against decompression bombs
+    MAX_IMAGE_PIXELS: int = 40_000_000
+
+    # Image pipeline routing: OCR text counts as "usable" (image-with-text branch) only when it
+    # has at least this many letters and this average OCR confidence (0-1). Otherwise the image
+    # goes to the AI-generated vs real branch.
+    OCR_MIN_LETTERS: int = 10
+    OCR_MIN_CONFIDENCE: float = 0.3
+
+    # Load the text, OCR and image models in a background thread at startup, so the first
+    # request does not wait for them.
+    PRELOAD_MODELS: bool = True
+
+    # Text model paths/limits. The legacy shared max-length variable is retained as a
+    # Roman Urdu override; the Urdu checkpoint keeps its own training limit (64 tokens).
+    XLMR_MAX_LEN: int | None = Field(default=None, gt=0, validation_alias="KHABARNAZAR_XLMR_MAX_LEN")
+    URDU_XLMR_MAX_LEN: int | None = Field(default=None, gt=0, validation_alias="KHABARNAZAR_URDU_XLMR_MAX_LEN")
+    ROMAN_XLMR_MAX_LEN: int | None = Field(default=None, gt=0, validation_alias="KHABARNAZAR_ROMAN_XLMR_MAX_LEN")
+    URDU_XLMR_DIR: str | None = Field(default=None, validation_alias="KHABARNAZAR_URDU_XLMR_DIR")
+    ROMAN_XLMR_DIR: str | None = Field(default=None, validation_alias="KHABARNAZAR_ROMAN_XLMR_DIR")
 
     # CORS
     CORS_ORIGINS: Union[List[str], str] = ["http://localhost:8081", "http://localhost:19006"]

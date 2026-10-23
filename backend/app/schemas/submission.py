@@ -1,6 +1,10 @@
 from app.schemas.common import UTCDateTime
-from typing import List, Optional
-from pydantic import BaseModel, ConfigDict, Field
+from typing import List, Literal, Optional
+from pydantic import BaseModel, ConfigDict, Field, computed_field, field_validator
+
+from app.ai.image.ai_detector import LABEL_AI_GENERATED, LABEL_REAL
+from app.ai.image.predict import NOT_ANALYZED
+from app.ai.pipeline import BRANCH_AI_OR_REAL, BRANCH_IMAGE_PAIR, SKIPPED_HAS_TEXT
 
 
 # ─── Text Submission ──────────────────────────────────────────────────────────
@@ -12,6 +16,12 @@ class TextSubmissionResponse(BaseModel):
     text_prediction: Optional[str] = None
     text_confidence: Optional[float] = None
     created_at: UTCDateTime
+
+    @computed_field
+    @property
+    def processing_status(self) -> Literal["completed", "unavailable"]:
+        """A null score means no compatible model produced a classification."""
+        return "completed" if self.text_confidence is not None else "unavailable"
 
     model_config = ConfigDict(from_attributes=True)
 
@@ -29,11 +39,22 @@ class ImageSubmissionResponse(BaseModel):
     detected_language: Optional[str] = None
     text_prediction: Optional[str] = None
     text_confidence: Optional[float] = None
-    image_score: Optional[float] = None
+    image_score: Optional[float] = None  # probability the picture is AI-generated (ai_or_real branch)
     manipulation_prediction: Optional[str] = None
     created_at: UTCDateTime
 
     model_config = ConfigDict(from_attributes=True)
+
+    @computed_field
+    @property
+    def analysis_branch(self) -> Optional[str]:
+        """'image_pair' (text in the image was classified), 'ai_or_real' (the picture was checked),
+        or None for images analysed before the pipeline had two branches."""
+        if self.manipulation_prediction == SKIPPED_HAS_TEXT:
+            return BRANCH_IMAGE_PAIR
+        if self.manipulation_prediction in (LABEL_AI_GENERATED, LABEL_REAL, NOT_ANALYZED):
+            return BRANCH_AI_OR_REAL
+        return None
 
 
 # ─── Explainability ───────────────────────────────────────────────────────────
@@ -71,6 +92,31 @@ class SubmissionResponse(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+# ─── Admin views ──────────────────────────────────────────────────────────────
+
+class AdminSubmissionItem(SubmissionResponse):
+    """A submission as listed to administrators: who sent it and its dispute status."""
+    user_email: Optional[str] = None
+    dispute_count: int = 0
+    latest_dispute_id: Optional[int] = None
+    latest_dispute_status: Optional[str] = None
+
+
+class DisputeCounts(BaseModel):
+    total: int
+    pending: int
+    reviewed: int
+
+
+class AdminStats(BaseModel):
+    users: int
+    submissions: int
+    submissions_by_label: dict[str, int]   # e.g. {"Fake": 3, "Real": 5, "Uncertain": 9}
+    submissions_by_type: dict[str, int]    # e.g. {"text": 12, "image": 5}
+    admin_overrides: int                   # submissions whose final label was set by an admin
+    disputes: DisputeCounts
+
+
 # ─── Submission list item (lighter) ──────────────────────────────────────────
 
 class SubmissionListItem(BaseModel):
@@ -91,4 +137,13 @@ class SubmissionListItem(BaseModel):
 # ─── Text submission request ──────────────────────────────────────────────────
 
 class TextSubmitRequest(BaseModel):
-    text: str = Field(..., min_length=3, max_length=10_000, description="Urdu or Roman Urdu news text to analyze")
+    text: str = Field(..., min_length=3, max_length=10_000, description="Urdu, Roman Urdu, or English news text to analyze")
+
+    @field_validator("text")
+    @classmethod
+    def not_blank(cls, value: str) -> str:
+        # min_length counts spaces; text that is only whitespace has nothing to classify.
+        stripped = value.strip()
+        if len(stripped) < 3:
+            raise ValueError("Text must contain at least 3 non-space characters")
+        return stripped

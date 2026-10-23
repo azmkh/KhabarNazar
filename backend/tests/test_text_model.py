@@ -1,32 +1,56 @@
-"""Stage 5/7: language detection, a real (tiny) trained model through the API,
-and explainability. The model is trained on synthetic sentences purely to test
-the plumbing; its predictions mean nothing about real news."""
-import io
+"""Mocked routing and API persistence tests for the Urdu/Roman Urdu XLM-R service."""
 
-import joblib
+from datetime import datetime, timezone
+
 import pytest
 from fastapi.testclient import TestClient
-from PIL import Image
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.linear_model import LogisticRegression
-from sklearn.pipeline import FeatureUnion, Pipeline
 
+import app.ai.text.xlmr as xlmr
 from app.ai.text.language_detection import detect_language
+from app.ai.text.predict import predict_text
 from app.main import app
+from app.schemas.submission import TextSubmissionResponse
 
 client = TestClient(app)
+URDU = "وزیر اعظم نے آج ایک بیان جاری کیا۔"
+ROMAN = "Yeh khabar sach hai ya jhoot, kya aap ko pata hai?"
+ENGLISH = "The report was released on Monday and we reviewed it."
 
-FAKE_WORDS = ["viral", "jhoot", "afwah", "sazish", "fake"]
-REAL_WORDS = ["sarkari", "elaan", "report", "tasdeeq", "official"]
+
+class FakeClassifier:
+    def __init__(self, script: str, label: str = "Fake", p_fake: float = 0.87):
+        self.script = script
+        self.model_version = f"mock-xlmr-{script}"
+        self.label = label
+        self.p_fake = p_fake
+        self.max_len = 64 if script == "urdu" else 512
+
+    def predict(self, text: str):
+        return {
+            "prediction": self.label,
+            "confidence": max(self.p_fake, 1 - self.p_fake),
+            "fake_probability": self.p_fake,
+            "model_version": self.model_version,
+            "is_stub": False,
+            "status": "completed",
+            "input_truncated": False,
+            "input_token_count": 20,
+            "max_input_tokens": self.max_len,
+        }
+
+    def explain(self, text: str, top_k: int = 8, max_words: int = 8, base_fake_probability=None):
+        return [{"word": "khabar", "contribution": 0.2, "direction": "supports_prediction"}]
 
 
 @pytest.mark.parametrize(
     ("text", "expected"),
     [
-        ("وزیر اعظم نے آج ایک بیان جاری کیا۔", "urdu"),
-        ("Yeh khabar sach hai ya jhoot, kya aap ko pata hai?", "roman_urdu"),
-        ("The minister said that the report was released on Monday.", "english"),
+        (URDU, "urdu"),
+        (ROMAN, "roman_urdu"),
+        (ENGLISH, "english"),
         ("وزیر اعظم نے کہا prime minister", "mixed"),
+        ("Yeh news is important", "unknown"),
+        ("Headline from Lahore", "unknown"),
         ("12345 !!!", "unknown"),
     ],
 )
@@ -34,97 +58,92 @@ def test_detect_language(text, expected):
     assert detect_language(text) == expected
 
 
-@pytest.fixture
-def trained_model(tmp_path, monkeypatch):
-    texts, labels = [], []
-    for i in range(30):
-        texts.append(f"{FAKE_WORDS[i % 5]} {FAKE_WORDS[(i + 1) % 5]} khabar {i}")
-        labels.append("1")
-        texts.append(f"{REAL_WORDS[i % 5]} {REAL_WORDS[(i + 2) % 5]} khabar {i}")
-        labels.append("0")
-    pipeline = Pipeline([
-        ("features", FeatureUnion([
-            ("word", TfidfVectorizer(analyzer="word")),
-            ("character", TfidfVectorizer(analyzer="char", ngram_range=(2, 4))),
-        ])),
-        ("classifier", LogisticRegression(max_iter=1000)),
-    ])
-    pipeline.fit(texts, labels)
-    path = tmp_path / "text_classifier.joblib"
-    joblib.dump({"model": pipeline, "label_map": {"1": "Fake", "0": "Real"}, "model_version": "test-model"}, path)
-    monkeypatch.setenv("KHABARNAZAR_TEXT_MODEL_PATH", str(path))
-    return path
+@pytest.mark.parametrize(
+    ("prediction", "confidence", "expected_status"),
+    [("Fake", 0.8, "completed"), ("Uncertain", None, "unavailable")],
+)
+def test_text_response_includes_processing_status(prediction, confidence, expected_status):
+    response = TextSubmissionResponse(
+        id=1,
+        input_text="a submitted claim",
+        detected_language="roman_urdu",
+        text_prediction=prediction,
+        text_confidence=confidence,
+        created_at=datetime.now(timezone.utc),
+    )
+    assert response.processing_status == expected_status
 
 
-def _token(email: str) -> dict:
-    response = client.post("/auth/register", json={"name": "Model Tester", "email": email, "password": "Password123!"})
+def _auth(email: str) -> dict:
+    response = client.post("/auth/register", json={
+        "name": "Model Tester", "email": email, "password": "Password123!"
+    })
     assert response.status_code == 201, response.text
     return {"Authorization": f"Bearer {response.json()['access_token']}"}
 
 
-def test_trained_model_prediction_risk_and_highlights(trained_model):
-    headers = _token("model.user@example.com")
-
-    fake = client.post("/submissions/text", json={"text": "viral jhoot afwah"}, headers=headers)
-    assert fake.status_code == 201, fake.text
-    fake = fake.json()
-    assert fake["final_label"] == "Fake"
-    assert fake["text_submission"]["text_confidence"] > 0.5
-    # Risk is the probability of Fake, so for a Fake prediction it equals confidence.
-    assert fake["combined_risk_score"] == pytest.approx(fake["text_submission"]["text_confidence"])
-    assert fake["explainability"]["model_version"] == "test-model"
-    assert '"word"' in fake["explainability"]["highlighted_words"]
-
-    real = client.post("/submissions/text", json={"text": "sarkari elaan official"}, headers=headers).json()
-    assert real["final_label"] == "Real"
-    # A confident "Real" must have LOW risk (previously risk = confidence, i.e. high).
-    assert real["combined_risk_score"] < 0.5
-    assert real["combined_risk_score"] == pytest.approx(1 - real["text_submission"]["text_confidence"], abs=1e-3)
+@pytest.mark.parametrize(("text", "script", "language"), [
+    (URDU, "urdu", "urdu"), (ROMAN, "roman", "roman_urdu")
+])
+def test_language_routes_to_its_own_model(text, script, language, monkeypatch):
+    calls = []
+    classifier = FakeClassifier(script)
+    monkeypatch.setattr(xlmr, "get_classifier", lambda selected: (calls.append(selected) or classifier, None))
+    result = predict_text(text)
+    assert calls == [script]
+    assert result["detected_language"] == language
+    assert result["prediction"] == "Fake" and result["is_stub"] is False
+    assert result["fake_probability"] == pytest.approx(0.87)
 
 
-def test_image_submission_uses_ocr_text_with_trained_model(trained_model, monkeypatch):
-    import app.services.submission_service as service
-
-    monkeypatch.setattr(service, "run_ocr", lambda path: {
-        "text": "viral jhoot afwah", "confidence": 0.9, "language": "roman_urdu",
-        "is_stub": False, "status": "completed", "message": None,
-    })
-    buf = io.BytesIO()
-    Image.new("RGB", (8, 8)).save(buf, format="PNG")
-    data = client.post(
-        "/submissions/image",
-        headers=_token("model.image@example.com"),
-        files={"file": ("x.png", buf.getvalue(), "image/png")},
-    ).json()
-    assert data["final_label"] == "Fake"
-    assert data["image_submission"]["text_prediction"] == "Fake"
-    # No image model: the manipulation signal stays empty and is not mixed into the risk.
-    assert data["image_submission"]["image_score"] is None
-    assert data["combined_risk_score"] == pytest.approx(data["image_submission"]["text_confidence"])
-    assert data["explainability"]["highlighted_words"]
+@pytest.mark.parametrize("text", [ENGLISH, "وزیر اعظم نے کہا prime minister", "Headline from Lahore"])
+def test_english_mixed_and_ambiguous_are_not_routed_to_either_model(text, monkeypatch):
+    calls = []
+    def no_model(script):
+        calls.append(script)
+        return None, "not requested"
+    monkeypatch.setattr(xlmr, "get_classifier", no_model)
+    result = predict_text(text)
+    assert calls == []
+    assert result["prediction"] == "Uncertain" and result["confidence"] is None
+    assert result["is_stub"] is True
 
 
-def test_corrupt_model_file_falls_back_instead_of_crashing(tmp_path, monkeypatch):
-    broken = tmp_path / "broken.joblib"
-    broken.write_bytes(b"not a model")
-    monkeypatch.setenv("KHABARNAZAR_TEXT_MODEL_PATH", str(broken))
-    response = client.post(
-        "/submissions/text",
-        json={"text": "viral jhoot afwah"},
-        headers=_token("model.broken@example.com"),
-    )
-    assert response.status_code == 201
-    assert response.json()["final_label"] == "Uncertain"
-    assert response.json()["explainability"]["model_version"] == "text-model-unavailable"
+def test_missing_or_failed_model_never_returns_a_prediction(monkeypatch):
+    monkeypatch.setattr(xlmr, "get_classifier", lambda script: (None, "model unavailable"))
+    missing = predict_text(ROMAN)
+    assert missing["prediction"] == "Uncertain" and missing["confidence"] is None
+
+    monkeypatch.setattr(xlmr, "get_classifier", lambda script: (_ for _ in ()).throw(RuntimeError("private detail")))
+    failed = predict_text(ROMAN)
+    assert failed["prediction"] == "Uncertain" and failed["confidence"] is None
+    assert "private detail" not in failed["summary"]
 
 
-def test_combined_risk_weighting(monkeypatch):
-    from app.config import settings
-    from app.services.submission_service import _build_combined_risk
+def test_inference_exception_never_returns_a_prediction(monkeypatch):
+    class BrokenClassifier:
+        def predict(self, text):
+            raise RuntimeError("private inference detail")
 
-    monkeypatch.setattr(settings, "TEXT_RISK_WEIGHT", 0.7)
-    monkeypatch.setattr(settings, "IMAGE_RISK_WEIGHT", 0.3)
-    assert _build_combined_risk(None, None) is None
-    assert _build_combined_risk(0.8, None) == 0.8
-    assert _build_combined_risk(None, 0.4) == 0.4
-    assert _build_combined_risk(1.0, 0.0) == 0.7
+    monkeypatch.setattr(xlmr, "get_classifier", lambda script: (BrokenClassifier(), None))
+    result = predict_text(ROMAN)
+    assert result["prediction"] == "Uncertain"
+    assert result["confidence"] is None
+    assert result["status"] == "unavailable"
+    assert "private inference detail" not in result["summary"]
+
+
+def test_authenticated_roman_result_is_persisted_and_read_back(monkeypatch):
+    classifier = FakeClassifier("roman", label="Real", p_fake=0.13)
+    monkeypatch.setattr(xlmr, "get_classifier", lambda script: (classifier, None))
+    headers = _auth("roman.mock@example.com")
+    response = client.post("/submissions/text", json={"text": ROMAN}, headers=headers)
+    assert response.status_code == 201, response.text
+    created = response.json()
+    assert created["text_submission"]["detected_language"] == "roman_urdu"
+    assert created["text_submission"]["text_prediction"] == "Real"
+    assert created["text_submission"]["processing_status"] == "completed"
+    assert created["combined_risk_score"] == pytest.approx(0.13)
+    detail = client.get(f"/submissions/{created['id']}", headers=headers).json()
+    assert detail["text_submission"]["text_prediction"] == "Real"
+    assert detail["explainability"]["model_version"] == "mock-xlmr-roman"

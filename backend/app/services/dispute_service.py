@@ -51,25 +51,35 @@ def create_dispute(db: Session, user: User, dispute_in: DisputeCreate) -> Disput
     return _with_review_details(db.query(Dispute)).filter(Dispute.id == dispute.id).first()
 
 
+def _visible_disputes(db: Session, current_user: User, dispute_status: Optional[str], mine: bool):
+    """Users see their own disputes; admins see all unless they ask for only their own."""
+    query = db.query(Dispute)
+    if current_user.role != "admin" or mine:
+        query = query.filter(Dispute.user_id == current_user.id)
+    if dispute_status:
+        query = query.filter(Dispute.status == dispute_status)
+    return query
+
+
 def list_disputes(
     db: Session,
     current_user: User,
     dispute_status: Optional[str] = None,
     skip: int = 0,
     limit: int = 50,
+    mine: bool = False,
 ) -> list[Dispute]:
-    query = db.query(Dispute)
-    if current_user.role != "admin":
-        query = query.filter(Dispute.user_id == current_user.id)
-    if dispute_status:
-        query = query.filter(Dispute.status == dispute_status)
     return (
-        _with_review_details(query)
+        _with_review_details(_visible_disputes(db, current_user, dispute_status, mine))
         .order_by(Dispute.created_at.desc(), Dispute.id.desc())
         .offset(skip)
         .limit(limit)
         .all()
     )
+
+
+def count_disputes(db: Session, current_user: User, dispute_status: Optional[str] = None, mine: bool = False) -> int:
+    return _visible_disputes(db, current_user, dispute_status, mine).count()
 
 
 def get_dispute(db: Session, dispute_id: int, current_user: User) -> Dispute:

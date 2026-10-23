@@ -1,7 +1,8 @@
 import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useMemo, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
 
+import { LoadMoreFooter } from '@/components/LoadMoreFooter';
 import { AppText, Card, EmptyState, Icon, Segmented, Tag, VerdictBadge, useAppTheme } from '@/components/ui';
 import { space } from '@/constants/theme';
 import { listDisputes, type ApiDispute } from '@/lib/api';
@@ -11,6 +12,8 @@ import { hrefAdminReview } from '@/lib/navigation';
 import type { Verdict } from '@/types/submission';
 
 type Filter = 'pending' | 'reviewed' | 'all';
+
+const PAGE_SIZE = 50;
 
 function preview(dispute: ApiDispute) {
   return dispute.submission?.text_submission?.input_text
@@ -24,38 +27,71 @@ function verdictOf(label?: string | null): Verdict {
   return 'uncertain';
 }
 
+// Filtering happens on the server, so every page matches the selected tab.
+const statusFor = (value: Filter) => (value === 'all' ? undefined : value);
+
 export default function AdminDisputesScreen() {
   const router = useRouter();
   const { colors } = useAppTheme();
   const { accessToken } = useAuth();
   const [disputes, setDisputes] = useState<ApiDispute[]>([]);
+  const [total, setTotal] = useState(0);
+  const [pendingCount, setPendingCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [filter, setFilter] = useState<Filter>('pending');
+  const disputesRef = useRef(disputes);
+  disputesRef.current = disputes;
+  // Ignore responses for a tab the admin has already switched away from.
+  const generation = useRef(0);
 
   const refresh = useCallback(async () => {
     if (!accessToken) return;
+    const current = ++generation.current;
     setLoading(true);
     setError(null);
     try {
-      setDisputes(await listDisputes(accessToken));
+      const [page, pending] = await Promise.all([
+        listDisputes(accessToken, { status: statusFor(filter), limit: PAGE_SIZE }),
+        listDisputes(accessToken, { status: 'pending', limit: 1 }),
+      ]);
+      if (current !== generation.current) return;
+      setDisputes(page.items);
+      setTotal(page.total);
+      setPendingCount(pending.total);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Could not load the dispute queue.');
+      if (current === generation.current) setError(err instanceof Error ? err.message : 'Could not load the dispute queue.');
     } finally {
-      setLoading(false);
+      if (current === generation.current) setLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, filter]);
+
+  const loadMore = useCallback(async () => {
+    if (!accessToken || loading || loadingMore || disputesRef.current.length >= total) return;
+    const current = generation.current;
+    setLoadingMore(true);
+    try {
+      const page = await listDisputes(accessToken, { status: statusFor(filter), skip: disputesRef.current.length, limit: PAGE_SIZE });
+      if (current !== generation.current) return;
+      setDisputes((rows) => {
+        const seen = new Set(rows.map((row) => row.id));
+        return [...rows, ...page.items.filter((row) => !seen.has(row.id))];
+      });
+      setTotal(page.total);
+    } catch (err) {
+      if (current === generation.current) setError(err instanceof Error ? err.message : 'Could not load more disputes.');
+    } finally {
+      if (current === generation.current) setLoadingMore(false);
+    }
+  }, [accessToken, filter, loading, loadingMore, total]);
 
   useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
-
-  const pendingCount = disputes.filter((item) => item.status === 'pending').length;
-  const visible = useMemo(() => disputes.filter((item) =>
-    filter === 'all' ? true : filter === 'pending' ? item.status === 'pending' : item.status !== 'pending'), [disputes, filter]);
 
   return (
     <FlatList
       style={{ backgroundColor: colors.background }}
-      data={visible}
+      data={disputes}
       keyExtractor={(item) => String(item.id)}
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={loading && disputes.length > 0} onRefresh={() => void refresh()} tintColor={colors.primary} />}
@@ -74,6 +110,9 @@ export default function AdminDisputesScreen() {
         </View>
       }
       ItemSeparatorComponent={() => <View style={styles.separator} />}
+      onEndReached={() => void loadMore()}
+      onEndReachedThreshold={0.4}
+      ListFooterComponent={<LoadMoreFooter loaded={disputes.length} total={total} loading={loadingMore} onLoadMore={() => void loadMore()} noun="disputes" />}
       ListEmptyComponent={
         loading ? (
           <EmptyState icon="inbox" title="Loading disputes…" loading />

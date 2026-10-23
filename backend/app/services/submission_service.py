@@ -3,87 +3,67 @@ import json
 from typing import List, Optional
 
 from fastapi import HTTPException, status
+from sqlalchemy import func
 from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.ai.image.explain import explain_image
-from app.ai.image.ocr import run_ocr
-from app.ai.image.predict import analyze_image
-from app.ai.text.explain import explain_text
+from app.ai.pipeline import (
+    BRANCH_IMAGE_PAIR,
+    evaluate,
+    ocr_summary,
+    run_image_pipeline,
+    run_text_pipeline,
+)
 from app.ai.text.language_detection import detect_language
-from app.ai.text.predict import UNAVAILABLE_MODEL_VERSION, predict_text
 from app.config import settings
+from app.models.dispute import Dispute
 from app.models.explainability import Explainability
 from app.models.image_submission import ImageSubmission
 from app.models.submission import Submission
 from app.models.text_submission import TextSubmission
+from app.models.user import User
 
 
-def _build_combined_risk(text_fake_probability: Optional[float], image_score: Optional[float]) -> Optional[float]:
-    """
-    Combines the text model's probability of "Fake" and the image manipulation
-    score into one 0-1 risk score using the configured weights. Missing signals
-    are left out (weights are renormalized); with no real signal the risk is None.
-    """
-    weighted = [
-        (value, weight)
-        for value, weight in (
-            (text_fake_probability, settings.TEXT_RISK_WEIGHT),
-            (image_score, settings.IMAGE_RISK_WEIGHT),
-        )
-        if value is not None and weight > 0
-    ]
-    if not weighted:
-        return None
-    total_weight = sum(weight for _, weight in weighted)
-    return round(sum(value * weight for value, weight in weighted) / total_weight, 4)
+def _highlighted_words_json(explanation: Optional[dict]) -> Optional[str]:
+    if explanation and explanation["highlighted_words"]:
+        return json.dumps(explanation["highlighted_words"], ensure_ascii=False)
+    return None
 
 
 def create_text_submission(db: Session, user_id: int, input_text: str) -> Submission:
     """
-    Creates a text submission record, runs the (stub) AI pipeline,
-    and stores all results to the database.
+    Creates a text submission record, runs the text pipeline and the evaluation
+    step, and stores all results to the database.
     """
-    # 1. Language detection
     language = detect_language(input_text)
+    text = run_text_pipeline(input_text, language=language)
+    ai_result, text_explanation = text["classification"], text["explanation"]
+    evaluation = evaluate("text", text)
 
-    # 2. AI text prediction (stub)
-    ai_result = predict_text(input_text, language=language)
-
-    # 3. Create parent Submission record
     submission = Submission(
         user_id=user_id,
         submission_type="text",
         detected_language=language,
-        combined_risk_score=_build_combined_risk(ai_result["fake_probability"], None),
-        final_label=ai_result["prediction"],
+        combined_risk_score=evaluation["combined_risk_score"],
+        final_label=evaluation["final_label"],
         final_label_source="AI",
     )
     db.add(submission)
     db.flush()  # Get submission.id before committing
 
-    # 4. Create TextSubmission child record
-    text_sub = TextSubmission(
+    db.add(TextSubmission(
         submission_id=submission.id,
         input_text=input_text,
         detected_language=language,
         text_prediction=ai_result.get("prediction"),
         text_confidence=ai_result.get("confidence"),
-    )
-    db.add(text_sub)
-
-    # 5. Save model feature attributions when a trained text model is available.
-    text_explanation = explain_text(input_text) if not ai_result.get("is_stub") else None
-    explain = Explainability(
+    ))
+    db.add(Explainability(
         submission_id=submission.id,
-        highlighted_words=(
-            json.dumps(text_explanation["highlighted_words"], ensure_ascii=False)
-            if text_explanation and text_explanation["highlighted_words"]
-            else None
-        ),
+        highlighted_words=_highlighted_words_json(text_explanation),
         explanation_summary=(text_explanation["summary"] if text_explanation else ai_result.get("summary")),
         model_version=ai_result["model_version"],
-    )
-    db.add(explain)
+    ))
 
     db.commit()
     return get_submission_by_id(db, submission_id=submission.id, user_id=user_id)
@@ -98,41 +78,29 @@ def create_image_submission(
     file_size_bytes: int,
 ) -> Submission:
     """
-    Runs OCR, analyzes extracted text when a trained text model is available,
-    and stores visual authenticity as a separate signal.
+    Runs the image pipeline: OCR decides between the image-pair branch (extracted
+    text classified by the text pipeline) and the AI-generated vs real branch.
+    Both are stored; only the text classification sets the verdict and risk.
     """
     abs_image_path = str(Path(settings.UPLOAD_DIR).resolve() / image_path)
+    result = run_image_pipeline(abs_image_path)
+    branch, ocr_result, img_result = result["branch"], result["ocr"], result["image"]
+    text_ai = result["text"]["classification"] if result["text"] else None
+    text_explanation = result["text"]["explanation"] if result["text"] else None
+    evaluation = evaluate(branch, result["text"])
 
-    # 1. Extract embedded text. EasyOCR is loaded lazily on first use.
-    ocr_result = run_ocr(abs_image_path)
-
-    # 2. Image manipulation analysis stays separate from extracted news text.
-    img_result = analyze_image(abs_image_path)
-
-    # 3. Analyze OCR text with the Stage 5 model if a real artifact is configured.
-    text_ai = None
-    if ocr_result.get("text"):
-        text_ai = predict_text(ocr_result["text"], language=ocr_result.get("language"))
-    text_confidence = text_ai["confidence"] if text_ai else None
-    text_fake_probability = text_ai["fake_probability"] if text_ai else None
-
-    combined = _build_combined_risk(text_fake_probability, img_result.get("image_score"))
-    final_label = text_ai.get("prediction", "Uncertain") if text_ai and not text_ai.get("is_stub") else "Uncertain"
-
-    # 4. Create parent Submission record
     submission = Submission(
         user_id=user_id,
         submission_type="image",
         detected_language=ocr_result.get("language"),
-        combined_risk_score=combined,
-        final_label=final_label,
+        combined_risk_score=evaluation["combined_risk_score"],
+        final_label=evaluation["final_label"],
         final_label_source="AI",
     )
     db.add(submission)
     db.flush()
 
-    # 5. Create ImageSubmission child record
-    img_sub = ImageSubmission(
+    db.add(ImageSubmission(
         submission_id=submission.id,
         image_path=image_path,
         original_filename=original_filename,
@@ -142,19 +110,12 @@ def create_image_submission(
         ocr_confidence=ocr_result.get("confidence"),
         detected_language=ocr_result.get("language"),
         text_prediction=(text_ai.get("prediction") if text_ai else None),
-        text_confidence=text_confidence,
+        text_confidence=(text_ai.get("confidence") if text_ai else None),
         image_score=img_result.get("image_score"),
         manipulation_prediction=img_result.get("manipulation_prediction"),
-    )
-    db.add(img_sub)
+    ))
 
-    # 6. Build text feature attribution and, only if a visual model provides one,
-    # render its attribution array to an image heatmap.
-    text_explanation = (
-        explain_text(ocr_result["text"])
-        if ocr_result.get("text") and text_ai and not text_ai.get("is_stub")
-        else None
-    )
+    # A heatmap is rendered only when the image detector supplied a Grad-CAM map.
     heatmap_relative_path = None
     heatmap_output_path = None
     if img_result.get("attribution_map") is not None:
@@ -166,44 +127,33 @@ def create_image_submission(
         output_path=heatmap_output_path,
     )
 
-    # 7. Summarize each signal and its availability; no claim is made from OCR alone.
-    if ocr_result.get("text"):
-        explanation_parts = [
-            f"OCR extracted text with average confidence {ocr_result['confidence']:.2f}."
-            if ocr_result.get("confidence") is not None
-            else "OCR extracted text; confidence is unavailable."
-        ]
+    # Summarize the branch taken and each result; nothing is inferred beyond what a model returned.
+    explanation_parts = [ocr_summary(ocr_result, branch)]
+    if branch == BRANCH_IMAGE_PAIR:
         if text_ai and not text_ai.get("is_stub"):
             explanation_parts.append(text_explanation["summary"] if text_explanation else text_ai["summary"])
         else:
-            explanation_parts.append("News claim classification is unavailable until a trained text model is connected.")
-    elif ocr_result.get("status") == "no_text_found":
-        explanation_parts = ["OCR completed but found no readable text."]
+            explanation_parts.append(f"The extracted text could not be classified: {text_ai['summary']}")
     else:
-        explanation_parts = [ocr_result.get("message") or "OCR is unavailable."]
-    if img_result.get("summary"):
-        explanation_parts.append(img_result["summary"])
-    explanation_parts.append(visual_explanation["summary"])
-    explain = Explainability(
+        if img_result.get("summary"):
+            explanation_parts.append(img_result["summary"])
+        explanation_parts.append("No news claim was checked, so there is no fake-news verdict for this image.")
+        if visual_explanation.get("heatmap_path"):
+            explanation_parts.append(
+                "The heatmap shows where the detector's ResNet18 member looked; it does not show edits."
+            )
+
+    if branch == BRANCH_IMAGE_PAIR:
+        model_version = f"img-pair:{text_ai['model_version']}" if text_ai else "img-pair"
+    else:
+        model_version = img_result.get("model_version") or "image-model-unavailable"
+    db.add(Explainability(
         submission_id=submission.id,
-        highlighted_words=(
-            json.dumps(text_explanation["highlighted_words"], ensure_ascii=False)
-            if text_explanation and text_explanation["highlighted_words"]
-            else None
-        ),
+        highlighted_words=_highlighted_words_json(text_explanation),
         heatmap_path=heatmap_relative_path if visual_explanation.get("heatmap_path") else None,
         explanation_summary=" ".join(explanation_parts),
-        model_version=(
-            "easyocr+text+vision"
-            if not ocr_result.get("is_stub") and text_explanation and visual_explanation.get("heatmap_path")
-            else "easyocr+text"
-            if not ocr_result.get("is_stub") and text_explanation
-            else "easyocr-ur-en"
-            if not ocr_result.get("is_stub")
-            else "ocr-unavailable"
-        ),
-    )
-    db.add(explain)
+        model_version=model_version[:50],
+    ))
 
     db.commit()
     return get_submission_by_id(db, submission_id=submission.id, user_id=user_id)
@@ -247,11 +197,16 @@ def get_user_submissions(
             selectinload(Submission.disputes),
         )
         .filter(Submission.user_id == user_id)
-        .order_by(Submission.created_at.desc())
+        # id breaks ties between rows saved in the same instant, so pages never overlap or skip.
+        .order_by(Submission.created_at.desc(), Submission.id.desc())
         .offset(skip)
         .limit(min(limit, 100))
         .all()
     )
+
+
+def count_user_submissions(db: Session, user_id: int) -> int:
+    return db.query(func.count(Submission.id)).filter(Submission.user_id == user_id).scalar() or 0
 
 
 def get_all_submissions(db: Session, skip: int = 0, limit: int = 50) -> List[Submission]:
@@ -263,9 +218,33 @@ def get_all_submissions(db: Session, skip: int = 0, limit: int = 50) -> List[Sub
             joinedload(Submission.text_submission),
             joinedload(Submission.image_submission),
             joinedload(Submission.explainability),
+            selectinload(Submission.disputes),
         )
         .order_by(Submission.created_at.desc(), Submission.id.desc())
         .offset(skip)
         .limit(limit)
         .all()
     )
+
+
+def count_all_submissions(db: Session) -> int:
+    return db.query(func.count(Submission.id)).scalar() or 0
+
+
+def get_admin_stats(db: Session) -> dict:
+    """Totals for the admin dashboard, counted in the database (not from one page of rows)."""
+    by_label = dict(db.query(Submission.final_label, func.count(Submission.id)).group_by(Submission.final_label).all())
+    by_type = dict(db.query(Submission.submission_type, func.count(Submission.id)).group_by(Submission.submission_type).all())
+    dispute_status = dict(db.query(Dispute.status, func.count(Dispute.id)).group_by(Dispute.status).all())
+    return {
+        "users": db.query(func.count(User.id)).scalar() or 0,
+        "submissions": sum(by_label.values()),
+        "submissions_by_label": by_label,
+        "submissions_by_type": by_type,
+        "admin_overrides": db.query(func.count(Submission.id)).filter(Submission.final_label_source == "Admin").scalar() or 0,
+        "disputes": {
+            "total": sum(dispute_status.values()),
+            "pending": dispute_status.get("pending", 0),
+            "reviewed": sum(count for status, count in dispute_status.items() if status != "pending"),
+        },
+    }

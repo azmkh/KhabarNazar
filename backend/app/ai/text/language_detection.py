@@ -1,8 +1,8 @@
-"""Rule-based script/language detection for Urdu, Roman Urdu, and English.
+"""Conservative language identification for Urdu, Roman Urdu, and English.
 
-This is a lightweight heuristic, not a trained language-identification model:
-Urdu is recognized by Arabic-script letters, and Latin-script text is labelled
-English or Roman Urdu by counting common function words of each language.
+This is a lightweight heuristic, not a trained language-identification model.
+Ambiguous Latin-script text is reported as unknown instead of being silently
+classified as Roman Urdu.
 """
 
 import re
@@ -23,6 +23,7 @@ ENGLISH_WORDS = {
     "a", "an", "and", "are", "was", "were", "be", "been", "of", "in", "on", "at", "to", "for",
     "with", "by", "from", "about", "that", "this", "it", "its", "has", "have", "had", "will",
     "would", "not", "but", "or", "as", "they", "their", "said", "news", "which", "who", "after",
+    "i", "you", "your", "we", "our", "do", "does", "did", "these", "those",
 } - ROMAN_URDU_WORDS
 
 
@@ -35,14 +36,18 @@ def detect_language(text: str) -> str:
     ratio = urdu_letters / len(letters)
     if ratio >= 0.7:
         return "urdu"
-    if ratio > 0.3:
+    # The Urdu-script model was trained on Urdu text, not bilingual samples.
+    # Do not route any text containing both scripts to it by a majority vote.
+    if ratio > 0:
         return "mixed"
 
     words = [word.lower() for word in LATIN_WORD.findall(text)]
     roman_hits = sum(word in ROMAN_URDU_WORDS for word in words)
     english_hits = sum(word in ENGLISH_WORDS for word in words)
-    if ratio > 0 and roman_hits == 0 and english_hits == 0:
-        return "mixed"
-    if english_hits > roman_hits:
+    # Require a two-marker margin. A single shared or ambiguous function word
+    # (for example "is", "the", or "to") is not enough to choose a language.
+    if roman_hits >= 2 and roman_hits - english_hits >= 2:
+        return "roman_urdu"
+    if english_hits >= 2 and english_hits - roman_hits >= 2:
         return "english"
-    return "roman_urdu"
+    return "unknown"

@@ -1,8 +1,11 @@
+import threading
+from contextlib import asynccontextmanager
 from datetime import datetime, timezone
 from fastapi import FastAPI, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 
+from app.ai.pipeline import model_warmup
 from app.config import settings
 from app.database import check_db_connection
 import app.models  # ensure models are registered with Base.metadata
@@ -11,7 +14,18 @@ from app.routers import auth_router, users_router, submissions_router, disputes_
 # The schema is managed only by Alembic (`alembic upgrade head`). Creating tables
 # here would hide missing migrations and make `alembic upgrade` fail on PostgreSQL.
 
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    # Models take seconds to load (and download on first run); do it off the request path.
+    # Requests that arrive earlier simply wait for the same one-time load.
+    if settings.PRELOAD_MODELS:
+        threading.Thread(target=model_warmup, name="model-warmup", daemon=True).start()
+    yield
+
+
 app = FastAPI(
+    lifespan=lifespan,
     title=settings.PROJECT_NAME,
     version=settings.PROJECT_VERSION,
     description=settings.PROJECT_DESCRIPTION,
@@ -29,6 +43,8 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=origins if isinstance(origins, list) else [origins],
     allow_credentials=False,
+    # Browsers hide non-standard headers unless listed; the web app reads list totals from this one.
+    expose_headers=["X-Total-Count"],
     allow_methods=["*"],
     allow_headers=["*"],
 )

@@ -10,9 +10,11 @@ import { useFonts } from 'expo-font';
 import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect, useMemo } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { View } from 'react-native';
 import 'react-native-reanimated';
 
+import { AnimatedSplash, SPLASH_BACKGROUND } from '@/components/AnimatedSplash';
 import { useAppTheme } from '@/components/ui';
 import { fonts } from '@/constants/theme';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
@@ -59,18 +61,27 @@ export default function RootLayout() {
 
 function RootLayoutBody() {
   const { ready } = useAuth();
+  // The animated splash plays once, over the app, after everything has loaded.
+  const [showSplash, setShowSplash] = useState(true);
+  const hideSplash = useCallback(() => setShowSplash(false), []);
 
   useEffect(() => {
     if (ready) {
+      // Hand over from the native splash (same background colour) to the animated one.
       SplashScreen.hideAsync();
     }
   }, [ready]);
 
   if (!ready) {
-    return null;
+    return <View style={{ flex: 1, backgroundColor: SPLASH_BACKGROUND }} />;
   }
 
-  return <RootLayoutNav />;
+  return (
+    <View style={{ flex: 1 }}>
+      <RootLayoutNav />
+      {showSplash ? <AnimatedSplash onDone={hideSplash} /> : null}
+    </View>
+  );
 }
 
 function RootLayoutNav() {

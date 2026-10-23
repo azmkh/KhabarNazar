@@ -2,6 +2,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useMemo, useState } from 'react';
 import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
+import { LoadMoreFooter } from '@/components/LoadMoreFooter';
 import { SubmissionRow } from '@/components/SubmissionRow';
 import { AppText, EmptyState, Masthead, useAppTheme } from '@/components/ui';
 import { radius, space } from '@/constants/theme';
@@ -20,7 +21,7 @@ const FILTERS: { value: Filter; label: string }[] = [
 
 export default function HistoryScreen() {
   const { colors } = useAppTheme();
-  const { submissions, refreshSubmissions, loading, loadError } = useSubmissions();
+  const { submissions, total, loadMore, loadingMore, refreshSubmissions, loading, loadError } = useSubmissions();
   const router = useRouter();
   const [filter, setFilter] = useState<Filter>('all');
 
@@ -52,7 +53,7 @@ export default function HistoryScreen() {
           <Masthead
             kicker="Your activity"
             title="History"
-            subtitle={`${submissions.length} ${submissions.length === 1 ? 'check' : 'checks'} saved to your account.`}
+            subtitle={`${total} ${total === 1 ? 'check' : 'checks'} saved to your account.`}
           />
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
             {FILTERS.map((option) => {
@@ -80,6 +81,11 @@ export default function HistoryScreen() {
         </>
       }
       ItemSeparatorComponent={() => <View style={styles.separator} />}
+      onEndReached={() => void loadMore()}
+      onEndReachedThreshold={0.4}
+      ListFooterComponent={
+        <LoadMoreFooter loaded={submissions.length} total={total} loading={loadingMore} onLoadMore={() => void loadMore()} />
+      }
       ListEmptyComponent={
         loadError ? (
           <EmptyState icon="circle-alert" title="Could not load history" message={loadError}
@@ -90,7 +96,8 @@ export default function HistoryScreen() {
           <EmptyState icon="scan-search" title="No checks yet"
             message="Run your first analysis from the Check tab." actionLabel="Start a check" onAction={() => router.push('/')} />
         ) : (
-          <EmptyState icon="list" title="Nothing here" message="No checks match this filter." />
+          <EmptyState icon="list" title="Nothing here"
+            message={submissions.length < total ? 'No loaded checks match this filter yet. Load more below to search older ones.' : 'No checks match this filter.'} />
         )
       }
       renderItem={({ item }) => (

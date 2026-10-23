@@ -1,26 +1,40 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
-import { useCallback } from 'react';
+import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { AppText, Card, Icon, type IconName, ListRow, Masthead, useAppTheme } from '@/components/ui';
 import { radius, space } from '@/constants/theme';
+import { getAdminStats, type ApiAdminStats } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
 import { hrefAdminDisputes, hrefAdminSubmissions } from '@/lib/navigation';
-import { useSubmissions } from '@/lib/SubmissionsContext';
 
 export default function AdminDashboardScreen() {
   const router = useRouter();
   const { colors } = useAppTheme();
-  const { submissions, loading, loadError, refreshSubmissions } = useSubmissions();
-  const { user } = useAuth();
+  const { user, accessToken } = useAuth();
+  const [stats, setStats] = useState<ApiAdminStats | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-  useFocusEffect(useCallback(() => { void refreshSubmissions().catch(() => undefined); }, [refreshSubmissions]));
+  // Totals are counted by the server across the whole database, not from one page of rows.
+  const refresh = useCallback(async () => {
+    if (!accessToken) return;
+    setLoading(true);
+    setError(null);
+    try {
+      setStats(await getAdminStats(accessToken));
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Could not load the dashboard.');
+    } finally {
+      setLoading(false);
+    }
+  }, [accessToken]);
 
-  const total = submissions.length;
-  const pending = submissions.filter((s) => s.dispute?.status === 'pending').length;
-  const reviewed = submissions.filter((s) => s.adminReview).length;
-  const misleading = submissions.filter((s) => s.verdict === 'misleading').length;
+  useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
+
+  const value = (n: number | undefined) => (stats ? n ?? 0 : '–');
+  const pending = stats?.disputes.pending ?? 0;
 
   return (
     <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.scroll}>
@@ -43,10 +57,12 @@ export default function AdminDashboardScreen() {
 
       <View style={styles.body}>
         <View style={styles.grid}>
-          <Stat icon="inbox" label="Total checks" value={total} color={colors.primary} soft={colors.primarySoft} />
-          <Stat icon="flag" label="Pending disputes" value={pending} color={colors.uncertain} soft={colors.uncertainSoft} />
-          <Stat icon="badge-check" label="Reviewed" value={reviewed} color={colors.credible} soft={colors.credibleSoft} />
-          <Stat icon="shield-alert" label="Flagged misleading" value={misleading} color={colors.misleading} soft={colors.misleadingSoft} />
+          <Stat icon="inbox" label="Total checks" value={value(stats?.submissions)} color={colors.primary} soft={colors.primarySoft} />
+          <Stat icon="flag" label="Pending disputes" value={value(stats?.disputes.pending)} color={colors.uncertain} soft={colors.uncertainSoft} />
+          <Stat icon="badge-check" label="Disputes reviewed" value={value(stats?.disputes.reviewed)} color={colors.credible} soft={colors.credibleSoft} />
+          <Stat icon="shield-alert" label="Flagged misleading" value={value(stats?.submissions_by_label.Fake)} color={colors.misleading} soft={colors.misleadingSoft} />
+          <Stat icon="users" label="Registered users" value={value(stats?.users)} color={colors.info} soft={colors.infoSoft} />
+          <Stat icon="pencil" label="Admin overrides" value={value(stats?.admin_overrides)} color={colors.textMuted} soft={colors.surfaceMuted} />
         </View>
 
         <Card padded={false} style={styles.group}>
@@ -59,7 +75,7 @@ export default function AdminDashboardScreen() {
           <ListRow
             icon="list"
             label="All submissions"
-            description="Every check with its verdict and confidence"
+            description={stats ? `${stats.submissions} checks from ${stats.users} users` : 'Every check with its verdict and dispute status'}
             divider={false}
             onPress={() => router.push(hrefAdminSubmissions())}
           />
@@ -67,12 +83,12 @@ export default function AdminDashboardScreen() {
 
         <Card tone="muted">
           <View style={styles.notice}>
-            <Icon name={loadError ? 'circle-alert' : 'refresh-cw'} size={16} color={loadError ? 'misleading' : 'textMuted'} />
-            <AppText variant="caption" color={loadError ? 'misleading' : 'textMuted'} style={styles.flex}>
-              {loadError ?? (loading ? 'Refreshing moderation data…' : 'Live data from the FastAPI backend.')}
+            <Icon name={error ? 'circle-alert' : 'refresh-cw'} size={16} color={error ? 'misleading' : 'textMuted'} />
+            <AppText variant="caption" color={error ? 'misleading' : 'textMuted'} style={styles.flex}>
+              {error ?? (loading ? 'Refreshing totals…' : 'Totals are counted across the whole database.')}
             </AppText>
             {!loading ? (
-              <Pressable onPress={() => void refreshSubmissions().catch(() => undefined)} hitSlop={8} accessibilityRole="button">
+              <Pressable onPress={() => void refresh()} hitSlop={8} accessibilityRole="button">
                 <AppText variant="caption" color="primary">Refresh</AppText>
               </Pressable>
             ) : null}
@@ -83,7 +99,7 @@ export default function AdminDashboardScreen() {
   );
 }
 
-function Stat({ icon, label, value, color, soft }: { icon: IconName; label: string; value: number; color: string; soft: string }) {
+function Stat({ icon, label, value, color, soft }: { icon: IconName; label: string; value: number | string; color: string; soft: string }) {
   return (
     <Card style={styles.stat}>
       <View style={[styles.statIcon, { backgroundColor: soft }]}>

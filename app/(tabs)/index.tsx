@@ -8,19 +8,23 @@ import { AppText, Avatar, Button, Card, Icon, Masthead, Segmented, TextField, us
 import { radius, space } from '@/constants/theme';
 import { submitImage, submitText } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
-import { hrefDisputeList, hrefProfileMe } from '@/lib/navigation';
+import { hrefAdminRoot, hrefDisputeList, hrefProfileMe } from '@/lib/navigation';
 import { useSubmissions } from '@/lib/SubmissionsContext';
 import { showAlert } from '@/lib/alert';
+import { useAdminPending } from '@/lib/useAdminPending';
 
 type Mode = 'text' | 'image';
 const MAX_TEXT = 10_000;
 const MIN_TEXT = 3;
+/** The backend rejects uploads over MAX_UPLOAD_SIZE_MB (10 MB). */
+const MAX_IMAGE_BYTES = 10 * 1024 * 1024;
 
 export default function CheckScreen() {
   const { colors } = useAppTheme();
   const router = useRouter();
   const { user, accessToken } = useAuth();
-  const { submissions, addServerSubmission } = useSubmissions();
+  const { isAdmin, pending } = useAdminPending();
+  const { submissions, total, disputeTotal, addServerSubmission } = useSubmissions();
 
   const [mode, setMode] = useState<Mode>('text');
   const [text, setText] = useState('');
@@ -28,7 +32,6 @@ export default function CheckScreen() {
   const [busy, setBusy] = useState(false);
 
   const firstName = user?.name?.trim().split(/\s+/)[0] || user?.email?.split('@')[0] || 'there';
-  const disputeCount = submissions.filter((item) => item.dispute).length;
   const recent = submissions.slice(0, 3);
   const trimmed = text.trim();
   const canSubmit = mode === 'text' ? trimmed.length >= MIN_TEXT : Boolean(imageAsset);
@@ -69,6 +72,9 @@ export default function CheckScreen() {
         if (!['image/jpeg', 'image/png', 'image/webp'].includes(inferredType)) {
           throw new Error('Choose a JPG, PNG, or WEBP image.');
         }
+        if (asset.fileSize && asset.fileSize > MAX_IMAGE_BYTES) {
+          throw new Error('This image is larger than 10 MB. Choose a smaller one or a screenshot.');
+        }
         const suffix = inferredType === 'image/png' ? 'png' : inferredType === 'image/webp' ? 'webp' : 'jpg';
         response = await submitImage(accessToken, {
           uri: asset.uri,
@@ -103,13 +109,33 @@ export default function CheckScreen() {
             </Pressable>
           }>
           <View style={styles.stats}>
-            <Stat value={submissions.length} label={submissions.length === 1 ? 'check' : 'checks'} />
+            <Stat value={total} label={total === 1 ? 'check' : 'checks'} />
             <View style={[styles.statDivider, { backgroundColor: colors.inkSoft }]} />
-            <Stat value={disputeCount} label={disputeCount === 1 ? 'dispute' : 'disputes'} />
+            <Stat value={disputeTotal} label={disputeTotal === 1 ? 'dispute' : 'disputes'} />
           </View>
         </Masthead>
 
         <View style={styles.body}>
+          {isAdmin ? (
+            // Administrators get a clear way into the moderation desk from the first screen.
+            <Card onPress={() => router.push(hrefAdminRoot())} style={[styles.adminCard, { borderColor: colors.primary }]}>
+              <View style={styles.adminRow}>
+                <View style={[styles.adminIcon, { backgroundColor: colors.primarySoft }]}>
+                  <Icon name="shield-check" size={22} color="primary" />
+                </View>
+                <View style={styles.flex}>
+                  <AppText variant="overline" color="primary">Signed in as administrator</AppText>
+                  <AppText variant="bodyStrong">Open the moderation desk</AppText>
+                  <AppText variant="caption" color={pending ? 'uncertain' : 'textMuted'}>
+                    {pending == null ? 'Review disputes and every submission' : pending
+                      ? `${pending} ${pending === 1 ? 'dispute is' : 'disputes are'} waiting for review`
+                      : 'No disputes waiting right now'}
+                  </AppText>
+                </View>
+                <Icon name="chevron-right" size={20} color="primary" />
+              </View>
+            </Card>
+          ) : null}
           <Card style={styles.composer}>
             <Segmented<Mode>
               value={mode}
@@ -127,11 +153,11 @@ export default function CheckScreen() {
                   onChangeText={setText}
                   multiline
                   maxLength={MAX_TEXT}
-                  placeholder="Paste a headline or WhatsApp forward in Urdu or Roman Urdu…"
+                  placeholder="Paste a headline or WhatsApp forward in Urdu, Roman Urdu, or English…"
                   accessibilityLabel="News text to check"
                 />
                 <View style={styles.meta}>
-                  <AppText variant="caption" color="textSubtle">Urdu · Roman Urdu</AppText>
+                  <AppText variant="caption" color="textSubtle">Urdu · Roman Urdu · English</AppText>
                   <AppText variant="caption" color="textSubtle">{text.length.toLocaleString()} / {MAX_TEXT.toLocaleString()}</AppText>
                 </View>
               </View>
@@ -184,8 +210,9 @@ export default function CheckScreen() {
               <View style={styles.flex}>
                 <AppText variant="bodyStrong">Decision support, not a final verdict</AppText>
                 <AppText variant="caption" color="textMuted" style={styles.noteBody}>
-                  Results come from an AI model and can be wrong, especially for Roman Urdu. Check
-                  the explanation, and dispute results you disagree with.
+                  The connected text model currently supports Urdu script. Roman Urdu and English may
+                  return Uncertain until compatible models are connected. Any model result can be wrong;
+                  check the explanation and dispute results you disagree with.
                 </AppText>
               </View>
             </View>
@@ -238,6 +265,9 @@ const styles = StyleSheet.create({
   statDivider: { width: 1, height: 18 },
   body: { paddingHorizontal: space.lg, gap: space.lg, marginTop: -space.lg },
   composer: { gap: space.lg },
+  adminCard: { borderWidth: 1.5 },
+  adminRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
+  adminIcon: { width: 44, height: 44, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
   gap: { gap: space.sm },
   meta: { flexDirection: 'row', justifyContent: 'space-between' },
   preview: { borderRadius: radius.md, overflow: 'hidden', height: 220 },

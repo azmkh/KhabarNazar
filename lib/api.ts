@@ -1,3 +1,6 @@
+import { File } from 'expo-file-system';
+import { Platform } from 'react-native';
+
 import { API_BASE_URL } from './config';
 
 export type ApiUser = {
@@ -27,12 +30,17 @@ export type ApiSubmission = {
   text_preview?: string | null;
   has_image?: boolean;
   dispute_count?: number;
+  /** Admin list only. */
+  user_email?: string | null;
+  latest_dispute_id?: number | null;
+  latest_dispute_status?: string | null;
   text_submission?: {
     id: number;
     input_text: string;
     detected_language?: string | null;
     text_prediction?: string | null;
     text_confidence?: number | null;
+    processing_status?: 'completed' | 'unavailable';
   } | null;
   image_submission?: {
     id: number;
@@ -42,8 +50,11 @@ export type ApiSubmission = {
     detected_language?: string | null;
     text_prediction?: string | null;
     text_confidence?: number | null;
+    /** Probability the picture is AI-generated (only on the ai_or_real branch). */
     image_score?: number | null;
     manipulation_prediction?: string | null;
+    /** image_pair: text in the image was classified; ai_or_real: the picture itself was checked. */
+    analysis_branch?: 'image_pair' | 'ai_or_real' | null;
   } | null;
   explainability?: {
     highlighted_words?: string | null;
@@ -67,6 +78,15 @@ export type ApiDispute = {
   created_at: string;
   submission?: ApiSubmission | null;
   user?: ApiUser | null;
+};
+
+export type ApiAdminStats = {
+  users: number;
+  submissions: number;
+  submissions_by_label: Record<string, number>;
+  submissions_by_type: Record<string, number>;
+  admin_overrides: number;
+  disputes: { total: number; pending: number; reviewed: number };
 };
 
 export class ApiError extends Error {
@@ -93,7 +113,7 @@ function apiUrl(path: string) {
   return `${versionedBase}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
-async function request<T>(path: string, options: RequestInit = {}, token?: string): Promise<T> {
+async function send(path: string, options: RequestInit = {}, token?: string): Promise<Response> {
   const headers = new Headers(options.headers ?? {});
   headers.set('Accept', 'application/json');
   if (token) headers.set('Authorization', `Bearer ${token}`);
@@ -102,8 +122,14 @@ async function request<T>(path: string, options: RequestInit = {}, token?: strin
   let response: Response;
   try {
     response = await fetch(apiUrl(path), { ...options, headers });
-  } catch {
-    throw new Error(`Cannot reach the backend at ${API_BASE_URL}. Check the API URL and that FastAPI is running.`);
+  } catch (error) {
+    const reason = error instanceof Error ? error.message : String(error);
+    // Only blame the connection for real network failures; otherwise show what went wrong
+    // (e.g. a request the app could not build), so the cause is not hidden.
+    if (/network|failed to fetch|timed? ?out|connection|could not connect|offline/i.test(reason)) {
+      throw new Error(`Cannot reach the backend at ${API_BASE_URL}. Check the API URL and that FastAPI is running.`);
+    }
+    throw new Error(`Could not send the request: ${reason}`);
   }
 
   if (!response.ok) {
@@ -123,8 +149,23 @@ async function request<T>(path: string, options: RequestInit = {}, token?: strin
     }
     throw new ApiError(message, response.status);
   }
+  return response;
+}
+
+async function request<T>(path: string, options: RequestInit = {}, token?: string): Promise<T> {
+  const response = await send(path, options, token);
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
+}
+
+/** One page of a list endpoint, plus the total across all pages (X-Total-Count header). */
+export type Page<T> = { items: T[]; total: number };
+
+async function requestPage<T>(path: string, token: string): Promise<Page<T>> {
+  const response = await send(path, {}, token);
+  const items = (await response.json()) as T[];
+  const total = Number(response.headers.get('X-Total-Count'));
+  return { items, total: response.headers.has('X-Total-Count') && Number.isFinite(total) ? total : items.length };
 }
 
 const json = (value: unknown): RequestInit => ({ method: 'POST', body: JSON.stringify(value) });
@@ -145,17 +186,27 @@ export function submitText(token: string, text: string) {
   return request<ApiSubmission>('/submissions/text', json({ text }), token);
 }
 
-export function submitImage(
+export async function submitImage(
   token: string,
   image: { uri: string; name: string; type: string },
 ) {
   const form = new FormData();
-  form.append('file', image as unknown as Blob);
+  if (Platform.OS === 'web') {
+    // Browsers need real file bytes; the picker gives a blob:/data: URI.
+    const blob = await (await globalThis.fetch(image.uri)).blob();
+    form.append('file', blob, image.name);
+  } else {
+    // Expo SDK 57 replaces fetch with expo/fetch, which rejects React Native's old
+    // `{ uri, name, type }` upload objects ("Unsupported FormDataPart implementation").
+    // An expo-file-system File implements Blob, so expo/fetch can read it.
+    form.append('file', new File(image.uri) as unknown as Blob);
+  }
   return request<ApiSubmission>('/submissions/image', { method: 'POST', body: form }, token);
 }
 
+/** The signed-in user's own submissions, newest first. */
 export function listSubmissions(token: string, skip = 0, limit = 50) {
-  return request<ApiSubmission[]>(`/submissions?skip=${skip}&limit=${limit}`, {}, token);
+  return requestPage<ApiSubmission>(`/submissions?skip=${skip}&limit=${limit}`, token);
 }
 
 export function getSubmission(token: string, id: string | number) {
@@ -170,8 +221,13 @@ export function submissionHeatmapUrl(id: string | number) {
   return apiUrl(`/submissions/${id}/heatmap`);
 }
 
-export function listAdminSubmissions(token: string, skip = 0, limit = 100) {
-  return request<ApiSubmission[]>(`/admin/submissions?skip=${skip}&limit=${limit}`, {}, token);
+/** Admin only: every user's submissions with submitter and latest dispute, newest first. */
+export function listAdminSubmissions(token: string, skip = 0, limit = 50) {
+  return requestPage<ApiSubmission>(`/admin/submissions?skip=${skip}&limit=${limit}`, token);
+}
+
+export function getAdminStats(token: string) {
+  return request<ApiAdminStats>('/admin/stats', {}, token);
 }
 
 export function createDispute(
@@ -181,10 +237,18 @@ export function createDispute(
   return request<ApiDispute>('/disputes', json(payload), token);
 }
 
-export function listDisputes(token: string, status?: string, skip = 0, limit = 100) {
+/**
+ * Disputes, newest first. Users always get their own; admins get everyone's
+ * unless `mine` is set.
+ */
+export function listDisputes(
+  token: string,
+  { status, skip = 0, limit = 100, mine = false }: { status?: string; skip?: number; limit?: number; mine?: boolean } = {},
+) {
   const query = new URLSearchParams({ skip: String(skip), limit: String(limit) });
   if (status) query.set('status', status);
-  return request<ApiDispute[]>(`/disputes?${query.toString()}`, {}, token);
+  if (mine) query.set('mine', 'true');
+  return requestPage<ApiDispute>(`/disputes?${query.toString()}`, token);
 }
 
 export function getDispute(token: string, id: string | number) {

@@ -1,6 +1,6 @@
 from pathlib import Path
 from typing import List
-from fastapi import APIRouter, Depends, File, HTTPException, Query, UploadFile, status
+from fastapi import APIRouter, Depends, File, HTTPException, Query, Response, UploadFile, status
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 
@@ -12,12 +12,13 @@ from app.models.explainability import Explainability
 from app.config import settings
 from app.schemas.submission import SubmissionListItem, SubmissionResponse, TextSubmitRequest
 from app.services.submission_service import (
+    count_user_submissions,
     create_image_submission,
     create_text_submission,
     get_submission_by_id,
     get_user_submissions,
 )
-from app.utils.dependencies import get_current_user
+from app.utils.dependencies import TOTAL_COUNT_HEADER, get_current_user
 from app.utils.upload import delete_upload, save_upload
 
 router = APIRouter(prefix="/submissions", tags=["Submissions"])
@@ -27,7 +28,7 @@ router = APIRouter(prefix="/submissions", tags=["Submissions"])
     "/text",
     response_model=SubmissionResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Submit Urdu or Roman Urdu text for analysis",
+    summary="Submit Urdu, Roman Urdu, or English text for analysis",
 )
 def submit_text(
     body: TextSubmitRequest,
@@ -35,8 +36,9 @@ def submit_text(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Accepts plaintext (Urdu or Roman Urdu), runs language detection and AI
-    text analysis (stub), persists the result, and returns the full submission.
+    Accepts plaintext (Urdu, Roman Urdu, or English), runs language detection and the
+    text pipeline, persists the result, and returns the full submission.
+    Text the connected models cannot classify is returned as Uncertain.
     """
     submission = create_text_submission(
         db=db,
@@ -50,7 +52,7 @@ def submit_text(
     "/image",
     response_model=SubmissionResponse,
     status_code=status.HTTP_201_CREATED,
-    summary="Submit an image for OCR and authenticity analysis",
+    summary="Submit an image: OCR + text check, or AI-generated vs real check",
 )
 def submit_image(
     file: UploadFile = File(..., description="Image file (JPEG, PNG, or WEBP, max 10 MB)"),
@@ -58,8 +60,9 @@ def submit_image(
     current_user: User = Depends(get_current_user),
 ):
     """
-    Validates and stores the uploaded image, runs stub OCR and image analysis,
-    persists the result, and returns the full submission record.
+    Validates and stores the uploaded image, then runs the image pipeline: images
+    with usable text are OCR'd and the text is classified (image pair); other
+    images are checked for AI generation. analysis_branch says which ran.
     """
     rel_path, original_name, file_size, mime_type = save_upload(file)
     try:
@@ -85,6 +88,7 @@ def submit_image(
     summary="List current user's submission history",
 )
 def list_submissions(
+    response: Response,
     skip: int = Query(0, ge=0),
     limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db),
@@ -92,8 +96,10 @@ def list_submissions(
 ):
     """
     Returns a paginated list of the logged-in user's submissions,
-    newest first, with lightweight preview fields.
+    newest first, with lightweight preview fields. The total across all
+    pages is in the X-Total-Count response header.
     """
+    response.headers[TOTAL_COUNT_HEADER] = str(count_user_submissions(db, current_user.id))
     submissions = get_user_submissions(db, user_id=current_user.id, skip=skip, limit=limit)
     items = []
     for sub in submissions:

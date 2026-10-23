@@ -1,49 +1,38 @@
 # KhabarNazar - Image Analysis Module
 
 Detects whether an image is **real or AI-generated** and explains the decision with **Grad-CAM** and **LIME**.
-Model: ResNet18 (ImageNet-pretrained), fully fine-tuned, trained in two stages on two datasets and tested on a third, unseen dataset.
 
-## Datasets (not included in the repo - download separately)
-| Dataset | Role | Images | Source |
-|---|---|---|---|
-| AI vs Real (tristanzhang32) | Stage-1 training + test | 48k train / 12k test | https://www.kaggle.com/datasets/tristanzhang32/ai-generated-images-vs-real-images |
-| Tiny-GenImage | Stage-2 training, unseen-generator test (7 generators) | 28k train / 7k val | https://huggingface.co/datasets/TheKernel01/Tiny-GenImage |
-| Misinfo-dataset | Unseen test only (FLUX, Imagen 3, PixArt, SDXL; fake-news topics) | 8k | https://www.kaggle.com/datasets/bohdan213/misinfo-dataset |
+## Datasets (not in the repo)
+| Dataset | Role | Link |
+|---|---|---|
+| AI vs Real (60k) | Training + test | [Kaggle](https://www.kaggle.com/datasets/tristanzhang32/ai-generated-images-vs-real-images) |
+| Tiny-GenImage (35k, 7 generators) | Second training dataset, unseen-generator test | [Hugging Face](https://huggingface.co/datasets/TheKernel01/Tiny-GenImage) |
+| Misinfo-dataset (8k, FLUX / Imagen 3 / PixArt / SDXL) | Unseen test (fake-news topics) | [Kaggle](https://www.kaggle.com/datasets/bohdan213/misinfo-dataset) |
 
-## Notebooks (run in order)
-| Notebook | Content |
+## Notebooks
+| # | Content |
 |---|---|
-| `00_data_check.ipynb` | GPU check, dataset counts, sample images |
-| `01_preprocess.ipynb` | Same resizing (shorter side 512) and JPEG format for every image, removing size/format shortcuts |
-| `02_train_ai_vs_real.ipynb` | Learning-rate experiment, baselines (simple CNN, ResNet18 head-only, ResNet18 full), final Stage-1 model, test metrics, ROC/PR, mistakes, t-SNE |
-| `03_tiny_genimage_and_unseen.ipynb` | Cross-dataset test, unseen-generator experiment, Stage-2 joint training, final comparison, Misinfo per-generator results |
-| `04_explainability.ipynb` | Grad-CAM and LIME on all test sets, and on any single image |
+| 00 | Environment and data check |
+| 01 | Preprocessing (same size/format for all images, removes shortcuts) |
+| 02 | ResNet18 training on AI vs Real: learning-rate test, baselines, metrics |
+| 03 | Tiny-GenImage training, unseen-generator test, Misinfo evaluation |
+| 04 | Grad-CAM and LIME explanations |
+| 05 | Improving Misinfo: CLIP / DINOv2 features, robust augmentation, ensemble, few-shot adaptation |
 
 ## Results
-**Stage 1 baselines (AI vs Real test set, 12,000 images)**
-
-| Model | Accuracy | F1 | ROC AUC |
+| Model | AI vs Real | Tiny-GenImage | Misinfo* |
 |---|---|---|---|
-| Simple CNN (from scratch) | 79.5% | 0.795 | 0.874 |
-| ResNet18, final layer only | 81.6% | 0.816 | 0.900 |
-| ResNet18, all layers (lr 1e-4) | **93.95%** | **0.940** | **0.985** |
+| ResNet18 (Stage 2) | 93.8% | 92.0% | 73.2% |
+| **Ensemble (CLIP + DINOv2 + ResNet18), zero-shot** | **94.6%** | **91.5%** | **84.0%** (AUC 0.910) |
+| Ensemble (CLIP + DINOv2), few-shot** | 91.1% | 87.3% | **96.7%** (AUC 0.993) |
 
-**Effect of the second dataset**
+\* Misinfo scored on the same fixed 80% test split for every model.
+\*\* Few-shot = classifier also trained on the other 20% of Misinfo, so Misinfo is **not** unseen for this row.
 
-| Model | AI vs Real | Tiny-GenImage | Misinfo (unseen) |
-|---|---|---|---|
-| Stage 1: AI vs Real only | 93.95% | 56.5% | 74.8% (AUC 0.853) |
-| Stage 2: AI vs Real + Tiny-GenImage | 93.8% | **92.0%** | 73.0% (AUC 0.862) |
-
-**Unseen-generator experiment** (fine-tuned on ADM, BigGAN, Midjourney, SD 1.5 only): unseen GLIDE detected 92%, Wukong 85%, VQDM 19%.
-
-**Misinfo, final model:** AI images detected - FLUX 99%, PixArt 99%, SDXL 88%, Imagen 3 66%; about 58% of real photos correctly accepted.
-
-**Limitations:** the model over-flags unfamiliar real photos, struggles with generators unlike its training data (VQDM, Imagen 3), and has not yet been trained to handle JPEG-compressed web/social-media images.
+Other findings: transfer learning beat a CNN trained from scratch (94% vs 79.5%); unseen generators GLIDE (92%) and Wukong (85%) were detected but VQDM was not (19%); CLIP generalised best of the single models.
 
 ## Models (`models/`)
-- `resnet18_ai_vs_real.pth` - Stage-1 model
-- `resnet18_final.pth` - **final model** (Stage 2)
+`resnet18_final.pth` (ResNet18), `resnet18_robust.pth` (with JPEG/resize/blur augmentation), `clip_vitl14_head*.joblib` and `dinov2_l_head*.joblib` (classifiers on frozen CLIP / DINOv2 features; `_fewshot20` = few-shot version).
 
 ## Setup
 ```
@@ -51,9 +40,7 @@ python -m venv venv
 venv\Scripts\activate
 pip install torch torchvision --index-url https://download.pytorch.org/whl/cu128
 pip install -r requirements.txt
-python -m ipykernel install --user --name khabarnazar --display-name "Python 3 (KhabarNazar)"
 jupyter notebook
 ```
 
-## Reference
-Pelekh, B. (2025). *AI-Generated Image Detection System for Mitigating Fake News and Misinformation*. Ukrainian Catholic University.
+Reference: Pelekh, B. (2025). *AI-Generated Image Detection System for Mitigating Fake News and Misinformation*. Ukrainian Catholic University.

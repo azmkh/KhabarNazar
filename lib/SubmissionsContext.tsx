@@ -1,15 +1,24 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 
-import { getSubmission, listAdminSubmissions, listDisputes, listSubmissions, submissionHeatmapUrl, submissionImageUrl, type ApiDispute, type ApiSubmission } from './api';
+import { getSubmission, listDisputes, listSubmissions, submissionHeatmapUrl, submissionImageUrl, type ApiDispute, type ApiSubmission } from './api';
 import { useAuth } from './AuthContext';
 import type { Submission, SubmissionDispute, Verdict } from '@/types/submission';
 
 type SubmissionsContextValue = {
+  /** The signed-in user's own submissions loaded so far (newest first). */
   submissions: Submission[];
+  /** How many submissions the user has in total, across all pages. */
+  total: number;
+  /** How many disputes the user has filed in total. */
+  disputeTotal: number;
+  hasMore: boolean;
   loading: boolean;
+  loadingMore: boolean;
   loadError: string | null;
   getById: (id: string) => Submission | undefined;
   refreshSubmissions: () => Promise<void>;
+  /** Load the next page of the user's history. */
+  loadMore: () => Promise<void>;
   loadSubmissionDetail: (id: string) => Promise<Submission>;
   addServerSubmission: (item: ApiSubmission, imageUri?: string | null) => string;
   updateSubmission: (id: string, patch: Partial<Submission>) => void;
@@ -17,13 +26,16 @@ type SubmissionsContextValue = {
 
 const SubmissionsContext = createContext<SubmissionsContextValue | null>(null);
 
-function verdictFromApi(label: string): Verdict {
+/** Rows per request when paging through history. */
+const PAGE_SIZE = 50;
+
+export function verdictFromApi(label: string): Verdict {
   if (label.toLowerCase() === 'real') return 'credible';
   if (label.toLowerCase() === 'fake') return 'misleading';
   return 'uncertain';
 }
 
-function fromApi(item: ApiSubmission, imageUri?: string | null): Submission {
+export function fromApi(item: ApiSubmission, imageUri?: string | null): Submission {
   const text = item.text_submission?.input_text ?? item.text_preview ?? item.image_submission?.ocr_text ?? '';
   const textModelUnavailable = item.explainability?.model_version === 'text-model-unavailable'
     || item.explainability?.model_version?.startsWith('stub');
@@ -43,6 +55,11 @@ function fromApi(item: ApiSubmission, imageUri?: string | null): Submission {
     createdAt: Date.parse(item.created_at) || Date.now(),
     kind: item.submission_type === 'both' ? 'both' : item.submission_type,
     textPreview: text ? text.slice(0, 280) : undefined,
+    detectedLanguage: item.detected_language
+      ?? item.text_submission?.detected_language
+      ?? item.image_submission?.detected_language
+      ?? null,
+    processingStatus: item.text_submission?.processing_status ?? null,
     imageUri: imageUri ?? (item.image_submission || item.has_image ? submissionImageUrl(item.id) : null),
     verdict: verdictFromApi(item.final_label),
     confidence,
@@ -54,8 +71,21 @@ function fromApi(item: ApiSubmission, imageUri?: string | null): Submission {
     languageQualityLabel: 'Not provided by the current backend.',
     sourceCredibility: null,
     sourceCredibilityLabel: 'Not provided by the current backend.',
-    manipulationLikelihood: imageScore == null ? null : Math.round(imageScore * 100),
-    manipulationLabel: item.image_submission?.manipulation_prediction ?? 'Not evaluated by a connected image model.',
+    analysisBranch: item.image_submission?.analysis_branch ?? null,
+    aiGeneratedLikelihood: imageScore == null ? null : Math.round(imageScore * 100),
+    aiGeneratedLabel: item.image_submission?.manipulation_prediction ?? 'Not evaluated by a connected image model.',
+  };
+}
+
+/** An admin-list row: the submitter and the latest dispute come with the submission. */
+export function fromAdminApi(item: ApiSubmission): Submission {
+  const row = fromApi(item);
+  return {
+    ...row,
+    submitterEmail: item.user_email ?? undefined,
+    dispute: item.latest_dispute_id
+      ? { id: String(item.latest_dispute_id), message: '', createdAt: row.createdAt, status: item.latest_dispute_status ?? 'pending' }
+      : undefined,
   };
 }
 
@@ -93,47 +123,109 @@ function withDisputes(rows: Submission[], disputes: ApiDispute[]): Submission[] 
   });
 }
 
+/** Fetch every dispute the signed-in user filed (all pages), newest first. */
+async function listAllMyDisputes(token: string) {
+  const all: ApiDispute[] = [];
+  let total = 0;
+  do {
+    const page = await listDisputes(token, { mine: true, skip: all.length, limit: 100 });
+    all.push(...page.items);
+    total = page.total;
+    if (page.items.length === 0) break;
+  } while (all.length < total);
+  return { items: all, total };
+}
+
 export function SubmissionsProvider({ children }: { children: React.ReactNode }) {
   const { accessToken, user, ready } = useAuth();
+  // The signed-in user's OWN submissions, newest first, loaded page by page (admins included).
   const [submissions, setSubmissions] = useState<Submission[]>([]);
+  const [total, setTotal] = useState(0);
+  const [disputeTotal, setDisputeTotal] = useState(0);
+  // Submissions opened by id that are not in the list above (e.g. an admin viewing another
+  // user's result). Kept apart so they never show up in the user's own history.
+  const [detailCache, setDetailCache] = useState<Record<string, Submission>>({});
   const [loading, setLoading] = useState(false);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
   const submissionsRef = useRef(submissions);
+  const disputesRef = useRef<ApiDispute[]>([]);
+  // Bumped on every refresh so a slow, older response can't overwrite a newer one.
+  const generation = useRef(0);
 
   useEffect(() => { submissionsRef.current = submissions; }, [submissions]);
 
+  const reset = useCallback(() => {
+    generation.current++;
+    disputesRef.current = [];
+    setSubmissions([]);
+    setTotal(0);
+    setDisputeTotal(0);
+    setDetailCache({});
+  }, []);
+
   const refreshSubmissions = useCallback(async () => {
     if (!accessToken || !user) {
-      setSubmissions([]);
+      reset();
       return;
     }
+    const current = ++generation.current;
     setLoading(true);
     setLoadError(null);
     try {
-      const [records, disputes] = await Promise.all([
-        user.role === 'admin' ? listAdminSubmissions(accessToken) : listSubmissions(accessToken),
-        listDisputes(accessToken),
+      const [page, disputes] = await Promise.all([
+        listSubmissions(accessToken, 0, PAGE_SIZE),
+        listAllMyDisputes(accessToken),
       ]);
-      setSubmissions(withDisputes(records.map((item) => fromApi(item)), disputes));
+      if (current !== generation.current) return;
+      disputesRef.current = disputes.items;
+      setSubmissions(withDisputes(page.items.map((item) => fromApi(item)), disputes.items));
+      setTotal(page.total);
+      setDisputeTotal(disputes.total);
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Could not load submissions.';
-      setLoadError(message);
+      if (current !== generation.current) return;
+      setLoadError(error instanceof Error ? error.message : 'Could not load submissions.');
       throw error;
     } finally {
-      setLoading(false);
+      if (current === generation.current) setLoading(false);
     }
-  }, [accessToken, user]);
+  }, [accessToken, user, reset]);
+
+  const hasMore = submissions.length < total;
+
+  const loadMore = useCallback(async () => {
+    if (!accessToken || loading || loadingMore || submissionsRef.current.length >= total) return;
+    const current = generation.current;
+    setLoadingMore(true);
+    try {
+      const page = await listSubmissions(accessToken, submissionsRef.current.length, PAGE_SIZE);
+      if (current !== generation.current) return;
+      const next = withDisputes(page.items.map((item) => fromApi(item)), disputesRef.current);
+      setSubmissions((rows) => {
+        const seen = new Set(rows.map((row) => row.id));
+        return [...rows, ...next.filter((row) => !seen.has(row.id))];
+      });
+      setTotal(page.total);
+    } catch (error) {
+      if (current === generation.current) setLoadError(error instanceof Error ? error.message : 'Could not load more submissions.');
+    } finally {
+      if (current === generation.current) setLoadingMore(false);
+    }
+  }, [accessToken, loading, loadingMore, total]);
 
   useEffect(() => {
     if (!ready) return;
     if (!accessToken) {
-      setSubmissions([]);
+      reset();
       return;
     }
     void refreshSubmissions().catch(() => undefined);
-  }, [ready, accessToken, refreshSubmissions]);
+  }, [ready, accessToken, refreshSubmissions, reset]);
 
-  const getById = useCallback((id: string) => submissions.find((item) => item.id === id), [submissions]);
+  const getById = useCallback(
+    (id: string) => submissions.find((item) => item.id === id) ?? detailCache[id],
+    [submissions, detailCache],
+  );
 
   const loadSubmissionDetail = useCallback(async (id: string) => {
     if (!accessToken) throw new Error('Sign in to load this submission.');
@@ -145,26 +237,33 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
       submitterEmail: current?.submitterEmail,
       adminReview: current?.adminReview,
     };
-    setSubmissions((rows) => rows.some((row) => row.id === id)
-      ? rows.map((row) => row.id === id ? mapped : row)
-      : [mapped, ...rows]);
+    if (current) {
+      setSubmissions((rows) => rows.map((row) => row.id === id ? mapped : row));
+    } else {
+      setDetailCache((cache) => ({ ...cache, [id]: mapped }));
+    }
     return mapped;
   }, [accessToken]);
 
   const addServerSubmission = useCallback((item: ApiSubmission, imageUri?: string | null) => {
     const row = fromApi(item, imageUri);
+    if (!submissionsRef.current.some((entry) => entry.id === row.id)) setTotal((count) => count + 1);
     setSubmissions((previous) => [row, ...previous.filter((entry) => entry.id !== row.id)]);
     return row.id;
   }, []);
 
   const updateSubmission = useCallback((id: string, patch: Partial<Submission>) => {
+    const existing = submissionsRef.current.find((row) => row.id === id);
+    if (patch.dispute && existing && !existing.dispute) setDisputeTotal((count) => count + 1);
     setSubmissions((rows) => rows.map((row) => row.id === id ? { ...row, ...patch } : row));
+    setDetailCache((cache) => (cache[id] ? { ...cache, [id]: { ...cache[id], ...patch } } : cache));
   }, []);
 
   const value = useMemo(() => ({
-    submissions, loading, loadError, getById, refreshSubmissions, loadSubmissionDetail,
-    addServerSubmission, updateSubmission,
-  }), [submissions, loading, loadError, getById, refreshSubmissions, loadSubmissionDetail, addServerSubmission, updateSubmission]);
+    submissions, total, disputeTotal, hasMore, loading, loadingMore, loadError, getById, refreshSubmissions,
+    loadMore, loadSubmissionDetail, addServerSubmission, updateSubmission,
+  }), [submissions, total, disputeTotal, hasMore, loading, loadingMore, loadError, getById, refreshSubmissions,
+    loadMore, loadSubmissionDetail, addServerSubmission, updateSubmission]);
 
   return <SubmissionsContext.Provider value={value}>{children}</SubmissionsContext.Provider>;
 }

@@ -2,6 +2,7 @@ import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback } from 'react';
 import { FlatList, StyleSheet, View } from 'react-native';
 
+import { LoadMoreFooter } from '@/components/LoadMoreFooter';
 import { SubmissionRow } from '@/components/SubmissionRow';
 import { AppText, EmptyState, useAppTheme } from '@/components/ui';
 import { space } from '@/constants/theme';
@@ -10,7 +11,7 @@ import { useSubmissions } from '@/lib/SubmissionsContext';
 
 export default function DisputePickScreen() {
   const { colors } = useAppTheme();
-  const { submissions, refreshSubmissions, loading, loadError } = useSubmissions();
+  const { submissions, total, loadMore, loadingMore, refreshSubmissions, loading, loadError } = useSubmissions();
   const router = useRouter();
 
   useFocusEffect(useCallback(() => {
@@ -29,6 +30,11 @@ export default function DisputePickScreen() {
         </AppText>
       }
       ItemSeparatorComponent={() => <View style={styles.separator} />}
+      onEndReached={() => void loadMore()}
+      onEndReachedThreshold={0.4}
+      ListFooterComponent={
+        <LoadMoreFooter loaded={submissions.length} total={total} loading={loadingMore} onLoadMore={() => void loadMore()} />
+      }
       ListEmptyComponent={
         loadError ? (
           <EmptyState icon="circle-alert" title="Could not load your checks" message={loadError}

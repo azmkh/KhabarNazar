@@ -36,14 +36,16 @@ def test_ocr_reports_unavailable_instead_of_inventing_text(tmp_path, monkeypatch
 
 
 def test_heatmap_is_rendered_and_served_only_to_owner(monkeypatch):
-    import app.services.submission_service as service
+    import app.ai.pipeline as pipeline
 
-    # Stand-in for a future visual model that returns an attribution map.
-    monkeypatch.setattr(service, "analyze_image", lambda path: {
+    # Stand-in for the image detector returning a Grad-CAM attribution map.
+    monkeypatch.setattr(pipeline, "analyze_image", lambda path: {
         "image_score": 0.6,
-        "manipulation_prediction": "Manipulated",
+        "manipulation_prediction": "Likely AI-generated",
         "attribution_map": np.linspace(0, 1, 16).reshape(4, 4),
         "is_stub": False,
+        "summary": "stand-in detector",
+        "model_version": "test-detector",
     })
     owner = _headers("heatmap.owner@example.com")
     data = client.post("/submissions/image", headers=owner, files={"file": ("x.png", _png(), "image/png")}).json()

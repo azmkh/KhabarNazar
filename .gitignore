@@ -51,3 +51,9 @@ dataset/**
 # local databases
 *.db
 *.sqlite3
+
+# trained Urdu text model (~1 GB, over GitHub's 100 MB limit); created by text_module/notebooks
+models/text/xlmr/
+# The verified release downloader stores separate Urdu/Roman Urdu checkpoints here.
+text_module/urdu/models/xlmr/
+text_module/roman_urdu/models/xlmr/

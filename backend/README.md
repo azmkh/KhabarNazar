@@ -1,6 +1,6 @@
 # KhabarNazar — Backend Service
 
-Welcome to the backend service for **KhabarNazar**, an AI-assisted fake-news and misinformation detection platform for Urdu and Roman Urdu news and news images.
+Welcome to the backend service for **KhabarNazar**, an AI-assisted misinformation decision-support platform for text and news images. The text API uses separate trained XLM-R checkpoints for Urdu script and Roman Urdu. English is accepted as input but classification is not connected.
 
 The backend is built with **FastAPI**, **PostgreSQL**, **SQLAlchemy**, and **Alembic**, designed with a clean layered architecture that separates routers, services, database models, and AI inference engines.
 
@@ -62,6 +62,16 @@ pip install -r requirements.txt
    copy. Re-running it is safe (databases are kept; the role gets a new password).
 3. Create the tables with `alembic upgrade head` (section 6).
 
+**What is in the database:** [`docs/DATABASE.md`](docs/DATABASE.md) describes every table and
+column, with a diagram, allowed values and the migration history ([`docs/schema.sql`](docs/schema.sql)
+has the exact SQL). For the live state at any time (migration level, row counts, latest
+activity, pending disputes) run:
+```powershell
+.\.venv\Scripts\python.exe scripts\describe_database.py --summary
+```
+After adding a migration, regenerate the docs with `scripts\describe_database.py`
+(no flag); `--check` reports whether they still match the database.
+
 By default PostgreSQL only accepts password logins from this computer, and
 Windows Firewall blocks port 5432 from other devices, so the database is not
 reachable from the network; the phone talks only to the FastAPI server.
@@ -88,7 +98,10 @@ Review and adjust your environment variables:
 - `JWT_ALGORITHM`: Usually `HS256`.
 - `ACCESS_TOKEN_EXPIRE_MINUTES`: Token validity duration (e.g. `1440` minutes / 24 hours).
 - `UPLOAD_DIR`: Path to the image upload store (`uploads`, resolved from `backend/`).
-- `TEXT_RISK_WEIGHT` / `IMAGE_RISK_WEIGHT`: weights for the combined risk score (default 0.7 / 0.3).
+- `MAX_IMAGE_PIXELS`: largest decoded image (width x height) accepted, against decompression bombs (default 40,000,000).
+- `OCR_MIN_LETTERS` / `OCR_MIN_CONFIDENCE`: when OCR text counts as usable, sending the image down the
+  image-with-text branch (default 10 letters, average confidence 0.3).
+- `PRELOAD_MODELS`: load the AI models in a background thread at startup (default `true`).
 - `MAX_UPLOAD_SIZE_MB`: Maximum permitted file upload size (default: 10 MB).
 - `CORS_ORIGINS`: Allowed browser origins (e.g. Expo web `http://localhost:8081`).
   Native apps on a phone/emulator are not affected by CORS.
@@ -169,7 +182,7 @@ All submission routes require a Bearer JWT from `POST /auth/login` or `POST /aut
 
 | Method | Path | Description |
 | --- | --- | --- |
-| `POST` | `/submissions/text` | Save Urdu / Roman Urdu text. AI prediction is a stub until Stage 5. |
+| `POST` | `/submissions/text` | Save text and classify it only when a compatible trained model is connected. |
 | `POST` | `/submissions/image` | Upload JPEG, PNG, or WEBP (max 10 MB). Stored under `backend/uploads/` with a generated filename. |
 | `GET` | `/submissions` | Current user's history, newest first (`skip`, `limit`). |
 | `GET` | `/submissions/{submission_id}` | Full record for a submission owned by the current user. |
@@ -188,17 +201,20 @@ curl -X POST http://localhost:8000/submissions/image ^
   -F "file=@screenshot.png"
 ```
 
-`final_label` is `Uncertain` until the text model is trained. The API does not
-invent predictions: while no model is connected, `text_confidence`,
-`combined_risk_score`, and `is_news` are `null` (not `0` or `true`).
+The API returns `text_submission.processing_status` as `completed` or `unavailable`.
+When no compatible classifier is connected, it returns `Uncertain` with null
+`text_confidence` and `combined_risk_score`, plus an explanation of the limitation.
+It never substitutes a mock prediction.
 
 Users can read only their own submissions; admins can read any submission.
 
-**Risk score.** `text_confidence` is how sure the model is of its own label;
-`combined_risk_score` is the probability that the content is *Fake*, so a
-confident "Real" result has a low risk. When an image manipulation model is
-connected, its `image_score` is combined with the text risk using
-`TEXT_RISK_WEIGHT`/`IMAGE_RISK_WEIGHT`; missing signals are left out.
+**Risk score.** `text_confidence` is the classifier's maximum softmax score; it
+is uncalibrated and does not measure factual truth. `combined_risk_score` is the
+model's probability estimate that the content is *Fake*, so a
+confident "Real" result has a low risk. Only a text classification (typed text, or
+the text read from an image) sets `final_label` and `combined_risk_score`. The
+image detector's `image_score` is never mixed in: an AI-generated picture does not
+make a claim false (see "AI pipeline" below).
 
 ## Stage 4: dataset and model preparation
 
@@ -242,33 +258,29 @@ important data; source files remain untouched. Generated files are written to
 `dataset/train/train.csv`, `dataset/validation/validation.csv`, and
 `dataset/test/test.csv`, replacing those generated split files on rerun.
 
-### Stage 5: text model
+### Stage 5: Urdu and Roman Urdu text models
 
-The text classifier uses word and character TF-IDF features with logistic
-regression. Word features cover Urdu and Roman Urdu tokens; character features
-help with spelling variation in transliterated Urdu. Training data must already
-contain real binary labels. The label strings are supplied explicitly so the
-script does not guess their meaning.
-
-From `backend/`, after preparing the workbook splits and confirming the actual
-column and label values:
+Typed text is classified by the separately trained XLM-R checkpoints. The Urdu
+checkpoint uses its saved Urdu normalization and 64-token training limit; the
+Roman Urdu checkpoint receives the original `roman_text` input and supports up
+to 512 tokens. Download missing release artifacts from the repository root:
 
 ```bash
-python scripts/train_text_model.py --text-column ACTUAL_TEXT_COLUMN --label-column ACTUAL_LABEL_COLUMN --fake-label ACTUAL_FAKE_VALUE --real-label ACTUAL_REAL_VALUE
+python text_module/download_models.py urdu
+python text_module/download_models.py roman_urdu
 ```
 
-The script evaluates against validation and test splits and writes
-`models/text/text_classifier.joblib`. The API loads that file automatically;
-set `KHABARNAZAR_TEXT_MODEL_PATH` to use a different artifact path. Until a
-trained artifact exists, API results remain `Uncertain` with `is_stub: true`.
-Only train on data you are authorized to use, and inspect the reported test
-metrics before presenting this model as reliable.
+The authenticated `POST /submissions/text` endpoint persists the prediction in
+the existing submission workflow. English, mixed-script, and uncertain input
+are not sent to either checkpoint and return an unavailable/uncertain result.
+Model scores are classifier scores, not independent fact-checking evidence.
+See the Text models section above for model paths and length overrides.
 
 ### Stage 6: OCR and image analysis
 
 Image submissions run EasyOCR for Urdu (`ur`) and English (`en`), then pass any
-extracted text through the Stage 5 classifier when its trained artifact is
-available. OCR output, average OCR confidence, detected script/language,
+extracted text through the same supported-language text routing when a matching
+trained artifact is available. OCR output, average OCR confidence, detected script/language,
 extracted-text prediction, and extracted-text confidence are saved with the
 submission. Apply the new database fields with:
 
@@ -283,11 +295,8 @@ location. On Windows, EasyOCR's installation guidance asks users to install
 PyTorch and torchvision first using the official PyTorch selector, then install
 the backend requirements. OCR is CPU-only in this backend configuration.
 
-No trained image manipulation model is included, so `image_score` remains
-`null` and `manipulation_prediction` is `Not Analyzed`. To connect one, return
-`image_score`, `manipulation_prediction` (max 50 characters, e.g. `Manipulated`
-or `Authentic`), and optionally `attribution_map` from `analyze_image()` in
-`app/ai/image/predict.py`. OCR lives separately in `app/ai/image/ocr.py`. OCR text analysis
+The AI-generated vs real image detector is described in "AI pipeline" below.
+OCR lives separately in `app/ai/image/ocr.py`. OCR text analysis
 does not determine whether image pixels are authentic, and image authenticity
 does not determine whether a news claim is true. The service keeps those
 signals separate. If EasyOCR is not installed or its weights cannot be loaded,
@@ -325,6 +334,25 @@ attributions on its own. The image submission path saves a heatmap only when an
 image model returns such an array; until then `heatmap_path` stays `null` and
 the explanation identifies the missing visual attribution. A heatmap describes
 model attention and does not establish image authenticity or claim truth.
+
+### Lists, paging and the admin dashboard
+
+`GET /submissions`, `GET /admin/submissions` and `GET /disputes` take `skip`
+and `limit` (max 100) and return a plain JSON list, newest first. The total
+number of matching rows across all pages is in the `X-Total-Count` response
+header (exposed to browsers via CORS), so clients can page with
+`skip = rows loaded so far` until they reach the total.
+
+- `GET /submissions` is always the signed-in user's **own** history, admins
+  included.
+- `GET /disputes?mine=true` returns only your own disputes even as an admin
+  (without it, admins see everyone's). `status=pending|reviewed|closed` filters
+  on the server.
+- `GET /admin/submissions` items add `user_email`, `dispute_count`,
+  `latest_dispute_id` and `latest_dispute_status` to the normal submission.
+- `GET /admin/stats` returns totals counted across the whole database: users,
+  submissions (by label and by type), admin overrides, and disputes
+  (total / pending / reviewed).
 
 ### Stage 8: disputes and administrator review
 
@@ -387,3 +415,87 @@ backend are shown as unavailable rather than filled with demo scores.
 
 Password reset and server-side profile name/email editing are not implemented
 by the current API. Profile photos remain local to the device.
+
+## AI pipeline
+
+`app/ai/pipeline.py` implements the project diagram:
+
+```text
+Text  -> text pipeline -> text classification -----------------------------------> evaluation
+Image -> image pipeline -> image with text    -> OCR -> text classification -> image pair -> evaluation
+                        -> image with no text -> AI-generated or real -----------------------> evaluation
+```
+
+- **Text.** `app/ai/text/predict.py` detects the input language and routes Urdu script and Roman
+  Urdu to their separate XLM-R checkpoints. Both checkpoints map class `0` to `Real` and `1` to
+  `Fake`; Urdu uses its checkpoint metadata limit (64 tokens), and Roman Urdu uses its trained
+  512-token limit. The tokenizer truncates beyond those limits as it did during training, and the
+  response explanation says when truncation occurred. Roman Urdu text is sent to its tokenizer
+  unchanged. Urdu uses the Urdu training normalization. English, mixed-script, and ambiguous Latin
+  input are not routed to either checkpoint and return `Uncertain` without a score.
+- **Image with text.** EasyOCR (Urdu + English) reads the image. If the text has at least
+  `OCR_MIN_LETTERS` letters and average confidence `OCR_MIN_CONFIDENCE`, it goes through the *same*
+  text pipeline as typed text. The image, its OCR text and the classification are stored together
+  in `image_submissions` (the "image pair"), and `analysis_branch` is `image_pair`. The AI-or-real
+  detector is not run, and `manipulation_prediction` is `Skipped: image has text`.
+- **Image with no usable text** (none, too little, unclear, or OCR unavailable): the zero-shot
+  ensemble from `image_module/` notebook 05 (CLIP ViT-L/14 + DINOv2-L + robust ResNet18, P(real)
+  averaged, threshold 0.5). `image_score` is the chance the picture is AI-generated, and
+  `manipulation_prediction` is `Likely AI-generated` or `Likely real photo`. The heatmap is Grad-CAM
+  from the ResNet18 member. Preprocessing copies the notebooks: shorter side to 512, then a 224x224
+  centre crop, so only the centre of the image is analysed. `analysis_branch` is `ai_or_real`.
+- **Evaluation.** `evaluate()` does not combine branches. The verdict and risk come from the text
+  classification only. On the AI-or-real branch the verdict is always `Uncertain`, because no claim
+  was checked.
+
+Every unavailable part (missing weights, missing packages, a model error) is reported in the
+explanation instead of being replaced by a made-up result.
+
+### Model files
+
+| Model | Location | How to get it |
+|---|---|---|
+| Urdu XLM-RoBERTa | `models/text/xlmr/` (existing local checkpoint) or `text_module/urdu/models/xlmr/` | `python text_module/download_models.py urdu` downloads the verified `urdu-xlmr-v1` release if you need a fresh copy. |
+| Roman Urdu XLM-RoBERTa-large (~1.12 GB weights) | `text_module/roman_urdu/models/xlmr/` (git-ignored) | `python text_module/download_models.py roman_urdu` downloads the `roman-urdu-xlmr-v1` release. |
+| Image heads + robust ResNet18 | `image_module/models/` (in git) | comes with the repo |
+| CLIP ViT-L/14, DINOv2-L (about 2.9 GB) | Hugging Face cache | downloaded automatically on first load |
+| EasyOCR Urdu + English | `backend/.cache/easyocr` | downloaded automatically on first OCR |
+
+`KHABARNAZAR_URDU_XLMR_DIR` and `KHABARNAZAR_ROMAN_XLMR_DIR` override the respective text model
+folders. `KHABARNAZAR_URDU_XLMR_MAX_LEN` and `KHABARNAZAR_ROMAN_XLMR_MAX_LEN` set per-model token
+limits and cannot exceed the verified training/checkpoint limits. The legacy
+`KHABARNAZAR_XLMR_MAX_LEN` is a Roman Urdu override only; if it is set to `256`, Roman Urdu uses 256
+tokens until that variable is removed or changed (for 512, set it to `512` or set the Roman-specific
+variable). Urdu continues to use its own 64-token training limit. These values can be set in
+`backend/.env`; the code does not rewrite that file. `KHABARNAZAR_IMAGE_MODEL_DIR` and
+`KHABARNAZAR_OCR_MODEL_DIR` continue to override the image/OCR folders.
+
+### Installing the ML packages (CPU)
+
+```bash
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cpu
+pip install -r requirements.txt
+pip install urduhack --no-deps
+```
+
+Without them the API still runs and reports every model as unavailable.
+
+### Reported results (from the module notebooks, not re-run here)
+
+The datasets are not in the repository, so these numbers are recorded from the local
+checkpoint metadata and have not been reproduced by this backend. The external result
+is a warning that held-out accuracy should not be treated as general fact-checking quality.
+
+- Urdu text, Hook and Bait test set: macro-F1 0.942, accuracy 94.4%. On Bend the Truth (outside
+  data, full articles): macro-F1 0.555, close to chance. It works on headline-style text.
+- Roman Urdu XLM-R large, one reported test run (826 examples): macro-F1 0.842, accuracy 84.3%.
+  The source articles are LLM-transliterated rather than naturally user-written Roman Urdu; this
+  backend has not reproduced those metrics. Model probabilities are uncalibrated classifier scores,
+  not independent fact verification.
+- Image ensemble, zero-shot: AI vs Real 94.6%, Tiny-GenImage 91.5%, Misinfo test split 84.0%
+  (AUC 0.910). Source: `image_module/outputs/05_comparison.csv`.
+
+### Tests
+
+`pytest` mocks OCR and the models. `pytest --real-models` also runs smoke tests that load the
+real models (they need the files above).

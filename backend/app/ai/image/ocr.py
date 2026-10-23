@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import logging
 import os
+import threading
 from functools import lru_cache
 from pathlib import Path
 
@@ -11,6 +12,7 @@ from app.ai.text.language_detection import detect_language
 
 logger = logging.getLogger(__name__)
 SUPPORTED_OCR_LANGUAGES = ("ur", "en")
+_load_lock = threading.Lock()
 
 
 @lru_cache(maxsize=1)
@@ -27,16 +29,36 @@ def _get_ocr_reader(model_directory: str):
     )
 
 
-def run_ocr(image_path: str) -> dict:
-    """Extract Urdu/English text with EasyOCR when installed and initialized."""
-    model_directory = Path(
+def load_ocr_reader():
+    """Load (or return the already loaded) EasyOCR reader; used to warm up at startup."""
+    with _load_lock:  # two first requests at once must not load EasyOCR twice
+        return _get_ocr_reader(str(_model_directory().resolve()))
+
+
+def _model_directory() -> Path:
+    return Path(
         os.environ.get(
             "KHABARNAZAR_OCR_MODEL_DIR",
             str(Path(__file__).resolve().parents[3] / ".cache" / "easyocr"),
         )
     ).expanduser()
+
+
+def has_usable_text(ocr_result: dict, min_letters: int, min_confidence: float) -> bool:
+    """True when OCR found enough confidently read text to classify (the image-with-text branch).
+
+    A few stray letters (a watermark, a logo) or a low-confidence read do not count.
+    """
+    text = ocr_result.get("text") or ""
+    confidence = ocr_result.get("confidence")
+    letters = sum(character.isalpha() for character in text)
+    return letters >= min_letters and confidence is not None and confidence >= min_confidence
+
+
+def run_ocr(image_path: str) -> dict:
+    """Extract Urdu/English text with EasyOCR when installed and initialized."""
     try:
-        reader = _get_ocr_reader(str(model_directory.resolve()))
+        reader = load_ocr_reader()
         detections = reader.readtext(image_path, detail=1, paragraph=False)
     except ImportError:
         return {
@@ -48,7 +70,7 @@ def run_ocr(image_path: str) -> dict:
             "message": "EasyOCR is not installed. Install backend requirements to enable OCR.",
         }
     except Exception:
-        logger.exception("EasyOCR could not initialize or process image %s", image_path)
+        logger.exception("EasyOCR could not initialize or process the image")
         return {
             "text": None,
             "confidence": None,

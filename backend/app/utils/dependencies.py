@@ -7,6 +7,9 @@ from app.models.user import User
 from app.services.auth_service import get_user_by_id
 from app.utils.security import decode_access_token
 
+# List endpoints report how many rows exist across all pages in this header.
+TOTAL_COUNT_HEADER = "X-Total-Count"
+
 # Swagger shows an "Authorize" box where the access_token from /auth/login is pasted.
 bearer_scheme = HTTPBearer(auto_error=False, description="Paste the access_token returned by /auth/login")
 

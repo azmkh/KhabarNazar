@@ -25,9 +25,11 @@ export type Submission = {
   textPreview?: string;
   imageUri?: string | null;
   verdict: Verdict;
-  /** Calibrated model confidence 0–1 (display with extra precision). */
+  /** Raw, uncalibrated model score 0–1; this is not a probability that the claim is true. */
   confidence: number | null;
-  /** Probability the content is fake (0–1), combining text and image signals; null when no model ran. */
+  detectedLanguage: string | null;
+  processingStatus: 'completed' | 'unavailable' | null;
+  /** Probability the claim is fake (0–1), from the text classifier only; null when no claim was classified. */
   riskScore: number | null;
   summary: string;
   highlightedWords?: Array<{ word: string; contribution: number; direction: string }>;
@@ -38,9 +40,15 @@ export type Submission = {
   /** How well the content matches known reputable patterns (0–100). */
   sourceCredibility: Score100 | null;
   sourceCredibilityLabel: string;
-  /** Image tampering / synthetic cues; null when no image was analyzed. */
-  manipulationLikelihood: Score100 | null;
-  manipulationLabel: string;
+  /**
+   * Which image branch ran: 'image_pair' (text in the image was classified as a news claim) or
+   * 'ai_or_real' (no usable text, so the picture was checked for AI generation). Null for text
+   * checks and for images analysed before the two branches existed.
+   */
+  analysisBranch: 'image_pair' | 'ai_or_real' | null;
+  /** Chance the picture is AI-generated (0–100); null when the detector did not run. Not a claim verdict. */
+  aiGeneratedLikelihood: Score100 | null;
+  aiGeneratedLabel: string;
   dispute?: SubmissionDispute;
   /** Who filed the dispute (demo). */
   submitterEmail?: string;

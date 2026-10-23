@@ -25,3 +25,14 @@ export function fullDate(timestamp: number) {
 export function percent(value: number | null | undefined, digits = 1) {
   return value == null ? 'Unavailable' : `${(value * 100).toFixed(digits)}%`;
 }
+
+export function languageLabel(language: string | null | undefined) {
+  switch (language) {
+    case 'urdu': return 'Urdu script';
+    case 'roman_urdu': return 'Roman Urdu';
+    case 'english': return 'English';
+    case 'mixed': return 'Mixed Urdu and Latin script';
+    case 'unknown': return 'Could not identify confidently';
+    default: return language ?? 'Not detected';
+  }
+}
