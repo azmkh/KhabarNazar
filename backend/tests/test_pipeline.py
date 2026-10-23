@@ -5,6 +5,7 @@ check routing, persistence and honesty of the results, not model quality. The sm
 the end load the real models and only run with `pytest --real-models`.
 """
 import io
+import re
 
 import pytest
 from fastapi.testclient import TestClient
@@ -338,7 +339,8 @@ def test_real_urdu_text_submission_returns_and_persists_model_result():
     detail = client.get(f"/submissions/{created['id']}", headers=headers)
     assert detail.status_code == 200
     assert detail.json()["text_submission"]["text_prediction"] == text_result["text_prediction"]
-    assert detail.json()["explainability"]["model_version"] == "text-xlmr-hookbait"
+    # text-model-v1 or urdu-xlmr-v1, whichever Urdu checkpoint is installed.
+    assert detail.json()["explainability"]["model_version"] in {"text-xlmr-hookbait", "xlmr-urdu"}
 
 
 @pytest.mark.real_models
@@ -362,8 +364,9 @@ def test_real_long_urdu_article_uses_the_long_article_model(monkeypatch):
 @pytest.mark.real_models
 def test_real_urdu_text_over_model_limit_uses_training_truncation():
     # The long-article model file is hidden here (conftest), so the XLM-R fallback is tested.
+    # Long enough to pass either Urdu checkpoint's limit (64 or 256 tokens).
     headers = _headers("real.urdu.long@example.com")
-    long_text = " ".join([URDU_TEXT] * 20)
+    long_text = " ".join([URDU_TEXT] * 40)
     response = client.post("/submissions/text", json={"text": long_text}, headers=headers)
     assert response.status_code == 201, response.text
     body = response.json()
@@ -371,7 +374,7 @@ def test_real_urdu_text_over_model_limit_uses_training_truncation():
     assert body["combined_risk_score"] is not None
     assert body["text_submission"]["processing_status"] == "completed"
     assert body["text_submission"]["text_confidence"] is not None
-    assert "truncated to 64 model tokens" in body["explainability"]["explanation_summary"]
+    assert re.search(r"truncated to (64|256) model tokens", body["explainability"]["explanation_summary"])
 
 
 @pytest.mark.real_models

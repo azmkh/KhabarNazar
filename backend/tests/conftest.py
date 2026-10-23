@@ -134,7 +134,14 @@ def _no_real_models(request, monkeypatch):
     loaded (and downloaded). Tests marked real_models use the real model folders."""
     if "real_models" in request.keywords:
         project_root = TEST_DIR.parent.parent
-        monkeypatch.setenv("KHABARNAZAR_URDU_XLMR_DIR", str(project_root / "models" / "text" / "xlmr"))
+        # The older text-model-v1 folder if this PC has it, otherwise the urdu-xlmr-v1 release
+        # folder that text_module/download_models.py fills. KHABARNAZAR_REAL_URDU_XLMR_DIR picks one.
+        legacy_urdu = project_root / "models" / "text" / "xlmr"
+        urdu_dir = os.environ.get("KHABARNAZAR_REAL_URDU_XLMR_DIR") or str(
+            legacy_urdu if (legacy_urdu / "config.json").is_file()
+            else project_root / "text_module" / "urdu" / "models" / "xlmr"
+        )
+        monkeypatch.setenv("KHABARNAZAR_URDU_XLMR_DIR", urdu_dir)
         monkeypatch.setenv(
             "KHABARNAZAR_ROMAN_XLMR_DIR",
             str(project_root / "text_module" / "roman_urdu" / "models" / "xlmr"),
