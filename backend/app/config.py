@@ -53,6 +53,10 @@ class Settings(BaseSettings):
     ROMAN_XLMR_MAX_LEN: int | None = Field(default=None, gt=0, validation_alias="KHABARNAZAR_ROMAN_XLMR_MAX_LEN")
     URDU_XLMR_DIR: str | None = Field(default=None, validation_alias="KHABARNAZAR_URDU_XLMR_DIR")
     ROMAN_XLMR_DIR: str | None = Field(default=None, validation_alias="KHABARNAZAR_ROMAN_XLMR_DIR")
+    # Urdu text longer than this many words goes to the long-article TF-IDF model
+    # (text_module/urdu/models/tfidf_long_articles.joblib unless TEXT_MODEL_PATH is set).
+    LONG_TEXT_WORDS: int = Field(default=150, gt=0, validation_alias="KHABARNAZAR_LONG_TEXT_WORDS")
+    TEXT_MODEL_PATH: str | None = Field(default=None, validation_alias="KHABARNAZAR_TEXT_MODEL_PATH")
 
     # CORS
     CORS_ORIGINS: Union[List[str], str] = ["http://localhost:8081", "http://localhost:19006"]

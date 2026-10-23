@@ -260,21 +260,47 @@ important data; source files remain untouched. Generated files are written to
 
 ### Stage 5: Urdu and Roman Urdu text models
 
-Typed text is classified by the separately trained XLM-R checkpoints. The Urdu
-checkpoint uses its saved Urdu normalization and 64-token training limit; the
-Roman Urdu checkpoint receives the original `roman_text` input and supports up
-to 512 tokens. Download missing release artifacts from the repository root:
+`app/ai/text/predict.py` picks one model per input:
+
+| Input | Model | Location | Reported score (macro-F1) |
+|---|---|---|---|
+| Urdu script, up to 150 words | XLM-R base, trained on Hook and Bait | `text_module/urdu/models/xlmr/` (or the older `models/text/xlmr/`) | 0.974 Hook and Bait test (release `urdu-xlmr-v1`) |
+| Urdu script, longer than 150 words | word + character TF-IDF + Logistic Regression, trained on FIRE 2021 | `text_module/urdu/models/tfidf_long_articles.joblib` (in git) | 0.639 FIRE 2021 test |
+| Roman Urdu | XLM-R large, trained on the KhabarNazar Roman Urdu dataset | `text_module/roman_urdu/models/xlmr/` | see `text_module/roman_urdu/README.md` |
+| English, mixed script, unidentified | none | - | returns `Uncertain` |
+
+Scores are the ones reported by the training notebooks in `text_module/`; this backend has
+not re-run them (the datasets are not in the repository).
+
+Each checkpoint gets the preprocessing it was trained with:
+- **Urdu XLM-R, release `urdu-xlmr-v1`:** the notebook's `clean_urdu` (punctuation kept), up to
+  256 tokens.
+- **Older `text-model-v1` checkpoint:** urduhack cleaning with punctuation removed and a 64-token
+  limit, read from its `khabarnazar_config.json`.
+- **TF-IDF model:** the notebook's `clean_urdu`, on the whole article.
+- **Roman Urdu XLM-R:** the text as typed, up to 512 tokens.
+
+If the TF-IDF file is missing, long Urdu text goes to the XLM-R model (truncated, and the
+explanation says so). Short Urdu text is never sent to the TF-IDF model, because it was trained
+on full articles.
+
+Download the XLM-R folders (about 1 GB each, git-ignored) from the repository root:
 
 ```bash
 python text_module/download_models.py urdu
 python text_module/download_models.py roman_urdu
 ```
 
-The authenticated `POST /submissions/text` endpoint persists the prediction in
-the existing submission workflow. English, mixed-script, and uncertain input
-are not sent to either checkpoint and return an unavailable/uncertain result.
-Model scores are classifier scores, not independent fact-checking evidence.
-See the Text models section above for model paths and length overrides.
+Overrides: `KHABARNAZAR_URDU_XLMR_DIR`, `KHABARNAZAR_ROMAN_XLMR_DIR`,
+`KHABARNAZAR_URDU_XLMR_MAX_LEN`, `KHABARNAZAR_ROMAN_XLMR_MAX_LEN` (the older shared
+`KHABARNAZAR_XLMR_MAX_LEN` applies to Roman Urdu only), `KHABARNAZAR_TEXT_MODEL_PATH` (the
+TF-IDF file) and `KHABARNAZAR_LONG_TEXT_WORDS`. A max length above a model's training limit is
+rejected. The `.joblib` file must be loaded with the scikit-learn version it was saved with
+(pinned in `requirements.txt`).
+
+The authenticated `POST /submissions/text` endpoint stores the prediction in the existing
+submission workflow. Model scores are classifier scores, not independent fact-checking.
+`text_module/urdu/test_urdu_backend.py` runs the real Urdu routing end to end without a server.
 
 ### Stage 6: OCR and image analysis
 
@@ -324,8 +350,10 @@ authenticity or news truth.
 When the trained Stage 5 text model is present, API results include a JSON
 string in `explainability.highlighted_words`. Each entry has a `word`, a signed
 `contribution`, and a `direction` (`supports_prediction` or
-`opposes_prediction`). These are feature attributions from the model, not
-fact-check evidence. The explanation summary states this limitation. With no
+`opposes_prediction`). For the TF-IDF model these come from its
+weights; for the XLM-R models each word is removed in turn and the change in the
+model's output is measured (up to 40 distinct words). These are feature
+attributions from the model, not fact-check evidence. The explanation summary states this limitation. With no
 trained model, highlights remain `null` and the API explains why.
 
 `app.ai.image.explain.save_attribution_heatmap(...)` can render a heatmap from a

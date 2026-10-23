@@ -1,0 +1,44 @@
+{
+  "seed": 42,
+  "jaccard_threshold": 0.5,
+  "total_rows": 8267,
+  "near_duplicate_pairs": 165,
+  "groups_with_more_than_one_article": 155,
+  "rows": {
+    "train": 6615,
+    "val": 826,
+    "test": 826
+  },
+  "by_source_label": {
+    "train": {
+      "ax_to_grind/fake": 989,
+      "ax_to_grind/real": 991,
+      "bend_the_truth/fake": 319,
+      "bend_the_truth/real": 398,
+      "fire/fake": 200,
+      "fire/real": 358,
+      "hook_and_bait/fake": 1680,
+      "hook_and_bait/real": 1680
+    },
+    "val": {
+      "ax_to_grind/fake": 124,
+      "ax_to_grind/real": 124,
+      "bend_the_truth/fake": 39,
+      "bend_the_truth/real": 49,
+      "fire/fake": 25,
+      "fire/real": 45,
+      "hook_and_bait/fake": 210,
+      "hook_and_bait/real": 210
+    },
+    "test": {
+      "ax_to_grind/fake": 124,
+      "ax_to_grind/real": 123,
+      "bend_the_truth/fake": 40,
+      "bend_the_truth/real": 49,
+      "fire/fake": 25,
+      "fire/real": 45,
+      "hook_and_bait/fake": 210,
+      "hook_and_bait/real": 210
+    }
+  }
+}

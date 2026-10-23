@@ -76,3 +76,34 @@ def clean_urdu_for_model(value: object, remove_punctuation: bool = False) -> str
     if remove_punctuation:
         text = _PUNCTUATION.sub(" ", text)
     return _SPACES.sub(" ", text).strip()
+
+
+# ---------------------------------------------------------------------------
+# clean_urdu() from text_module/urdu/notebooks/urdu_fake_news_xlmr.ipynb (cell "CHAR_MAP").
+# Used by the models trained in that notebook: the urdu-xlmr-v1 XLM-R release and the
+# long-article TF-IDF model. Must stay identical to the notebook. Punctuation is kept.
+# ---------------------------------------------------------------------------
+_NB_CHAR_MAP = {
+    "ي": "ی",  # Arabic yeh    -> Urdu yeh
+    "ى": "ی",  # alef maksura  -> Urdu yeh
+    "ك": "ک",  # Arabic kaf    -> Urdu kaf
+    "ه": "ہ",  # Arabic heh    -> Urdu heh goal
+    "ە": "ہ",  # ae            -> heh goal
+    "ة": "ۃ",  # teh marbuta   -> Urdu teh marbuta goal
+    "‌": " ", "‍": "", "‏": "", "‎": "",
+}
+_NB_DIACRITICS = re.compile("[ً-ْٰٖ-ٟ]")
+_NB_URL = re.compile(r"https?://\S+|www\.\S+")
+_NB_EMAIL = re.compile(r"\S+@\S+")
+_NB_HTML = re.compile(r"<[^>]+>")
+_NB_SPACE = re.compile(r"\s+")
+
+
+def clean_urdu_notebook(text: object) -> str:
+    text = unicodedata.normalize("NFKC", str(text))
+    text = "".join(_NB_CHAR_MAP.get(character, character) for character in text)
+    text = _NB_DIACRITICS.sub("", text)
+    text = _NB_URL.sub(" ", text)
+    text = _NB_EMAIL.sub(" ", text)
+    text = _NB_HTML.sub(" ", text)
+    return _NB_SPACE.sub(" ", text).strip()

@@ -144,3 +144,21 @@ def test_oversized_override_is_rejected_against_model_positions(tmp_path, monkey
     (tmp_path / "model.safetensors").write_bytes(b"weights")
     with pytest.raises(ValueError, match="exceeds tokenizer/model limit 512"):
         xlmr.XlmrClassifier(tmp_path, "roman")
+
+
+def test_each_urdu_checkpoint_gets_the_cleaning_it_was_trained_with():
+    text = "يہ خبر: کَیا واقعی؟ https://example.com"
+    legacy = xlmr.XlmrClassifier.__new__(xlmr.XlmrClassifier)
+    legacy.script, legacy.notebook_cleaning, legacy.remove_punctuation = "urdu", False, True
+    notebook = xlmr.XlmrClassifier.__new__(xlmr.XlmrClassifier)
+    notebook.script, notebook.notebook_cleaning = "urdu", True
+    # text-model-v1 (khabarnazar_config.json): urduhack cleaning with punctuation removed.
+    assert legacy.prepare(text) == "یہ خبر کیا واقعی"
+    # urdu-xlmr-v1 (no metadata file): the notebook's clean_urdu, which keeps punctuation.
+    assert notebook.prepare(text) == "یہ خبر: کیا واقعی؟"
+
+
+def test_notebook_urdu_release_uses_its_training_length(monkeypatch):
+    monkeypatch.delenv("KHABARNAZAR_URDU_XLMR_MAX_LEN", raising=False)
+    monkeypatch.setattr(settings, "URDU_XLMR_MAX_LEN", None)
+    assert xlmr.configured_max_length("urdu", xlmr.URDU_NOTEBOOK_MAX_LEN) == 256

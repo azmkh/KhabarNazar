@@ -16,7 +16,7 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Optional
 
-from app.ai.text.preprocess import USING_URDUHACK, clean_urdu_for_model
+from app.ai.text.preprocess import USING_URDUHACK, clean_urdu_for_model, clean_urdu_notebook
 from app.config import BASE_DIR, settings
 
 logger = logging.getLogger(__name__)
@@ -28,6 +28,12 @@ DEFAULT_DIRS = {
     "roman": TEXT_MODULE / "roman_urdu" / "models" / "xlmr",
 }
 TRAINING_MAX_LEN = {"urdu": 64, "roman": 512}
+# Two Urdu checkpoints exist and were prepared differently:
+# - release text-model-v1 ships khabarnazar_config.json (max_len 64, urduhack cleaning,
+#   punctuation removed) and those settings are read from it;
+# - release urdu-xlmr-v1 (text_module/urdu notebook, run E1) has no such file; it was trained
+#   with MAX_LEN = 256 on text cleaned by the notebook's clean_urdu (punctuation kept).
+URDU_NOTEBOOK_MAX_LEN = 256
 MODEL_VERSION = {"urdu": "xlmr-urdu", "roman": "xlmr-roman-urdu"}
 LANGUAGE_TO_MODEL = {"urdu": "urdu", "roman_urdu": "roman"}
 _LOAD_LOCK = threading.Lock()
@@ -105,7 +111,11 @@ class XlmrClassifier:
         metadata_path = path / "khabarnazar_config.json"
         if metadata_path.is_file():
             metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+        # Without its own metadata file an Urdu checkpoint is the notebook release (see above).
+        notebook_urdu = script == "urdu" and not metadata
         metadata_max = int(metadata["max_len"]) if script == "urdu" and metadata.get("max_len") else None
+        if notebook_urdu:
+            metadata_max = URDU_NOTEBOOK_MAX_LEN
         max_len = configured_max_length(script, metadata_max)
 
         self.torch = torch
@@ -131,11 +141,14 @@ class XlmrClassifier:
             )
         self.max_len = max_len
         self.model_version = str(metadata.get("model_version", MODEL_VERSION[script]))[:50]
+        self.notebook_cleaning = notebook_urdu
         self.remove_punctuation = bool(metadata.get("remove_punctuation", True)) if script == "urdu" else False
-        if script == "urdu" and not USING_URDUHACK:
+        if script == "urdu" and not notebook_urdu and not USING_URDUHACK:
             raise ValueError("Urdu normalization dependency urduhack is unavailable")
 
     def prepare(self, text: str) -> str:
+        if self.script == "urdu" and getattr(self, "notebook_cleaning", False):
+            return clean_urdu_notebook(text)
         if self.script == "urdu":
             return clean_urdu_for_model(text, remove_punctuation=self.remove_punctuation)
         # The Roman Urdu training notebook feeds roman_text directly to XLM-R.

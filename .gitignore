@@ -57,3 +57,5 @@ models/text/xlmr/
 # The verified release downloader stores separate Urdu/Roman Urdu checkpoints here.
 text_module/urdu/models/xlmr/
 text_module/roman_urdu/models/xlmr/
+# XLM-R text model folders (~1 GB each) are downloaded separately, see text_module/README.md
+text_module/*/models/xlmr/

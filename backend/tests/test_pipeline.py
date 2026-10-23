@@ -342,7 +342,26 @@ def test_real_urdu_text_submission_returns_and_persists_model_result():
 
 
 @pytest.mark.real_models
+def test_real_long_urdu_article_uses_the_long_article_model(monkeypatch):
+    from app.config import settings
+
+    # Use text_module/urdu's real file instead of the hidden path conftest sets.
+    monkeypatch.delenv("KHABARNAZAR_TEXT_MODEL_PATH", raising=False)
+    monkeypatch.setattr(settings, "TEXT_MODEL_PATH", None)
+    headers = _headers("real.urdu.article@example.com")
+    long_text = " ".join([URDU_TEXT] * 20)
+    response = client.post("/submissions/text", json={"text": long_text}, headers=headers)
+    assert response.status_code == 201, response.text
+    body = response.json()
+    assert body["final_label"] in {"Fake", "Real"}
+    assert 0 <= body["combined_risk_score"] <= 1
+    assert body["explainability"]["model_version"] == "tfidf-urdu-long-articles"
+    assert "long-article Urdu model" in body["explainability"]["explanation_summary"]
+
+
+@pytest.mark.real_models
 def test_real_urdu_text_over_model_limit_uses_training_truncation():
+    # The long-article model file is hidden here (conftest), so the XLM-R fallback is tested.
     headers = _headers("real.urdu.long@example.com")
     long_text = " ".join([URDU_TEXT] * 20)
     response = client.post("/submissions/text", json={"text": long_text}, headers=headers)
