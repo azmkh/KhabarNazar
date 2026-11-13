@@ -156,6 +156,23 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
   const [loadError, setLoadError] = useState<string | null>(null);
   const submissionsRef = useRef(submissions);
   const disputesRef = useRef<ApiDispute[]>([]);
+  // Full records loaded by id (explanation, scores, OCR, heatmap). List pages carry only a summary,
+  // so a list refresh must not replace a record the result screen has already loaded in full.
+  const detailsRef = useRef<Map<string, Submission>>(new Map());
+  const keepDetail = useCallback((row: Submission): Submission => {
+    const detail = detailsRef.current.get(row.id);
+    if (!detail) return row;
+    // Fields that can change after the check (an admin review) come from the fresh list row.
+    return {
+      ...detail,
+      verdict: row.verdict,
+      riskScore: row.riskScore,
+      dispute: row.dispute,
+      adminReview: row.adminReview,
+      submitterEmail: row.submitterEmail ?? detail.submitterEmail,
+      imageUri: detail.imageUri ?? row.imageUri,
+    };
+  }, []);
   // Bumped on every refresh so a slow, older response can't overwrite a newer one.
   const generation = useRef(0);
 
@@ -164,6 +181,7 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
   const reset = useCallback(() => {
     generation.current++;
     disputesRef.current = [];
+    detailsRef.current = new Map();
     setSubmissions([]);
     setTotal(0);
     setDisputeTotal(0);
@@ -185,7 +203,7 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
       ]);
       if (current !== generation.current) return;
       disputesRef.current = disputes.items;
-      setSubmissions(withDisputes(page.items.map((item) => fromApi(item)), disputes.items));
+      setSubmissions(withDisputes(page.items.map((item) => fromApi(item)), disputes.items).map(keepDetail));
       setTotal(page.total);
       setDisputeTotal(disputes.total);
     } catch (error) {
@@ -195,7 +213,7 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
     } finally {
       if (current === generation.current) setLoading(false);
     }
-  }, [accessToken, user, reset]);
+  }, [accessToken, user, reset, keepDetail]);
 
   const hasMore = submissions.length < total;
 
@@ -206,7 +224,7 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
     try {
       const page = await listSubmissions(accessToken, submissionsRef.current.length, PAGE_SIZE);
       if (current !== generation.current) return;
-      const next = withDisputes(page.items.map((item) => fromApi(item)), disputesRef.current);
+      const next = withDisputes(page.items.map((item) => fromApi(item)), disputesRef.current).map(keepDetail);
       setSubmissions((rows) => {
         const seen = new Set(rows.map((row) => row.id));
         return [...rows, ...next.filter((row) => !seen.has(row.id))];
@@ -217,7 +235,7 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
     } finally {
       if (current === generation.current) setLoadingMore(false);
     }
-  }, [accessToken, loading, loadingMore, total]);
+  }, [accessToken, loading, loadingMore, total, keepDetail]);
 
   useEffect(() => {
     if (!ready) return;
@@ -243,6 +261,7 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
       submitterEmail: current?.submitterEmail,
       adminReview: current?.adminReview,
     };
+    detailsRef.current.set(id, mapped);
     if (current) {
       setSubmissions((rows) => rows.map((row) => row.id === id ? mapped : row));
     } else {
@@ -253,6 +272,8 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
 
   const addServerSubmission = useCallback((item: ApiSubmission, imageUri?: string | null) => {
     const row = fromApi(item, imageUri);
+    // The upload response is the full record, so keep it like a loaded detail.
+    detailsRef.current.set(row.id, row);
     if (!submissionsRef.current.some((entry) => entry.id === row.id)) setTotal((count) => count + 1);
     setSubmissions((previous) => [row, ...previous.filter((entry) => entry.id !== row.id)]);
     return row.id;

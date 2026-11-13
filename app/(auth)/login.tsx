@@ -29,6 +29,7 @@ export default function LoginScreen() {
 
   return (
     <AuthShell
+      showTagline={false}
       title="Welcome back"
       subtitle="Sign in to run checks and see your history."
       footer={

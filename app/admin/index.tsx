@@ -33,7 +33,7 @@ export default function AdminDashboardScreen() {
 
   useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
 
-  const value = (n: number | undefined) => (stats ? n ?? 0 : '–');
+  const value = (n: number | undefined) => (stats ? n ?? 0 : '…');
   const pending = stats?.disputes.pending ?? 0;
 
   return (

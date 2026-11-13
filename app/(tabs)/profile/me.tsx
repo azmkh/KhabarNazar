@@ -15,14 +15,14 @@ export default function MyProfileScreen() {
       <View style={styles.header}>
         <Avatar uri={user?.avatarUri} name={user?.name || user?.email} size={96} />
         <AppText variant="title" align="center">{user?.name || user?.email?.split('@')[0] || 'User'}</AppText>
-        <AppText variant="body" color="textMuted" align="center">{user?.email ?? '—'}</AppText>
+        <AppText variant="body" color="textMuted" align="center">{user?.email ?? 'Email not available'}</AppText>
       </View>
 
       <Card padded={false}>
-        <Field icon="user" label="Name" value={user?.name || '—'} />
-        <Field icon="mail" label="Email" value={user?.email ?? '—'} />
+        <Field icon="user" label="Name" value={user?.name || 'Not set'} />
+        <Field icon="mail" label="Email" value={user?.email ?? 'Not available'} />
         <Field icon="shield-check" label="Role" value={user?.role === 'admin' ? 'Administrator' : 'Standard user'} />
-        <Field icon="calendar" label="Member since" value={Number.isFinite(joined) ? fullDate(joined) : '—'} last />
+        <Field icon="calendar" label="Member since" value={Number.isFinite(joined) ? fullDate(joined) : 'Unknown'} last />
       </Card>
 
       <AppText variant="caption" color="textSubtle" align="center">

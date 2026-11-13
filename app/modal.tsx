@@ -34,13 +34,6 @@ export default function ModalScreen() {
         ))}
       </Card>
 
-      <Card tone="muted" title="Project">
-        <AppText variant="body" color="textMuted">
-          A final-year project at FAST-NUCES Lahore on AI-assisted misinformation detection for Urdu and
-          Roman Urdu, supporting SDG 16 (credible information) and SDG 9 (innovation for
-          under-represented languages).
-        </AppText>
-      </Card>
     </ScrollView>
   );
 }

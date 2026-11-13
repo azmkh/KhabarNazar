@@ -87,37 +87,66 @@ export default function ResultScreen() {
           <HeroStat label="Model score (uncalibrated)" value={percent(row.confidence)} />
           <HeroStat label="Fake-news risk" value={percent(row.riskScore)} />
         </View>
-        <AppText variant="caption" color="textMuted">
-          {isImage && !textInImageChecked
-            ? 'No news claim was checked in this image (no usable text was read), so there is no '
-              + 'fake-news verdict. The picture itself was analysed separately (see Image analysis below).'
-            : 'The model score is an uncalibrated output, not a measure of truth. Risk is the estimated '
-              + 'chance the content is fake. Neither is proof that a claim is true or false.'}
-        </AppText>
+        {isImage && !textInImageChecked ? (
+          <AppText variant="caption" color="textMuted">
+            No news claim was checked in this image (no usable text was read), so there is no fake-news
+            verdict. The picture itself was analysed separately (see Image analysis below).
+          </AppText>
+        ) : null}
       </View>
 
-      {/* Human review outcome */}
-      {row.adminReview ? (
-        <Card>
-          <View style={styles.rowGap}>
-            <Icon name="badge-check" size={20} color="credible" />
+      {/* The user's dispute and the administrator's reply, together */}
+      {row.dispute || row.adminReview ? (
+        <Card title="Dispute and review">
+          {row.dispute ? (
+            <View style={styles.rowGap}>
+              <Icon name="flag" size={20} color="uncertain" />
+              <View style={styles.flex}>
+                <AppText variant="overline" color="textSubtle">User's dispute</AppText>
+                {row.dispute.message ? (
+                  <AppText variant="body" style={styles.mt4}>{row.dispute.message}</AppText>
+                ) : null}
+                {row.dispute.evidenceLink ? (
+                  <AppText variant="caption" color="primary" style={styles.mt4} numberOfLines={2}>
+                    Evidence: {row.dispute.evidenceLink}
+                  </AppText>
+                ) : null}
+                <AppText variant="caption" color="textSubtle" style={styles.mt4}>
+                  Filed {fullDate(row.dispute.createdAt)}
+                </AppText>
+              </View>
+            </View>
+          ) : null}
+          <View style={[styles.rowGap, row.dispute ? styles.reply : null, row.dispute ? { borderTopColor: colors.border } : null]}>
+            <Icon name={row.adminReview ? 'badge-check' : 'clock'} size={20} color={row.adminReview ? 'credible' : 'textMuted'} />
             <View style={styles.flex}>
-              <AppText variant="bodyStrong">
-                {row.adminReview.resolution === 'override' && adminVerdict
-                  ? `Reviewed: changed to ${adminVerdict.label.toLowerCase()}`
-                  : 'Reviewed: AI verdict upheld'}
-              </AppText>
-              {row.adminReview.note ? (
-                <AppText variant="body" color="textMuted" style={styles.mt4}>“{row.adminReview.note}”</AppText>
-              ) : null}
-              <AppText variant="caption" color="textSubtle" style={styles.mt4}>{fullDate(row.adminReview.reviewedAt)}</AppText>
+              <AppText variant="overline" color="textSubtle">Admin reply</AppText>
+              {row.adminReview ? (
+                <>
+                  <AppText variant="bodyStrong" style={styles.mt4}>
+                    {row.adminReview.resolution === 'override' && adminVerdict
+                      ? `Verdict changed to ${adminVerdict.label.toLowerCase()}`
+                      : 'AI verdict upheld'}
+                  </AppText>
+                  {row.adminReview.note ? (
+                    <AppText variant="body" color="textMuted" style={styles.mt4}>{row.adminReview.note}</AppText>
+                  ) : null}
+                  <AppText variant="caption" color="textSubtle" style={styles.mt4}>
+                    Reviewed {fullDate(row.adminReview.reviewedAt)}
+                  </AppText>
+                </>
+              ) : (
+                <AppText variant="body" color="textMuted" style={styles.mt4}>
+                  Waiting for an administrator to review this dispute.
+                </AppText>
+              )}
             </View>
           </View>
         </Card>
       ) : null}
 
       {/* Submitted content */}
-      <Card title={isImage ? 'Submitted image' : 'Submitted text'}>
+      <Card title={isImage ? 'Submitted image' : 'User claim'}>
         {row.imageUri ? (
           <View style={[styles.imageFrame, { backgroundColor: colors.surfaceMuted }]}>
             <AuthImage uri={row.imageUri} style={styles.image} resizeMode="contain" />
@@ -252,20 +281,8 @@ export default function ResultScreen() {
       </Card>
       ) : null}
 
-      {/* Dispute */}
-      {row.dispute ? (
-        <Card tone="muted">
-          <View style={styles.rowGap}>
-            <Icon name="flag" size={18} color="uncertain" />
-            <View style={styles.flex}>
-              <AppText variant="bodyStrong">
-                {row.dispute.status === 'pending' ? 'Your dispute is awaiting review' : `Dispute ${row.dispute.status}`}
-              </AppText>
-              <AppText variant="caption" color="textMuted" style={styles.mt4} numberOfLines={3}>{row.dispute.message}</AppText>
-            </View>
-          </View>
-        </Card>
-      ) : (
+      {/* Dispute (shown above once filed) */}
+      {row.dispute || row.adminReview ? null : (
         <Button
           label="Dispute this result"
           icon="scale"
@@ -298,6 +315,7 @@ const styles = StyleSheet.create({
   heroStats: { flexDirection: 'row', gap: space.sm },
   heroStat: { flex: 1, borderRadius: radius.md, padding: space.md, gap: 2 },
   rowGap: { flexDirection: 'row', gap: space.md },
+  reply: { marginTop: space.md, paddingTop: space.md, borderTopWidth: StyleSheet.hairlineWidth },
   mt4: { marginTop: 4 },
   mt12: { marginTop: space.md },
   mb6: { marginBottom: 6 },

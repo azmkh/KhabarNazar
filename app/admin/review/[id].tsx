@@ -140,7 +140,7 @@ export default function AdminReviewScreen() {
         </Card>
 
         {image || content ? (
-          <Card title={image ? 'Submitted image' : 'Submitted text'}>
+          <Card title={image ? 'Submitted image' : 'User claim'}>
             {image ? (
               <View style={[styles.imageFrame, { backgroundColor: colors.surfaceMuted }]}>
                 <AuthImage uri={submissionImageUrl(submission!.id)} style={styles.image} resizeMode="contain" />

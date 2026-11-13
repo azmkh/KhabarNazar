@@ -3,7 +3,7 @@ import { useRouter } from 'expo-router';
 import { useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { AppText, Avatar, Button, Card, Icon, useAppTheme } from '@/components/ui';
+import { Avatar, Button, Icon, useAppTheme } from '@/components/ui';
 import { space } from '@/constants/theme';
 import { useAuth } from '@/lib/AuthContext';
 import { showAlert } from '@/lib/alert';
@@ -64,23 +64,12 @@ export default function EditProfileScreen() {
         </View>
       </View>
 
-      <Card tone="muted">
-        <View style={styles.note}>
-          <Icon name="info" size={18} color="info" />
-          <AppText variant="caption" color="textMuted" style={styles.flex}>
-            Your photo is stored only on this device. Name and email changes are not supported by the
-            backend yet.
-          </AppText>
-        </View>
-      </Card>
-
       <Button label="Save" icon="check" onPress={() => void onSave()} loading={busy} disabled={!changed} />
     </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  flex: { flex: 1 },
   scroll: { padding: space.lg, gap: space.xl, paddingBottom: space.xxxl },
   avatarArea: { alignItems: 'center', gap: space.lg, paddingTop: space.lg },
   cameraBadge: {
@@ -95,5 +84,4 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarActions: { flexDirection: 'row', gap: space.sm },
-  note: { flexDirection: 'row', gap: space.md },
 });

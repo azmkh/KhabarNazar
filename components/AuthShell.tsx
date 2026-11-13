@@ -10,10 +10,12 @@ type Props = {
   subtitle: string;
   children: ReactNode;
   footer?: ReactNode;
+  /** The one-line description under the logo; the sign-in screen leaves it out. */
+  showTagline?: boolean;
 };
 
 /** Shared layout for sign-in, registration and password reset. */
-export function AuthShell({ title, subtitle, children, footer }: Props) {
+export function AuthShell({ title, subtitle, children, footer, showTagline = true }: Props) {
   const { colors } = useAppTheme();
   const insets = useSafeAreaInsets();
 
@@ -26,9 +28,11 @@ export function AuthShell({ title, subtitle, children, footer }: Props) {
         keyboardShouldPersistTaps="handled">
         <View style={styles.brand}>
           <Wordmark size="lg" />
-          <AppText variant="body" color="onInkMuted" style={styles.tagline}>
-            Check Urdu, Roman Urdu and news images before you share them.
-          </AppText>
+          {showTagline ? (
+            <AppText variant="body" color="onInkMuted" style={styles.tagline}>
+              Check Urdu, Roman Urdu and news images before you share them.
+            </AppText>
+          ) : null}
         </View>
 
         <View style={[styles.sheet, { backgroundColor: colors.background }]}>

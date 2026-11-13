@@ -2,10 +2,9 @@ import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { AppText, Avatar, Card, Icon, ListRow, Masthead, Tag, useAppTheme } from '@/components/ui';
+import { AppText, Avatar, Card, ListRow, Masthead, Tag, useAppTheme } from '@/components/ui';
 import { space } from '@/constants/theme';
 import { useAuth } from '@/lib/AuthContext';
-import { API_BASE_URL } from '@/lib/config';
 import { hrefAdminRoot, hrefProfileEdit, hrefProfileLogout, hrefProfileMe } from '@/lib/navigation';
 
 export default function AccountScreen() {
@@ -50,23 +49,6 @@ export default function AccountScreen() {
           <ListRow icon="info" label="About KhabarNazar" divider={false} onPress={() => router.push('/modal')} />
         </Section>
 
-        <Card tone="muted">
-          <View style={styles.serverRow}>
-            <Icon name="server" size={18} color="textMuted" />
-            <View style={styles.flex}>
-              <AppText variant="caption" color="textMuted">Backend</AppText>
-              <AppText variant="bodyStrong" selectable numberOfLines={1}>
-                {API_BASE_URL || 'Not configured'}
-              </AppText>
-              {!API_BASE_URL ? (
-                <AppText variant="caption" color="misleading" style={styles.mt4}>
-                  Set EXPO_PUBLIC_API_URL in .env and restart Expo.
-                </AppText>
-              ) : null}
-            </View>
-          </View>
-        </Card>
-
         <AppText variant="caption" color="textSubtle" align="center">
           {Constants.expoConfig?.name ?? 'KhabarNazar'} · version {Constants.expoConfig?.version ?? '1.0.0'}
         </AppText>
@@ -92,6 +74,4 @@ const styles = StyleSheet.create({
   section: { gap: space.sm },
   sectionTitle: { paddingHorizontal: space.xs },
   group: { overflow: 'hidden' },
-  serverRow: { flexDirection: 'row', gap: space.md },
-  mt4: { marginTop: 4 },
 });

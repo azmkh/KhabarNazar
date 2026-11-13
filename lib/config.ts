@@ -6,4 +6,4 @@ export const API_BASE_URL =
   ((typeof process !== 'undefined' && process.env?.EXPO_PUBLIC_API_URL) || '').replace(/\/$/, '');
 
 export const APP_TAGLINE =
-  'Decision support for Urdu, Roman Urdu, and news images — not absolute truth.';
+  'Decision support for Urdu, Roman Urdu, and news images. Not absolute truth.';

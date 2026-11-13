@@ -113,7 +113,7 @@ export default function CheckScreen() {
         keyboardShouldPersistTaps="handled">
         <Masthead
           kicker={`Hello, ${firstName}`}
-          title="What would you like to check?"
+          title={isAdmin ? 'Ready to review?' : 'What would you like to check?'}
           accessory={
             <Pressable onPress={() => router.push(hrefProfileMe())} accessibilityRole="button" accessibilityLabel="My profile">
               <Avatar uri={user?.avatarUri} name={user?.name || user?.email} size={44} onInk />
@@ -147,6 +147,8 @@ export default function CheckScreen() {
               </View>
             </Card>
           ) : null}
+          {/* Administrators only review; the submit box is for standard users. */}
+          {!isAdmin ? (
           <Card style={styles.composer}>
             <Segmented<Mode>
               value={mode}
@@ -214,6 +216,7 @@ export default function CheckScreen() {
               disabled={!canSubmit}
             />
           </Card>
+          ) : null}
 
           <Card tone="muted">
             <View style={styles.noteRow}>

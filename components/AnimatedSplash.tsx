@@ -2,7 +2,6 @@ import { useEffect, useRef } from 'react';
 import { AccessibilityInfo, Animated, Easing, Image, StyleSheet, useWindowDimensions, View } from 'react-native';
 
 import { AppText } from '@/components/ui';
-import { fonts } from '@/constants/theme';
 
 // Matches the native splash background in app.json, so the hand-over is seamless.
 export const SPLASH_BACKGROUND = '#6D28D9';
@@ -99,9 +98,8 @@ export function AnimatedSplash({ onDone }: Props) {
             },
           ]}>
           <AppText variant="display" color="#FFFFFF" align="center">KhabarNazar</AppText>
-          <AppText color="rgba(255,255,255,0.85)" align="center" style={styles.urdu}>خبر نظر</AppText>
-          <AppText variant="caption" color="rgba(255,255,255,0.78)" align="center" style={styles.tagline}>
-            Check the news before you share it
+          <AppText variant="body" color="rgba(255,255,255,0.85)" align="center" style={styles.tagline}>
+            News at a Glance, AI-Powered Fake News Detection
           </AppText>
         </Animated.View>
       </View>
@@ -115,6 +113,5 @@ const styles = StyleSheet.create({
   center: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 24 },
   logo: { width: 168, height: 168 },
   titles: { marginTop: 6, alignItems: 'center' },
-  urdu: { fontFamily: fonts.urdu, fontSize: 20, lineHeight: 42, marginTop: -2 },
-  tagline: { marginTop: 4, letterSpacing: 0.3 },
+  tagline: { marginTop: 8, letterSpacing: 0.3, maxWidth: 300 },
 });
