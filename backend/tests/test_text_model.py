@@ -96,17 +96,45 @@ def test_language_routes_to_its_own_model(text, script, language, monkeypatch):
     assert result["fake_probability"] == pytest.approx(0.87)
 
 
-@pytest.mark.parametrize("text", [ENGLISH, "وزیر اعظم نے کہا prime minister", "Headline from Lahore"])
-def test_english_mixed_and_ambiguous_are_not_routed_to_either_model(text, monkeypatch):
+@pytest.mark.parametrize(("text", "script", "language", "note"), [
+    # No text is refused for its language: English and unclear Latin text use the Roman Urdu model,
+    # mixed text uses the model for its main script, and the result says which model read it.
+    (ENGLISH, "roman", "english", "There is no English model"),
+    ("Headline from Lahore", "roman", "unknown", "not clearly identified"),
+    ("وزیر اعظم نے کہا prime minister", "urdu", "mixed", "checked with the Urdu model"),
+    ("Breaking news وزیر prime minister said today", "roman", "mixed", "checked with the Roman Urdu model"),
+])
+def test_english_mixed_and_unclear_text_are_classified_and_labelled(text, script, language, note, monkeypatch):
     calls = []
-    def no_model(script):
-        calls.append(script)
-        return None, "not requested"
-    monkeypatch.setattr(xlmr, "get_classifier", no_model)
+    classifier = FakeClassifier(script)
+    monkeypatch.setattr(xlmr, "get_classifier", lambda selected: (calls.append(selected) or classifier, None))
+    result = predict_text(text)
+    assert calls == [script]
+    assert result["detected_language"] == language and result["model_language"] == ("urdu" if script == "urdu" else "roman_urdu")
+    assert result["is_stub"] is False and result["prediction"] == "Fake"
+    assert note in result["summary"]
+
+
+@pytest.mark.parametrize("text", ["12345 !!!", "٢٠٢٦ - 10:30"])
+def test_text_without_letters_is_not_classified(text, monkeypatch):
+    calls = []
+    monkeypatch.setattr(xlmr, "get_classifier", lambda script: (calls.append(script) or FakeClassifier(script), None))
     result = predict_text(text)
     assert calls == []
-    assert result["prediction"] == "Uncertain" and result["confidence"] is None
-    assert result["is_stub"] is True
+    assert result["prediction"] == "Uncertain" and result["confidence"] is None and result["is_stub"] is True
+    assert "no words to classify" in result["summary"]
+
+
+def test_no_word_is_removed_before_the_model_sees_the_text(monkeypatch):
+    # There is no word filter: every word the user typed reaches the classifier unchanged.
+    seen = []
+    classifier = FakeClassifier("roman")
+    original = classifier.predict
+    classifier.predict = lambda text: seen.append(text) or original(text)
+    monkeypatch.setattr(xlmr, "get_classifier", lambda script: (classifier, None))
+    text = "Wo kal raat mar gaye, ye bilkul bakwas aur jhooti khabar hai, damn idiots"
+    predict_text(text)
+    assert seen == [text]
 
 
 def test_missing_or_failed_model_never_returns_a_prediction(monkeypatch):

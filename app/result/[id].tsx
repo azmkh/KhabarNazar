@@ -10,15 +10,17 @@ import {
   ContentText,
   EmptyState,
   Icon,
+  type IconName,
   Meter,
   Tag,
   useAppTheme,
   verdictMeta,
 } from '@/components/ui';
-import { radius, space } from '@/constants/theme';
+import { type Palette, radius, space } from '@/constants/theme';
 import { fullDate, languageLabel, percent } from '@/lib/format';
 import { hrefDisputeDetail } from '@/lib/navigation';
 import { useSubmissions } from '@/lib/SubmissionsContext';
+import type { Submission } from '@/types/submission';
 
 export default function ResultScreen() {
   const { id: idParam } = useLocalSearchParams<{ id?: string | string[] }>();
@@ -64,13 +66,76 @@ export default function ResultScreen() {
   const words = row.highlightedWords?.filter(
     (item, index, all) => all.findIndex((other) => other.word === item.word) === index,
   );
-  // For text-only checks the risk is already shown in the verdict header.
-  const hasExtraSignals = isImage || row.languageQuality != null || row.sourceCredibility != null;
+  // Text checks keep their signals card; image results show their parts in their own cards.
+  const hasExtraSignals = !isImage && (row.languageQuality != null || row.sourceCredibility != null);
   const adminVerdict = row.adminReview?.overrideVerdict ? verdictMeta(row.adminReview.overrideVerdict, colors) : null;
+  // An image only gets a news verdict when text read from it was classified (or an admin set one).
+  // Without usable text there is no claim, so no answer is given about one.
+  const claimClassified = textInImageChecked && row.textClassificationStatus === 'completed';
+  const showVerdict = !isImage || claimClassified || row.adminReview?.resolution === 'override';
+  const authenticity = imageAuthenticity(row, colors);
 
   return (
     <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
-      {/* Verdict */}
+      {/* Image authenticity comes first for images: it is always produced, unlike a claim verdict */}
+      {isImage ? (
+        <View style={[styles.hero, { backgroundColor: authenticity.soft, borderColor: authenticity.color }]}>
+          <View style={styles.heroTop}>
+            <View style={[styles.heroIcon, { backgroundColor: colors.surface }]}>
+              <Icon name={authenticity.icon} size={28} color={authenticity.color} />
+            </View>
+            <View style={styles.flex}>
+              <AppText variant="overline" color={authenticity.color}>Image authenticity</AppText>
+              <AppText variant="title" color={authenticity.color}>{authenticity.label}</AppText>
+            </View>
+          </View>
+          {row.imageAnalysisStatus === 'completed' ? (
+            <Meter
+              label="Chance the picture is AI-generated"
+              value={row.aiGeneratedLikelihood == null ? null : row.aiGeneratedLikelihood / 100}
+              color={authenticity.color}
+            />
+          ) : null}
+          <AppText variant="caption" color="textMuted">
+            {row.imageAnalysisStatus === 'completed'
+              ? 'About the picture itself, not whether any news claim is true.'
+              : row.imageAnalysisStatus === 'skipped'
+                ? 'This older check did not analyse the picture because it contained text.'
+                : 'The image detector could not analyse this picture.'}
+          </AppText>
+          {!showVerdict ? (
+            <AppText variant="caption" color="textMuted">
+              {ocrFailed
+                ? 'Text could not be read from this image, so no news claim was checked.'
+                : 'No readable news text was found in this image, so no news claim was checked.'}
+            </AppText>
+          ) : null}
+        </View>
+      ) : null}
+
+      {/* Grad-CAM heatmap: where the image detector looked */}
+      {isImage && row.imageAnalysisStatus === 'completed' ? (
+        <Card title="Where the detector looked">
+          {row.heatmapPath ? (
+            <>
+              <View style={[styles.imageFrame, { backgroundColor: colors.surfaceMuted }]}>
+                <AuthImage uri={row.heatmapPath} style={styles.image} resizeMode="contain" />
+              </View>
+              <AppText variant="caption" color="textMuted" style={styles.mt4}>
+                Grad-CAM heatmap of the detector's ResNet18 model. Only the outlined centre area is analysed.
+                It does not show edits.
+              </AppText>
+            </>
+          ) : (
+            <AppText variant="caption" color="uncertain">
+              The heatmap could not be produced for this image.
+            </AppText>
+          )}
+        </Card>
+      ) : null}
+
+      {/* Verdict on the claim (typed text, or text read from the image) */}
+      {showVerdict ? (
       <View style={[styles.hero, { backgroundColor: meta.soft, borderColor: meta.color }]}>
         <View style={styles.heroTop}>
           <View style={[styles.heroIcon, { backgroundColor: colors.surface }]}>
@@ -78,7 +143,9 @@ export default function ResultScreen() {
           </View>
           <View style={styles.flex}>
             <AppText variant="overline" color={meta.color}>
-              {row.adminReview?.resolution === 'override' ? 'AI verdict (overridden)' : 'Verdict'}
+              {row.adminReview?.resolution === 'override'
+                ? 'AI verdict (overridden)'
+                : isImage ? 'Verdict on the text in the image' : 'Verdict'}
             </AppText>
             <AppText variant="title" color={meta.color}>{meta.label}</AppText>
           </View>
@@ -87,13 +154,8 @@ export default function ResultScreen() {
           <HeroStat label="Model score (uncalibrated)" value={percent(row.confidence)} />
           <HeroStat label="Fake-news risk" value={percent(row.riskScore)} />
         </View>
-        {isImage && !textInImageChecked ? (
-          <AppText variant="caption" color="textMuted">
-            No news claim was checked in this image (no usable text was read), so there is no fake-news
-            verdict. The picture itself was analysed separately (see Image analysis below).
-          </AppText>
-        ) : null}
       </View>
+      ) : null}
 
       {/* The user's dispute and the administrator's reply, together */}
       {row.dispute || row.adminReview ? (
@@ -174,11 +236,9 @@ export default function ResultScreen() {
             Too little or unclear text to check as a news claim.
           </AppText>
         ) : null}
-        {isImage && textInImageChecked ? (
-          <AppText variant="caption" color={row.textClassificationStatus === 'completed' ? 'textMuted' : 'uncertain'} style={styles.mt4}>
-            {row.textClassificationStatus === 'completed'
-              ? `Text classification: ${row.ocrTextPrediction ?? 'Unavailable'} (model score ${percent(row.ocrTextConfidence)})`
-              : 'The text in this image could not be classified by a compatible model.'}
+        {isImage && textInImageChecked && row.textClassificationStatus !== 'completed' ? (
+          <AppText variant="caption" color="uncertain" style={styles.mt4}>
+            The text in this image could not be classified.
           </AppText>
         ) : null}
         {row.detectedLanguage ? (
@@ -195,11 +255,14 @@ export default function ResultScreen() {
       </Card>
 
       {/* Explanation */}
-      <Card title="Why this result">
-        <AppText variant="body">{row.summary}</AppText>
+      {!isImage || words?.length ? (
+      <Card title={isImage ? 'Words that most influenced the verdict' : 'Why this result'}>
+        {!isImage ? <AppText variant="body">{row.summary}</AppText> : null}
         {words?.length ? (
-          <View style={styles.mt12}>
-            <AppText variant="caption" color="textMuted" style={styles.mb6}>Words that most influenced the model</AppText>
+          <View style={isImage ? null : styles.mt12}>
+            {!isImage ? (
+              <AppText variant="caption" color="textMuted" style={styles.mb6}>Words that most influenced the model</AppText>
+            ) : null}
             <View style={styles.words}>
               {words.map((item, index) => {
                 const supports = item.direction === 'supports_prediction';
@@ -219,58 +282,13 @@ export default function ResultScreen() {
           </View>
         ) : null}
       </Card>
-
-      {/* Image analysis and Grad-CAM: about the picture, never about whether a claim is true */}
-      {isImage ? (
-        <Card title="Image analysis">
-          {row.imageAnalysisStatus === 'completed' ? (
-            <Meter
-              label="Chance the picture is AI-generated"
-              value={row.aiGeneratedLikelihood == null ? null : row.aiGeneratedLikelihood / 100}
-              color={colors.uncertain}
-              note={`${row.aiGeneratedLabel}. This is about the picture, not whether any news claim is true.`}
-            />
-          ) : (
-            <AppText variant="caption" color="uncertain">
-              {row.imageAnalysisStatus === 'skipped'
-                ? 'This older check did not analyse the picture because it contained text.'
-                : 'The image detector could not analyse this picture, so there is no image result.'}
-            </AppText>
-          )}
-          <View style={styles.mt12}>
-            <AppText variant="overline" color="textSubtle" style={styles.mb6}>Grad-CAM heatmap</AppText>
-            {row.heatmapPath ? (
-              <>
-                <View style={[styles.imageFrame, { backgroundColor: colors.surfaceMuted }]}>
-                  <AuthImage uri={row.heatmapPath} style={styles.image} resizeMode="contain" />
-                </View>
-                <AppText variant="caption" color="textMuted" style={styles.mt4}>
-                  Where the detector's ResNet18 model looked. Only the outlined centre area is analysed;
-                  the rest of the picture is shown as it is. It explains the image model's output; it
-                  does not show edits or prove a claim true or false.
-                </AppText>
-              </>
-            ) : (
-              <AppText variant="caption" color="uncertain">
-                {row.gradcamStatus === 'unavailable'
-                  ? 'Grad-CAM heatmap unavailable: the detector ran, but no heatmap could be produced for this image.'
-                  : 'No Grad-CAM heatmap: the image detector did not run on this image.'}
-              </AppText>
-            )}
-          </View>
-        </Card>
       ) : null}
 
       {/* Signals */}
       {hasExtraSignals ? (
       <Card title="Signals">
         <View style={styles.signals}>
-          <Meter
-            label="Fake-news risk"
-            value={row.riskScore}
-            color={colors.misleading}
-            note={isImage ? 'From the text classification only; the image analysis is never mixed in.' : undefined}
-          />
+          <Meter label="Fake-news risk" value={row.riskScore} color={colors.misleading} />
           {row.languageQuality != null ? (
             <Meter label="Language quality" value={row.languageQuality / 100} note={row.languageQualityLabel} />
           ) : null}
@@ -293,6 +311,17 @@ export default function ResultScreen() {
       )}
     </ScrollView>
   );
+}
+
+/** Label, colour and icon for the image-authenticity hero. */
+function imageAuthenticity(row: Submission, colors: Palette) {
+  if (row.imageAnalysisStatus !== 'completed' || row.aiGeneratedLikelihood == null) {
+    return { label: 'Not analysed', icon: 'image-off' as IconName, color: colors.uncertain, soft: colors.uncertainSoft };
+  }
+  // The backend's own label (its 0.5 threshold), not a re-rounded percentage.
+  return row.aiGeneratedLabel === 'Likely AI-generated'
+    ? { label: row.aiGeneratedLabel, icon: 'sparkles' as IconName, color: colors.misleading, soft: colors.misleadingSoft }
+    : { label: row.aiGeneratedLabel, icon: 'camera' as IconName, color: colors.credible, soft: colors.credibleSoft };
 }
 
 function HeroStat({ label, value }: { label: string; value: string }) {

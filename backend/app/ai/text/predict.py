@@ -1,12 +1,17 @@
 """Language-aware routing to the separately trained text models.
 
-| Input                                    | Model                                         |
-|------------------------------------------|-----------------------------------------------|
-| Urdu script, up to LONG_TEXT_WORDS words | Urdu XLM-R (Hook and Bait, 64-token limit)    |
-| Urdu script, longer (full articles)      | TF-IDF + Logistic Regression (FIRE 2021)      |
-| Roman Urdu                               | Roman Urdu XLM-R (512-token limit)            |
-| English, mixed script, unidentified      | none: an explicit Uncertain result            |
+Every text with letters is classified; nothing is refused because of its language or its words.
 
+| Input                                          | Model                                         |
+|------------------------------------------------|-----------------------------------------------|
+| Urdu script, up to LONG_TEXT_WORDS words       | Urdu XLM-R (Hook and Bait)                    |
+| Urdu script, longer (full articles)            | TF-IDF + Logistic Regression (FIRE 2021)      |
+| Mixed script, mostly Urdu letters              | the Urdu models, as above                     |
+| Roman Urdu, English, other or unclear Latin    | Roman Urdu XLM-R (512-token limit)            |
+| No letters at all (only digits or symbols)     | none: an explicit Uncertain result            |
+
+English has no model of its own. It goes to the Roman Urdu XLM-R (a multilingual XLM-R large,
+fine-tuned on Roman Urdu news only), and the result says so: it is less reliable than Roman Urdu.
 Long Urdu text falls back to the XLM-R model (truncated) when the TF-IDF file is missing.
 """
 
@@ -24,6 +29,39 @@ UNAVAILABLE_MODEL_VERSION = "text-model-unavailable"
 # Word count above which Urdu text goes to the long-article model (KHABARNAZAR_LONG_TEXT_WORDS).
 LONG_TEXT_WORDS = settings.LONG_TEXT_WORDS
 SUPPORTED_TEXT_LANGUAGES = {"urdu", "roman_urdu"}
+ARABIC_SCRIPT = ("\u0600", "\u06ff")
+
+# Shown with results when the text is not plain Urdu or Roman Urdu, so the reader knows which
+# model actually read it.
+ROUTING_NOTES = {
+    "english": (
+        " The text looks like English. There is no English model, so it was checked with the Roman Urdu "
+        "model, which was not trained on English; treat this result as less reliable."
+    ),
+    "unknown": " The language was not clearly identified, so the text was checked with the Roman Urdu model.",
+}
+
+
+def model_language(text: str, detected: str) -> Optional[str]:
+    """Which trained model reads this text: "urdu" or "roman_urdu". None only with no letters.
+
+    Detection only labels the text; it never stops it from being classified.
+    """
+    letters = [character for character in text if character.isalpha()]
+    if not letters:
+        return None
+    if detected in SUPPORTED_TEXT_LANGUAGES:
+        return detected
+    urdu_letters = sum(ARABIC_SCRIPT[0] <= character <= ARABIC_SCRIPT[1] for character in letters)
+    return "urdu" if urdu_letters / len(letters) >= 0.5 else "roman_urdu"
+
+
+def routing_note(detected: str, route: str) -> str:
+    """A sentence saying which model read the text when it is not plain Urdu or Roman Urdu."""
+    if detected == "mixed":
+        name = "Urdu" if route == "urdu" else "Roman Urdu"
+        return f" The text mixes Urdu and Latin script; it was checked with the {name} model, for its main script."
+    return ROUTING_NOTES.get(detected, "")
 
 
 def _unavailable(language: str, reason: str) -> dict:
@@ -41,7 +79,7 @@ def _unavailable(language: str, reason: str) -> dict:
 
 
 def classifier_for_language(language: str):
-    """Return a supported language's classifier without routing English to Roman Urdu."""
+    """Return the classifier for a model language ("urdu" or "roman_urdu"; see model_language)."""
     script = xlmr.LANGUAGE_TO_MODEL.get(language)
     if script is None:
         return None, None, None
@@ -64,23 +102,21 @@ def long_article_model(text: str, language: str):
 
 
 def predict_text(text: str, language: Optional[str] = None) -> dict:
-    """Run real inference for detected Urdu/Roman Urdu; report other input unavailable.
+    """Classify any text that has letters with the trained model for its script.
 
-    `language` is accepted for existing callers, but detector output remains authoritative
-    so OCR tags such as `en`/`ur` cannot route text to an incompatible checkpoint.
+    `language` is accepted for existing callers, but the text itself decides the model, so OCR
+    tags such as `en`/`ur` cannot route text to the wrong checkpoint.
     """
     if not isinstance(text, str) or not text.strip():
         return _unavailable("unknown", "Enter some text before submitting it for analysis.")
 
     resolved_language = detect_language(text)
-    script, classifier, reason = classifier_for_language(resolved_language)
-    if script is None:
-        if resolved_language == "english":
-            return _unavailable(resolved_language, "English classification is not connected; only Urdu and Roman Urdu models are available.")
-        if resolved_language == "mixed":
-            return _unavailable(resolved_language, "Mixed Urdu-script and Latin-script text is not supported by either text model.")
-        return _unavailable(resolved_language, "The input language could not be identified reliably, so no model was selected.")
-    pipeline = long_article_model(text, resolved_language)
+    route = model_language(text, resolved_language)
+    if route is None:
+        return _unavailable(resolved_language, "The text has no words to classify (only numbers or symbols).")
+    note = routing_note(resolved_language, route)
+    script, classifier, reason = classifier_for_language(route)
+    pipeline = long_article_model(text, route)
     if pipeline is not None:
         try:
             result = long_articles.predict(pipeline, text)
@@ -90,7 +126,9 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
                 "summary": (
                     f"The long-article Urdu model (TF-IDF, trained on full FIRE 2021 articles) predicted "
                     f"{result['prediction'].lower()}. Its score is not independent verification of the claim."
+                    + note
                 ),
+                "model_language": route,
             }
         except Exception:
             logger.exception("Long-article Urdu model inference failed; using the Urdu XLM-R model")
@@ -116,8 +154,9 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
             "detected_language": resolved_language,
             "summary": (
                 f"The trained {label_language} XLM-R model predicted {result['prediction'].lower()}. "
-                "Its score is not independent verification of the claim." + detail
+                "Its score is not independent verification of the claim." + detail + note
             ),
+            "model_language": route,
             "is_stub": False,
             "status": "completed",
         }

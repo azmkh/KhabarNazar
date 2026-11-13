@@ -22,6 +22,7 @@ ROMAN_URDU_WORDS = {
     "bahut", "abhi", "phir", "jab", "apna", "apni", "apne", "hua", "hui", "hue", "kaha", "karna",
     "karne", "hoga", "hogi", "unhon", "unhone", "saath", "liya", "toh", "sirf", "zyada", "kab",
     "kahan", "kaun", "yahan", "wahan", "mujhe", "hamara", "hamari", "tumhara",
+    "gaye", "bajay", "kal", "aaj", "dopehr", "subah", "raat", "saal",
 }
 # Frequent English function words. Overlaps with Roman Urdu ("is", "the", "he")
 # are removed so they do not count for both languages.

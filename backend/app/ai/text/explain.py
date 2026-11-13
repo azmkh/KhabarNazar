@@ -11,7 +11,7 @@ import logging
 
 from app.ai.text.language_detection import detect_language
 from app.ai.text import long_articles
-from app.ai.text.predict import classifier_for_language, long_article_model, predict_text
+from app.ai.text.predict import classifier_for_language, long_article_model, model_language, predict_text, routing_note
 
 logger = logging.getLogger(__name__)
 MAX_EXPLANATION_WORDS = 8
@@ -24,7 +24,11 @@ def explain_text(
     prediction: dict | None = None,
 ) -> dict:
     """Show words that influence the selected model's label, not fact verification."""
+    # Explain the same model predict_text() used for this text.
     detected = detect_language(text)
+    route = (prediction or {}).get("model_language") or model_language(text, detected)
+    # Say which model read the text when it is not plain Urdu or Roman Urdu (English, mixed, unclear).
+    note = routing_note(detected, route) if route else ""
     if prediction is None:
         # Explain the same model predict_text() would choose for this text.
         prediction = predict_text(text)
@@ -35,7 +39,7 @@ def explain_text(
                 "is_stub": True,
             }
     if prediction.get("model_version") == long_articles.MODEL_VERSION:
-        pipeline = long_article_model(text, detected)
+        pipeline = long_article_model(text, route)
         if pipeline is not None:
             try:
                 highlights = long_articles.explain(pipeline, text, top_k=min(max(0, top_k), MAX_EXPLANATION_WORDS))
@@ -44,6 +48,7 @@ def explain_text(
                     "summary": (
                         f"The long-article Urdu model predicted {prediction['prediction']}. Highlights show the "
                         "words whose features weighed most in this model's output; they are not fact verification."
+                        + note
                     ),
                     "is_stub": False,
                 }
@@ -54,7 +59,7 @@ def explain_text(
                     "summary": "The model result is available, but its word explanation could not be generated.",
                     "is_stub": True,
                 }
-    script, classifier, reason = classifier_for_language(detected)
+    script, classifier, reason = classifier_for_language(route) if route else (None, None, None)
     if script is None or classifier is None:
         return {
             "highlighted_words": [],
@@ -71,6 +76,7 @@ def explain_text(
                     f"The {language_name} model predicted {prediction['prediction']}. The input was "
                     f"truncated to {prediction['max_input_tokens']} model tokens. Word-level attribution "
                     "is omitted for truncated text; the model output is not fact verification."
+                    + note
                 ),
                 "is_stub": False,
             }
@@ -83,6 +89,7 @@ def explain_text(
         summary = (
             f"The {language_name} model predicted {prediction['prediction']}. Word highlights show how "
             "removing each selected word changed the model output; they are not fact verification."
+            + note
         )
         return {"highlighted_words": highlights, "summary": summary, "is_stub": False}
     except Exception:

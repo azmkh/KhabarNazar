@@ -143,17 +143,18 @@ def test_roman_urdu_text_image_runs_both_paths(monkeypatch, text_models, detecto
 
 # ─── Scenario 3: image with English text ─────────────────────────────────────
 
-def test_english_text_image_is_not_sent_to_an_urdu_model_but_still_gets_gradcam(monkeypatch, text_models, detector):
+def test_english_text_image_is_classified_by_the_roman_model_and_still_gets_gradcam(monkeypatch, text_models, detector):
     urdu, roman = text_models
     monkeypatch.setattr(pipeline, "run_ocr", _ocr_reading(ENGLISH_TEXT))
     headers = _headers("s3.english@example.com")
     data = _upload(headers).json()
     image = data["image_submission"]
 
-    assert image["detected_language"] == "english" and urdu.calls == roman.calls == 0
-    assert image["text_classification_status"] == "unavailable" and image["text_confidence"] is None
-    assert "English classification is not connected" in data["explainability"]["explanation_summary"]
-    assert data["final_label"] == "Uncertain" and data["combined_risk_score"] is None
+    # English has no model of its own: the Roman Urdu model reads it, and the result says so.
+    assert image["detected_language"] == "english" and roman.calls >= 1 and urdu.calls == 0
+    assert image["text_classification_status"] == "completed" and image["text_confidence"] is not None
+    assert "There is no English model" in data["explainability"]["explanation_summary"]
+    assert data["final_label"] in {"Real", "Fake"} and data["combined_risk_score"] is not None
     assert len(detector.paths) == 1 and image["image_analysis_status"] == "completed"
     _assert_gradcam_completed(data, headers)
 
@@ -359,7 +360,7 @@ REAL_CASES = {
     "roman_urdu": (lambda: _latin_text_image(["Hukumat ne elaan kiya hai", "ke kal se tamam schools", "band rahenge"]),
                    "roman_urdu", "completed"),
     "english": (lambda: _latin_text_image(["The government said that", "all schools will be closed", "from tomorrow"]),
-                "english", "unavailable"),
+                "english", "completed"),
     "no_text": (_photo_like, None, "not_run"),
 }
 

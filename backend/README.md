@@ -1,6 +1,6 @@
 # KhabarNazar — Backend Service
 
-Welcome to the backend service for **KhabarNazar**, an AI-assisted misinformation decision-support platform for text and news images. The text API uses separate trained XLM-R checkpoints for Urdu script and Roman Urdu. English is accepted as input but classification is not connected.
+Welcome to the backend service for **KhabarNazar**, an AI-assisted misinformation decision-support platform for text and news images. The text API uses separate trained XLM-R checkpoints for Urdu script and Roman Urdu. Every text with letters is classified: English has no model of its own and is checked with the Roman Urdu model, with a note that this is less reliable.
 
 The backend is built with **FastAPI**, **PostgreSQL**, **SQLAlchemy**, and **Alembic**, designed with a clean layered architecture that separates routers, services, database models, and AI inference engines.
 
@@ -267,7 +267,9 @@ important data; source files remain untouched. Generated files are written to
 | Urdu script, up to 150 words | XLM-R base, trained on Hook and Bait | `text_module/urdu/models/xlmr/` (or the older `models/text/xlmr/`) | 0.974 Hook and Bait test (release `urdu-xlmr-v1`) |
 | Urdu script, longer than 150 words | word + character TF-IDF + Logistic Regression, trained on FIRE 2021 | `text_module/urdu/models/tfidf_long_articles.joblib` (in git) | 0.639 FIRE 2021 test |
 | Roman Urdu | XLM-R large, trained on the KhabarNazar Roman Urdu dataset | `text_module/roman_urdu/models/xlmr/` | see `text_module/roman_urdu/README.md` |
-| English, mixed script, unidentified | none | - | returns `Uncertain` |
+| Mixed script, mostly Urdu letters | the Urdu models above | as above | as above |
+| English, other or unidentified Latin text, mixed script mostly Latin | the Roman Urdu XLM-R (not trained on English) | `text_module/roman_urdu/models/xlmr/` | not measured on English; the result says it is less reliable |
+| No letters at all (only digits or symbols) | none | - | returns `Uncertain` |
 
 Scores are the ones reported by the training notebooks in `text_module/`; this backend has
 not re-run them (the datasets are not in the repository).
@@ -463,8 +465,10 @@ decides whether there is a news claim to classify; it never decides whether the 
   `text-model-v1`), and Roman Urdu uses its trained 512-token limit. The tokenizer truncates beyond
   those limits as it did during training, and the response explanation says when truncation
   occurred. Roman Urdu text is sent to its tokenizer unchanged. Urdu uses the Urdu training
-  normalization. English, mixed-script, and ambiguous Latin input are not routed to either
-  checkpoint and return `Uncertain` without a score.
+  normalization. No text is refused for its language and no words are filtered: mixed text goes to
+  the model for its main script, and English or unidentified Latin text goes to the Roman Urdu model
+  (`model_language` in the result says which). English results say that model was not trained on
+  English. Only text without any letters returns `Uncertain` without a score.
 - **OCR path.** EasyOCR (Urdu + English) reads the image and its result is stored in `ocr_status`
   (`completed`, `no_text_found`, `unavailable`, `dependency_missing`). If the text has at least
   `OCR_MIN_LETTERS` letters and average confidence `OCR_MIN_CONFIDENCE`, it goes through the *same*

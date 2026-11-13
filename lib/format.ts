@@ -32,7 +32,7 @@ export function languageLabel(language: string | null | undefined) {
     case 'roman_urdu': return 'Roman Urdu';
     case 'english': return 'English';
     case 'mixed': return 'Mixed Urdu and Latin script';
-    case 'unknown': return 'Could not identify confidently';
+    case 'unknown': return 'Not clearly identified';
     default: return language ?? 'Not detected';
   }
 }
