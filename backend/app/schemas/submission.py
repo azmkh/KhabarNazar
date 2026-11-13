@@ -36,10 +36,12 @@ class ImageSubmissionResponse(BaseModel):
     file_size_bytes: Optional[int] = None
     ocr_text: Optional[str] = None
     ocr_confidence: Optional[float] = None
+    # completed / no_text_found / unavailable / dependency_missing; None for rows saved before it existed.
+    ocr_status: Optional[str] = None
     detected_language: Optional[str] = None
     text_prediction: Optional[str] = None
     text_confidence: Optional[float] = None
-    image_score: Optional[float] = None  # probability the picture is AI-generated (ai_or_real branch)
+    image_score: Optional[float] = None  # probability the picture is AI-generated (image detector)
     manipulation_prediction: Optional[str] = None
     created_at: UTCDateTime
 
@@ -48,12 +50,33 @@ class ImageSubmissionResponse(BaseModel):
     @computed_field
     @property
     def analysis_branch(self) -> Optional[str]:
-        """'image_pair' (text in the image was classified), 'ai_or_real' (the picture was checked),
-        or None for images analysed before the pipeline had two branches."""
-        if self.manipulation_prediction == SKIPPED_HAS_TEXT:
+        """'image_pair' (text in the image was classified as the claim) or 'ai_or_real' (no usable
+        text; only the picture was checked). The picture is analysed on both. None for images
+        analysed before the pipeline had branches."""
+        if self.manipulation_prediction == SKIPPED_HAS_TEXT or self.text_prediction is not None:
             return BRANCH_IMAGE_PAIR
         if self.manipulation_prediction in (LABEL_AI_GENERATED, LABEL_REAL, NOT_ANALYZED):
             return BRANCH_AI_OR_REAL
+        return None
+
+    @computed_field
+    @property
+    def text_classification_status(self) -> Literal["completed", "unavailable", "not_run"]:
+        """Whether the OCR text was classified: not_run when there was no usable text."""
+        if self.text_prediction is None:
+            return "not_run"
+        return "completed" if self.text_confidence is not None else "unavailable"
+
+    @computed_field
+    @property
+    def image_analysis_status(self) -> Optional[Literal["completed", "unavailable", "skipped"]]:
+        """The AI-or-real detector: skipped only on rows saved by older versions."""
+        if self.image_score is not None:
+            return "completed"
+        if self.manipulation_prediction == SKIPPED_HAS_TEXT:
+            return "skipped"
+        if self.manipulation_prediction == NOT_ANALYZED:
+            return "unavailable"
         return None
 
 
@@ -90,6 +113,17 @@ class SubmissionResponse(BaseModel):
     explainability: Optional[ExplainabilityResponse] = None
 
     model_config = ConfigDict(from_attributes=True)
+
+    @computed_field
+    @property
+    def gradcam_status(self) -> Optional[Literal["completed", "unavailable", "not_run"]]:
+        """Grad-CAM heatmap for image checks: completed (heatmap stored), unavailable (the detector
+        ran but no heatmap was produced), not_run (the detector did not run). None for text."""
+        if self.image_submission is None:
+            return None
+        if self.explainability is not None and self.explainability.heatmap_path:
+            return "completed"
+        return "unavailable" if self.image_submission.image_score is not None else "not_run"
 
 
 # ─── Admin views ──────────────────────────────────────────────────────────────

@@ -47,15 +47,22 @@ export type ApiSubmission = {
     image_path: string;
     ocr_text?: string | null;
     ocr_confidence?: number | null;
+    /** completed, no_text_found, unavailable (OCR failed) or dependency_missing; null on older rows. */
+    ocr_status?: string | null;
     detected_language?: string | null;
     text_prediction?: string | null;
     text_confidence?: number | null;
-    /** Probability the picture is AI-generated (only on the ai_or_real branch). */
+    /** Probability the picture is AI-generated, from the image detector (run on every image). */
     image_score?: number | null;
     manipulation_prediction?: string | null;
-    /** image_pair: text in the image was classified; ai_or_real: the picture itself was checked. */
+    /** image_pair: text in the image was classified; ai_or_real: no usable text, only the picture was checked. */
     analysis_branch?: 'image_pair' | 'ai_or_real' | null;
+    text_classification_status?: 'completed' | 'unavailable' | 'not_run';
+    /** 'skipped' only on rows saved before every image was analysed. */
+    image_analysis_status?: 'completed' | 'unavailable' | 'skipped' | null;
   } | null;
+  /** Grad-CAM heatmap for image checks; null for text checks. */
+  gradcam_status?: 'completed' | 'unavailable' | 'not_run' | null;
   explainability?: {
     highlighted_words?: string | null;
     heatmap_path?: string | null;
@@ -113,16 +120,27 @@ function apiUrl(path: string) {
   return `${versionedBase}${path.startsWith('/') ? path : `/${path}`}`;
 }
 
-async function send(path: string, options: RequestInit = {}, token?: string): Promise<Response> {
+/**
+ * Analysis runs OCR, the text model and the image detector with Grad-CAM on the server's CPU, which
+ * can take a while (longer on the first request after the server starts), so it gets a generous limit.
+ */
+const ANALYSIS_TIMEOUT_MS = 180_000;
+
+async function send(path: string, options: RequestInit = {}, token?: string, timeoutMs?: number): Promise<Response> {
   const headers = new Headers(options.headers ?? {});
   headers.set('Accept', 'application/json');
   if (token) headers.set('Authorization', `Bearer ${token}`);
   if (options.body && typeof options.body === 'string') headers.set('Content-Type', 'application/json');
 
   let response: Response;
+  const controller = timeoutMs ? new AbortController() : null;
+  const timer = controller ? setTimeout(() => controller.abort(), timeoutMs) : null;
   try {
-    response = await fetch(apiUrl(path), { ...options, headers });
+    response = await fetch(apiUrl(path), { ...options, headers, signal: controller?.signal ?? options.signal });
   } catch (error) {
+    if (controller?.signal.aborted) {
+      throw new Error('The analysis took too long and was stopped. Check that the backend is running, then try again.');
+    }
     const reason = error instanceof Error ? error.message : String(error);
     // Only blame the connection for real network failures; otherwise show what went wrong
     // (e.g. a request the app could not build), so the cause is not hidden.
@@ -130,6 +148,8 @@ async function send(path: string, options: RequestInit = {}, token?: string): Pr
       throw new Error(`Cannot reach the backend at ${API_BASE_URL}. Check the API URL and that FastAPI is running.`);
     }
     throw new Error(`Could not send the request: ${reason}`);
+  } finally {
+    if (timer) clearTimeout(timer);
   }
 
   if (!response.ok) {
@@ -152,8 +172,8 @@ async function send(path: string, options: RequestInit = {}, token?: string): Pr
   return response;
 }
 
-async function request<T>(path: string, options: RequestInit = {}, token?: string): Promise<T> {
-  const response = await send(path, options, token);
+async function request<T>(path: string, options: RequestInit = {}, token?: string, timeoutMs?: number): Promise<T> {
+  const response = await send(path, options, token, timeoutMs);
   if (response.status === 204) return undefined as T;
   return response.json() as Promise<T>;
 }
@@ -183,7 +203,7 @@ export function getCurrentUser(token: string) {
 }
 
 export function submitText(token: string, text: string) {
-  return request<ApiSubmission>('/submissions/text', json({ text }), token);
+  return request<ApiSubmission>('/submissions/text', json({ text }), token, ANALYSIS_TIMEOUT_MS);
 }
 
 export async function submitImage(
@@ -201,7 +221,7 @@ export async function submitImage(
     // An expo-file-system File implements Blob, so expo/fetch can read it.
     form.append('file', new File(image.uri) as unknown as Blob);
   }
-  return request<ApiSubmission>('/submissions/image', { method: 'POST', body: form }, token);
+  return request<ApiSubmission>('/submissions/image', { method: 'POST', body: form }, token, ANALYSIS_TIMEOUT_MS);
 }
 
 /** The signed-in user's own submissions, newest first. */

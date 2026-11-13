@@ -1,5 +1,6 @@
 from pathlib import Path
 import json
+import logging
 from typing import List, Optional
 
 from fastapi import HTTPException, status
@@ -22,6 +23,8 @@ from app.models.image_submission import ImageSubmission
 from app.models.submission import Submission
 from app.models.text_submission import TextSubmission
 from app.models.user import User
+
+logger = logging.getLogger(__name__)
 
 
 def _highlighted_words_json(explanation: Optional[dict]) -> Optional[str]:
@@ -78,9 +81,9 @@ def create_image_submission(
     file_size_bytes: int,
 ) -> Submission:
     """
-    Runs the image pipeline: OCR decides between the image-pair branch (extracted
-    text classified by the text pipeline) and the AI-generated vs real branch.
-    Both are stored; only the text classification sets the verdict and risk.
+    Runs the image pipeline on the stored upload: OCR (and, with usable text, the text
+    classifier) AND the AI-or-real detector with its Grad-CAM heatmap. Every part is stored
+    separately; only the text classification sets the verdict and risk.
     """
     abs_image_path = str(Path(settings.UPLOAD_DIR).resolve() / image_path)
     result = run_image_pipeline(abs_image_path)
@@ -108,6 +111,7 @@ def create_image_submission(
         file_size_bytes=file_size_bytes,
         ocr_text=ocr_result.get("text"),
         ocr_confidence=ocr_result.get("confidence"),
+        ocr_status=ocr_result.get("status"),
         detected_language=ocr_result.get("language"),
         text_prediction=(text_ai.get("prediction") if text_ai else None),
         text_confidence=(text_ai.get("confidence") if text_ai else None),
@@ -115,33 +119,42 @@ def create_image_submission(
         manipulation_prediction=img_result.get("manipulation_prediction"),
     ))
 
-    # A heatmap is rendered only when the image detector supplied a Grad-CAM map.
+    # The heatmap is rendered from the detector's Grad-CAM map over the original upload.
+    # A rendering failure is reported, never replaced by a placeholder image.
+    gradcam_error = img_result.get("gradcam_error")
     heatmap_relative_path = None
-    heatmap_output_path = None
     if img_result.get("attribution_map") is not None:
-        heatmap_relative_path = f"explanations/{submission.id}_heatmap.png"
-        heatmap_output_path = Path(settings.UPLOAD_DIR).resolve() / heatmap_relative_path
-    visual_explanation = explain_image(
-        abs_image_path,
-        attribution_map=img_result.get("attribution_map"),
-        output_path=heatmap_output_path,
-    )
+        candidate = f"explanations/{submission.id}_heatmap.png"
+        try:
+            visual = explain_image(
+                abs_image_path,
+                attribution_map=img_result["attribution_map"],
+                output_path=Path(settings.UPLOAD_DIR).resolve() / candidate,
+            )
+            if visual.get("heatmap_path"):
+                heatmap_relative_path = candidate
+        except Exception:
+            logger.exception("Could not render the Grad-CAM heatmap for submission %s", submission.id)
+            gradcam_error = "the heatmap image could not be rendered"
 
-    # Summarize the branch taken and each result; nothing is inferred beyond what a model returned.
+    # Summarize each part; nothing is inferred beyond what a model returned.
     explanation_parts = [ocr_summary(ocr_result, branch)]
     if branch == BRANCH_IMAGE_PAIR:
         if text_ai and not text_ai.get("is_stub"):
             explanation_parts.append(text_explanation["summary"] if text_explanation else text_ai["summary"])
         else:
             explanation_parts.append(f"The extracted text could not be classified: {text_ai['summary']}")
-    else:
-        if img_result.get("summary"):
-            explanation_parts.append(img_result["summary"])
+    if img_result.get("summary"):
+        explanation_parts.append(img_result["summary"])
+    if heatmap_relative_path:
+        explanation_parts.append(
+            "The Grad-CAM heatmap shows where the detector's ResNet18 member looked; it does not show edits "
+            "and does not say whether a claim is true."
+        )
+    elif not img_result.get("is_stub"):
+        explanation_parts.append(f"Grad-CAM heatmap unavailable: {gradcam_error or 'no map was produced'}.")
+    if branch != BRANCH_IMAGE_PAIR:
         explanation_parts.append("No news claim was checked, so there is no fake-news verdict for this image.")
-        if visual_explanation.get("heatmap_path"):
-            explanation_parts.append(
-                "The heatmap shows where the detector's ResNet18 member looked; it does not show edits."
-            )
 
     if branch == BRANCH_IMAGE_PAIR:
         model_version = f"img-pair:{text_ai['model_version']}" if text_ai else "img-pair"
@@ -150,12 +163,18 @@ def create_image_submission(
     db.add(Explainability(
         submission_id=submission.id,
         highlighted_words=_highlighted_words_json(text_explanation),
-        heatmap_path=heatmap_relative_path if visual_explanation.get("heatmap_path") else None,
+        heatmap_path=heatmap_relative_path,
         explanation_summary=" ".join(explanation_parts),
         model_version=model_version[:50],
     ))
 
-    db.commit()
+    try:
+        db.commit()
+    except Exception:
+        # Do not leave a heatmap behind for a submission that was never saved.
+        if heatmap_relative_path:
+            (Path(settings.UPLOAD_DIR).resolve() / heatmap_relative_path).unlink(missing_ok=True)
+        raise
     return get_submission_by_id(db, submission_id=submission.id, user_id=user_id)
 
 

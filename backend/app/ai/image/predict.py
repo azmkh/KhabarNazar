@@ -25,6 +25,8 @@ def _unavailable(reason: str) -> dict:
         "status": "model_unavailable",
         "summary": f"Image authenticity was not analyzed: {reason}",
         "attribution_map": None,
+        "gradcam_status": "not_run",
+        "gradcam_error": "the image model did not run, so there is nothing to explain",
         "model_version": None,
     }
 
@@ -48,6 +50,8 @@ def analyze_image(image_path: str) -> dict:
 
     p_real = result["p_real"]
     label = ai_detector.label_for(p_real)
+    attribution_map = result.get("attribution_map")
+    gradcam_error = result.get("gradcam_error")
     return {
         "image_score": round(1 - p_real, 4),
         "manipulation_prediction": label,
@@ -58,7 +62,11 @@ def analyze_image(image_path: str) -> dict:
             f"({1 - p_real:.0%} chance it is AI-generated, judged from the centre of the image). "
             "This is about the picture itself, not whether any news claim is true or false."
         ),
-        "attribution_map": result["attribution_map"],
+        "attribution_map": attribution_map,
+        # Grad-CAM explains the ResNet18 member's prediction; it is reported separately so a
+        # failed heatmap never hides (or fakes) the detector's result.
+        "gradcam_status": "completed" if attribution_map is not None else "failed",
+        "gradcam_error": None if attribution_map is not None else (gradcam_error or "no Grad-CAM map was produced"),
         "members": {name: round(value, 4) for name, value in result["members"].items()},
         "model_version": ai_detector.MODEL_VERSION,
     }

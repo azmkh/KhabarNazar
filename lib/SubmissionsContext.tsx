@@ -72,6 +72,12 @@ export function fromApi(item: ApiSubmission, imageUri?: string | null): Submissi
     sourceCredibility: null,
     sourceCredibilityLabel: 'Not provided by the current backend.',
     analysisBranch: item.image_submission?.analysis_branch ?? null,
+    ocrStatus: item.image_submission?.ocr_status ?? null,
+    ocrTextPrediction: item.image_submission?.text_prediction ?? null,
+    ocrTextConfidence: item.image_submission?.text_confidence ?? null,
+    textClassificationStatus: item.image_submission?.text_classification_status ?? null,
+    imageAnalysisStatus: item.image_submission?.image_analysis_status ?? null,
+    gradcamStatus: item.gradcam_status ?? null,
     aiGeneratedLikelihood: imageScore == null ? null : Math.round(imageScore * 100),
     aiGeneratedLabel: item.image_submission?.manipulation_prediction ?? 'Not evaluated by a connected image model.',
   };

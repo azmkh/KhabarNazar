@@ -449,32 +449,43 @@ by the current API. Profile photos remain local to the device.
 `app/ai/pipeline.py` implements the project diagram:
 
 ```text
-Text  -> text pipeline -> text classification -----------------------------------> evaluation
-Image -> image pipeline -> image with text    -> OCR -> text classification -> image pair -> evaluation
-                        -> image with no text -> AI-generated or real -----------------------> evaluation
+Text  -> text pipeline -> text classification ----------------------------------------> evaluation
+Image -> image pipeline -+-> OCR -> usable text? -> text classification -> image pair -> evaluation
+                         +-> image analysis (AI-generated or real) -> Grad-CAM -------> evaluation
 ```
+
+OCR and image analysis are not alternatives: **every valid image goes through both**. OCR only
+decides whether there is a news claim to classify; it never decides whether the picture is analysed.
 
 - **Text.** `app/ai/text/predict.py` detects the input language and routes Urdu script and Roman
   Urdu to their separate XLM-R checkpoints. Both checkpoints map class `0` to `Real` and `1` to
-  `Fake`; Urdu uses its checkpoint metadata limit (64 tokens), and Roman Urdu uses its trained
-  512-token limit. The tokenizer truncates beyond those limits as it did during training, and the
-  response explanation says when truncation occurred. Roman Urdu text is sent to its tokenizer
-  unchanged. Urdu uses the Urdu training normalization. English, mixed-script, and ambiguous Latin
-  input are not routed to either checkpoint and return `Uncertain` without a score.
-- **Image with text.** EasyOCR (Urdu + English) reads the image. If the text has at least
+  `Fake`; Urdu uses its checkpoint's limit (256 tokens for `urdu-xlmr-v1`, 64 for the older
+  `text-model-v1`), and Roman Urdu uses its trained 512-token limit. The tokenizer truncates beyond
+  those limits as it did during training, and the response explanation says when truncation
+  occurred. Roman Urdu text is sent to its tokenizer unchanged. Urdu uses the Urdu training
+  normalization. English, mixed-script, and ambiguous Latin input are not routed to either
+  checkpoint and return `Uncertain` without a score.
+- **OCR path.** EasyOCR (Urdu + English) reads the image and its result is stored in `ocr_status`
+  (`completed`, `no_text_found`, `unavailable`, `dependency_missing`). If the text has at least
   `OCR_MIN_LETTERS` letters and average confidence `OCR_MIN_CONFIDENCE`, it goes through the *same*
-  text pipeline as typed text. The image, its OCR text and the classification are stored together
-  in `image_submissions` (the "image pair"), and `analysis_branch` is `image_pair`. The AI-or-real
-  detector is not run, and `manipulation_prediction` is `Skipped: image has text`.
-- **Image with no usable text** (none, too little, unclear, or OCR unavailable): the zero-shot
-  ensemble from `image_module/` notebook 05 (CLIP ViT-L/14 + DINOv2-L + robust ResNet18, P(real)
-  averaged, threshold 0.5). `image_score` is the chance the picture is AI-generated, and
-  `manipulation_prediction` is `Likely AI-generated` or `Likely real photo`. The heatmap is Grad-CAM
-  from the ResNet18 member. Preprocessing copies the notebooks: shorter side to 512, then a 224x224
-  centre crop, so only the centre of the image is analysed. `analysis_branch` is `ai_or_real`.
-- **Evaluation.** `evaluate()` does not combine branches. The verdict and risk come from the text
-  classification only. On the AI-or-real branch the verdict is always `Uncertain`, because no claim
-  was checked.
+  text pipeline as typed text, and `analysis_branch` is `image_pair`. Otherwise (no text, too
+  little, unclear, or OCR failed) no claim is classified and `analysis_branch` is `ai_or_real`.
+- **Image path (always).** The original upload goes to the zero-shot ensemble from `image_module/`
+  notebook 05 (CLIP ViT-L/14 + DINOv2-L + robust ResNet18, P(real) averaged, threshold 0.5).
+  `image_score` is the chance the picture is AI-generated, and `manipulation_prediction` is
+  `Likely AI-generated` or `Likely real photo`. Preprocessing copies the notebooks: shorter side to
+  512, then a 224x224 centre crop, so only the centre of the image is analysed. The Grad-CAM heatmap
+  (last ResNet18 block, for the class that member predicts) is drawn over the original upload and
+  stored as `explanations/<id>_heatmap.png`. A Grad-CAM failure keeps the detector's prediction and
+  is reported (`gradcam_status` is `unavailable`); a detector failure keeps any OCR text result.
+- **Evaluation.** `evaluate()` does not combine the paths. The verdict and risk come from the text
+  classification only. Without a classified claim the verdict is always `Uncertain`. The image
+  result and its heatmap are reported beside it: an AI-generated picture does not make a claim
+  false, and a real photo does not make it true.
+- **Response fields.** `image_submission` adds `ocr_status`, `text_classification_status`
+  (`completed`, `unavailable`, `not_run`) and `image_analysis_status` (`completed`, `unavailable`, or
+  `skipped` on rows saved before this change); the submission adds `gradcam_status` (`completed`,
+  `unavailable`, `not_run`).
 
 Every unavailable part (missing weights, missing packages, a model error) is reported in the
 explanation instead of being replaced by a made-up result.

@@ -16,6 +16,12 @@ ROMAN_URDU_WORDS = {
     "se", "mein", "main", "mai", "par", "pe", "aur", "ya", "nahi", "nahin", "nai", "kya", "kyun",
     "kaise", "yeh", "ye", "woh", "wo", "is", "us", "ek", "bhi", "sab", "hum", "ap", "aap", "tum",
     "gaya", "gayi", "raha", "rahi", "rahe", "kar", "kiya", "diya", "liye", "wala", "wali", "khabar",
+    # Further common words, none of them English words, so OCR'd Roman Urdu with few of the
+    # function words above (for example short captions and memes) is still recognised.
+    "tak", "na", "aisa", "aisi", "aise", "tarah", "lekin", "magar", "agar", "kuch", "koi", "bohat",
+    "bahut", "abhi", "phir", "jab", "apna", "apni", "apne", "hua", "hui", "hue", "kaha", "karna",
+    "karne", "hoga", "hogi", "unhon", "unhone", "saath", "liya", "toh", "sirf", "zyada", "kab",
+    "kahan", "kaun", "yahan", "wahan", "mujhe", "hamara", "hamari", "tumhara",
 }
 # Frequent English function words. Overlaps with Roman Urdu ("is", "the", "he")
 # are removed so they do not count for both languages.

@@ -7,7 +7,7 @@
 | | |
 |---|---|
 | Database | PostgreSQL 17.11 (`khabarnazar`; tests use `khabarnazar_test`) |
-| Migration revision | `d2e7b4c19a35` (latest) |
+| Migration revision | `e5b1c7a3d920` (latest) |
 | Tables | 6 application tables + `alembic_version` |
 | Managed by | SQLAlchemy models in `backend/app/models/`, changed only through Alembic migrations in `backend/alembic/versions/` |
 
@@ -69,6 +69,7 @@ erDiagram
         timestamptz created_at
         varchar text_prediction
         double_precision text_confidence
+        varchar ocr_status
     }
     explainability {
         integer id PK
@@ -169,11 +170,12 @@ The uploaded image and its results. Exactly one per image check. The two image s
 | `ocr_text` | TEXT | yes |  | Text read from the image by OCR. Empty if OCR is not installed or found no text. |
 | `ocr_confidence` | DOUBLE PRECISION | yes |  | Average OCR confidence for that text, 0–1. |
 | `detected_language` | VARCHAR(50) | yes |  | Language of the OCR text (same values as for text checks). |
-| `image_score` | DOUBLE PRECISION | yes |  | Image manipulation / AI-generated score, 0–1. Empty until an image model is connected. |
-| `manipulation_prediction` | VARCHAR(50) | yes |  | Short label from the image model (max 50 characters). Currently `Not Analyzed`. |
+| `image_score` | DOUBLE PRECISION | yes |  | Chance the picture is AI-generated, 0–1, from the image detector. Empty when the detector did not run. |
+| `manipulation_prediction` | VARCHAR(50) | yes |  | Short label from the image detector (max 50 characters): `Likely AI-generated`, `Likely real photo` or `Not Analyzed: model unavailable`. Older rows may hold `Skipped: image has text`. |
 | `created_at` | TIMESTAMPTZ | no |  | When the row was saved (UTC). |
 | `text_prediction` | VARCHAR(50) | yes |  | The text model's label for the OCR text, if there was text: `Fake`, `Real` or `Uncertain`. |
 | `text_confidence` | DOUBLE PRECISION | yes |  | How sure the text model is of that label, 0–1. Empty while no model is trained. |
+| `ocr_status` | VARCHAR(30) | yes |  | What OCR did: `completed` (text read), `no_text_found`, `unavailable` (OCR failed) or `dependency_missing`. Empty for images saved before this column existed. |
 
 **Links:** `submission_id` → `submissions.id` (on delete: cascade)
 
@@ -188,7 +190,7 @@ Why the result came out as it did. Exactly one per check.
 | `id` | INTEGER | no | PK | Unique row number, assigned automatically. |
 | `submission_id` | INTEGER | no | FK → submissions.id, UNIQUE | The check this explanation belongs to (one-to-one). Deleted with the check. |
 | `highlighted_words` | TEXT | yes |  | JSON text: a list of `{word, contribution, direction}` showing which words pushed the text model's score. Empty when no model is trained. These are model attributions, not fact-checks. |
-| `heatmap_path` | VARCHAR(512) | yes |  | Heatmap image inside `backend/uploads/` (`explanations/<id>_heatmap.png`). Empty unless an image model supplies one. |
+| `heatmap_path` | VARCHAR(512) | yes |  | Grad-CAM heatmap inside `backend/uploads/` (`explanations/<id>_heatmap.png`), from the image detector's ResNet18 member. Empty when the detector or Grad-CAM did not produce one. |
 | `explanation_summary` | TEXT | yes |  | Plain-language summary shown on the result screen, including what was unavailable and why. |
 | `model_version` | VARCHAR(50) | yes |  | Which analysis produced the result, e.g. `text-tfidf-logreg`, `text-model-unavailable`, `easyocr-ur-en`, `ocr-unavailable`. |
 | `created_at` | TIMESTAMPTZ | no |  | When the row was saved (UTC). |
@@ -239,6 +241,7 @@ These columns are plain text in the database; the API (Pydantic schemas and serv
 | `submissions.final_label_source` | `AI`, `Admin` |
 | `*.detected_language` | `urdu`, `roman_urdu`, `english`, `mixed`, `unknown` |
 | `image_submissions.mime_type` | `image/jpeg`, `image/png`, `image/webp` |
+| `image_submissions.ocr_status` | `completed`, `no_text_found`, `unavailable`, `dependency_missing` |
 | `disputes.status` | `pending`, `reviewed` (`closed` reserved) |
 | `disputes.admin_decision` | `uphold_ai`, `override` |
 | `disputes.override_label` | `Fake`, `Real`, `Uncertain` |
@@ -261,6 +264,7 @@ Applied in this order by `alembic upgrade head`:
 | 2 | `a4c8d2e91b07` | create_submission_tables |
 | 3 | `c81f2a9b6714` | add extracted text prediction fields to image submissions |
 | 4 | `d2e7b4c19a35` | store timestamps with time zone; make is_news nullable |
+| 5 | `e5b1c7a3d920` | add ocr_status to image_submissions |
 
 ## Useful commands (from `backend/`)
 

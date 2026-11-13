@@ -16,6 +16,7 @@ class ImageSubmission(Base):
     file_size_bytes = Column(Integer, nullable=True)
     ocr_text = Column(Text, nullable=True)                  # Text extracted via OCR
     ocr_confidence = Column(Float, nullable=True)           # 0.0 – 1.0
+    ocr_status = Column(String(30), nullable=True)          # completed / no_text_found / unavailable / dependency_missing
     detected_language = Column(String(50), nullable=True)   # Language of OCR text
     text_prediction = Column(String(50), nullable=True)     # Extracted-claim model result, if available
     text_confidence = Column(Float, nullable=True)          # Extracted-claim model confidence, if available

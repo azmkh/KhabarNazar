@@ -145,8 +145,10 @@ def test_image_with_text_becomes_an_image_pair(monkeypatch, no_explanations):
     # The pair keeps the image, the extracted text and the text classification together.
     assert image["image_path"] and image["ocr_text"] == URDU_TEXT and image["text_prediction"] == "Fake"
     assert text_calls == [URDU_TEXT]           # the same text pipeline as typed text
-    assert detector_calls == []                 # an image with text skips the AI-or-real detector
-    assert image["manipulation_prediction"] == "Skipped: image has text" and image["image_score"] is None
+    # OCR and image analysis are not alternatives: the picture is analysed even though it has text.
+    assert len(detector_calls) == 1
+    assert image["manipulation_prediction"] == "Likely AI-generated" and image["image_score"] == pytest.approx(0.9)
+    # The image score never changes the claim verdict, which comes from the text alone.
     assert data["final_label"] == "Fake" and data["combined_risk_score"] == pytest.approx(0.8)
 
     stored = client.get(f"/submissions/{data['id']}", headers=headers).json()

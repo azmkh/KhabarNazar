@@ -41,11 +41,21 @@ export type Submission = {
   sourceCredibility: Score100 | null;
   sourceCredibilityLabel: string;
   /**
-   * Which image branch ran: 'image_pair' (text in the image was classified as a news claim) or
-   * 'ai_or_real' (no usable text, so the picture was checked for AI generation). Null for text
-   * checks and for images analysed before the two branches existed.
+   * 'image_pair' (text in the image was classified as a news claim) or 'ai_or_real' (no usable text,
+   * so no claim was checked). The picture itself is analysed either way. Null for text checks and
+   * for images analysed before the branches existed.
    */
   analysisBranch: 'image_pair' | 'ai_or_real' | null;
+  /** What OCR did on an image: null for text checks and older image rows. */
+  ocrStatus: 'completed' | 'no_text_found' | 'unavailable' | 'dependency_missing' | string | null;
+  /** Text model result for text read from an image (null when no text was classified). */
+  ocrTextPrediction: string | null;
+  ocrTextConfidence: number | null;
+  textClassificationStatus: 'completed' | 'unavailable' | 'not_run' | null;
+  /** The AI-generated vs real detector ('skipped' only on rows saved by older versions). */
+  imageAnalysisStatus: 'completed' | 'unavailable' | 'skipped' | null;
+  /** Grad-CAM heatmap: completed, unavailable (detector ran, no heatmap) or not_run. */
+  gradcamStatus: 'completed' | 'unavailable' | 'not_run' | null;
   /** Chance the picture is AI-generated (0–100); null when the detector did not run. Not a claim verdict. */
   aiGeneratedLikelihood: Score100 | null;
   aiGeneratedLabel: string;

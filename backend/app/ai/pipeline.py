@@ -1,32 +1,40 @@
 """The analysis pipelines from the project diagram, and the evaluation step that receives their results.
 
-Text  -> text pipeline -> text classification ------------------------------> evaluation
-Image -> image pipeline -> image with text    -> OCR -> text classification -> image pair -> evaluation
-                        -> image with no text -> AI-generated or real ---------------------> evaluation
+Text  -> text pipeline -> text classification ------------------------------------------> evaluation
+Image -> image pipeline -+-> OCR -> (usable text?) -> text classification -> image pair -> evaluation
+                         +-> image analysis (AI-generated or real) -> Grad-CAM ---------> evaluation
 
-The two image branches are exclusive: an image with usable text is not sent to the AI-or-real
-detector, and an image without usable text is never classified as a news claim.
+OCR and image analysis are NOT alternatives. Every valid image is read by OCR *and* checked by the
+AI-or-real detector, whose ResNet18 member also produces the Grad-CAM heatmap. OCR only decides
+whether there is a news claim to classify; it never decides whether the picture is analysed.
 
-The evaluation step does NOT combine the branches into one score. The verdict and the fake-news
+The `branch` name records whether OCR text was classified: "image_pair" (usable text was found and
+sent to the text pipeline) or "ai_or_real" (no usable text, so only the picture was analysed).
+
+The evaluation step does NOT combine the outputs into one score. The verdict and the fake-news
 risk come only from a text classification (typed text, or the text of an image pair). The
-AI-or-real result is reported on its own: an AI-generated picture does not make a claim false,
-and a real photo does not make it true.
+AI-or-real result and its Grad-CAM are reported on their own: an AI-generated picture does not make
+a claim false, and a real photo does not make it true.
 """
 
 from __future__ import annotations
 
+import logging
 from typing import Optional
 
 from app.ai.image.ocr import has_usable_text, run_ocr
 from app.ai.image.predict import analyze_image
 from app.ai.text.explain import explain_text
-from app.ai.text.predict import predict_text
+from app.ai.text.predict import UNAVAILABLE_MODEL_VERSION, predict_text
 from app.config import settings
 
+logger = logging.getLogger(__name__)
+
 BRANCH_TEXT = "text"
-BRANCH_IMAGE_PAIR = "image_pair"  # image with text: OCR text + its classification, tied to the image
-BRANCH_AI_OR_REAL = "ai_or_real"  # image with no usable text: authenticity of the picture
-# Stored in image_submissions.manipulation_prediction (VARCHAR(50)) when the detector is not run.
+BRANCH_IMAGE_PAIR = "image_pair"  # usable OCR text was classified; the picture was analysed too
+BRANCH_AI_OR_REAL = "ai_or_real"  # no usable OCR text: only the picture was analysed
+# Stored in image_submissions.manipulation_prediction by older versions, which skipped the detector
+# for images with text. Kept so those rows are still recognised; new submissions never store it.
 SKIPPED_HAS_TEXT = "Skipped: image has text"
 
 
@@ -40,26 +48,47 @@ def run_text_pipeline(text: str, language: Optional[str] = None) -> dict:
     return {"classification": classification, "explanation": explanation}
 
 
+def _text_pipeline_failed(language: Optional[str]) -> dict:
+    """A clearly marked unavailable classification when the text pipeline itself raised."""
+    return {
+        "classification": {
+            "prediction": "Uncertain",
+            "confidence": None,
+            "fake_probability": None,
+            "summary": "The text classifier failed on the extracted text. Check the backend log.",
+            "model_version": UNAVAILABLE_MODEL_VERSION,
+            "detected_language": language,
+            "is_stub": True,
+            "status": "unavailable",
+            "input_truncated": False,
+        },
+        "explanation": None,
+    }
+
+
 def run_image_pipeline(image_path: str) -> dict:
-    """OCR first; route to the image-pair branch or the AI-or-real branch."""
+    """Run OCR (and, with usable text, the text pipeline) AND the image analysis with Grad-CAM.
+
+    Each part handles its own failure, so an OCR error never stops the image analysis and a
+    detector or Grad-CAM error never discards the OCR text or its classification.
+    """
     ocr = run_ocr(image_path)
+    text = None
     if has_usable_text(ocr, settings.OCR_MIN_LETTERS, settings.OCR_MIN_CONFIDENCE):
         # Image pair: the same text pipeline as typed text, on the extracted text of this image.
-        text = run_text_pipeline(ocr["text"], language=ocr.get("language"))
-        return {
-            "branch": BRANCH_IMAGE_PAIR,
-            "ocr": ocr,
-            "text": text,
-            "image": {
-                "image_score": None,
-                "manipulation_prediction": SKIPPED_HAS_TEXT,
-                "is_stub": True,
-                "status": "skipped",
-                "summary": None,
-                "attribution_map": None,
-            },
-        }
-    return {"branch": BRANCH_AI_OR_REAL, "ocr": ocr, "text": None, "image": analyze_image(image_path)}
+        try:
+            text = run_text_pipeline(ocr["text"], language=ocr.get("language"))
+        except Exception:
+            logger.exception("Text pipeline failed on OCR text")
+            text = _text_pipeline_failed(ocr.get("language"))
+    # Always analyse the original uploaded picture, whatever OCR found.
+    image = analyze_image(image_path)
+    return {
+        "branch": BRANCH_IMAGE_PAIR if text is not None else BRANCH_AI_OR_REAL,
+        "ocr": ocr,
+        "text": text,
+        "image": image,
+    }
 
 
 def evaluate(branch: str, text: Optional[dict] = None) -> dict:
@@ -74,17 +103,16 @@ def evaluate(branch: str, text: Optional[dict] = None) -> dict:
 
 
 def ocr_summary(ocr: dict, branch: str) -> str:
-    """What OCR found and how that decided the branch."""
+    """What OCR found and whether that text was checked as a news claim."""
     if ocr.get("is_stub"):
         return (f"{ocr.get('message') or 'OCR is unavailable.'} Any text in the image could not be read, "
-                "so only the picture itself was checked.")
+                "so no news claim was checked.")
     if branch == BRANCH_IMAGE_PAIR:
         return (f"OCR read text from the image (average confidence {ocr['confidence']:.2f}), "
-                "so the text was checked and the picture was not tested for AI generation.")
+                "so the text was checked as the news claim.")
     if ocr.get("text"):
-        return ("OCR found only a little or unclear text, too little to check as a news claim, "
-                "so the picture itself was checked instead.")
-    return "OCR found no readable text, so the picture itself was checked."
+        return "OCR found only a little or unclear text, too little to check as a news claim."
+    return "OCR found no readable text, so no news claim was checked."
 
 
 def model_warmup() -> None:

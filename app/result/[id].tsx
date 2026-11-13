@@ -55,9 +55,11 @@ export default function ResultScreen() {
 
   const meta = verdictMeta(row.verdict, colors);
   const isImage = row.kind !== 'text';
-  // Image checks follow one of two branches; only the image-pair branch classifies a news claim.
+  // Every image is analysed by the image detector (with Grad-CAM); OCR text is classified as the
+  // news claim only when there was enough of it (the image-pair branch).
   const pictureChecked = row.analysisBranch === 'ai_or_real';
   const textInImageChecked = row.analysisBranch === 'image_pair';
+  const ocrFailed = row.ocrStatus === 'unavailable' || row.ocrStatus === 'dependency_missing';
   // The backend scores each occurrence of a word; show each word once.
   const words = row.highlightedWords?.filter(
     (item, index, all) => all.findIndex((other) => other.word === item.word) === index,
@@ -86,9 +88,9 @@ export default function ResultScreen() {
           <HeroStat label="Fake-news risk" value={percent(row.riskScore)} />
         </View>
         <AppText variant="caption" color="textMuted">
-          {pictureChecked
-            ? 'This image had no readable text, so no news claim was checked. The picture itself was '
-              + 'checked for signs of AI generation instead (see Image authenticity below).'
+          {isImage && !textInImageChecked
+            ? 'No news claim was checked in this image (no usable text was read), so there is no '
+              + 'fake-news verdict. The picture itself was analysed separately (see Image analysis below).'
             : 'The model score is an uncalibrated output, not a measure of truth. Risk is the estimated '
               + 'chance the content is fake. Neither is proof that a claim is true or false.'}
         </AppText>
@@ -130,15 +132,32 @@ export default function ResultScreen() {
             ) : null}
             <ContentText>{row.textPreview}</ContentText>
           </View>
-        ) : isImage ? (
-          <AppText variant="caption" color="textMuted" style={styles.ocr}>No readable text was extracted from this image.</AppText>
+        ) : isImage && !ocrFailed ? (
+          <AppText variant="caption" color="textMuted" style={styles.ocr}>No readable text was found in this image.</AppText>
+        ) : null}
+        {isImage && ocrFailed ? (
+          <AppText variant="caption" color="uncertain" style={styles.ocr}>
+            Text reading (OCR) failed on this image, so any text in it could not be checked.
+          </AppText>
+        ) : null}
+        {isImage && pictureChecked && row.textPreview ? (
+          <AppText variant="caption" color="textMuted" style={styles.mt4}>
+            Too little or unclear text to check as a news claim.
+          </AppText>
+        ) : null}
+        {isImage && textInImageChecked ? (
+          <AppText variant="caption" color={row.textClassificationStatus === 'completed' ? 'textMuted' : 'uncertain'} style={styles.mt4}>
+            {row.textClassificationStatus === 'completed'
+              ? `Text classification: ${row.ocrTextPrediction ?? 'Unavailable'} (model score ${percent(row.ocrTextConfidence)})`
+              : 'The text in this image could not be classified by a compatible model.'}
+          </AppText>
         ) : null}
         {row.detectedLanguage ? (
           <AppText variant="caption" color="textMuted" style={styles.mt12}>
             Detected language: {languageLabel(row.detectedLanguage)}
           </AppText>
         ) : null}
-        {row.processingStatus === 'unavailable' ? (
+        {!isImage && row.processingStatus === 'unavailable' ? (
           <AppText variant="caption" color="uncertain" style={styles.mt4}>
             This text was not classified by a compatible model.
           </AppText>
@@ -170,37 +189,58 @@ export default function ResultScreen() {
             </View>
           </View>
         ) : null}
-        {row.heatmapPath ? (
-          <View style={styles.mt12}>
-            <AppText variant="caption" color="textMuted" style={styles.mb6}>
-              Where the AI-image detector looked (it analyses the centre of the image)
-            </AppText>
-            <View style={[styles.imageFrame, { backgroundColor: colors.surfaceMuted }]}>
-              <AuthImage uri={row.heatmapPath} style={styles.image} resizeMode="contain" />
-            </View>
-          </View>
-        ) : null}
       </Card>
+
+      {/* Image analysis and Grad-CAM: about the picture, never about whether a claim is true */}
+      {isImage ? (
+        <Card title="Image analysis">
+          {row.imageAnalysisStatus === 'completed' ? (
+            <Meter
+              label="Chance the picture is AI-generated"
+              value={row.aiGeneratedLikelihood == null ? null : row.aiGeneratedLikelihood / 100}
+              color={colors.uncertain}
+              note={`${row.aiGeneratedLabel}. This is about the picture, not whether any news claim is true.`}
+            />
+          ) : (
+            <AppText variant="caption" color="uncertain">
+              {row.imageAnalysisStatus === 'skipped'
+                ? 'This older check did not analyse the picture because it contained text.'
+                : 'The image detector could not analyse this picture, so there is no image result.'}
+            </AppText>
+          )}
+          <View style={styles.mt12}>
+            <AppText variant="overline" color="textSubtle" style={styles.mb6}>Grad-CAM heatmap</AppText>
+            {row.heatmapPath ? (
+              <>
+                <View style={[styles.imageFrame, { backgroundColor: colors.surfaceMuted }]}>
+                  <AuthImage uri={row.heatmapPath} style={styles.image} resizeMode="contain" />
+                </View>
+                <AppText variant="caption" color="textMuted" style={styles.mt4}>
+                  Where the detector's ResNet18 model looked (it analyses the centre of the image). It
+                  explains the image model's output; it does not show edits or prove a claim true or false.
+                </AppText>
+              </>
+            ) : (
+              <AppText variant="caption" color="uncertain">
+                {row.gradcamStatus === 'unavailable'
+                  ? 'Grad-CAM heatmap unavailable: the detector ran, but no heatmap could be produced for this image.'
+                  : 'No Grad-CAM heatmap: the image detector did not run on this image.'}
+              </AppText>
+            )}
+          </View>
+        </Card>
+      ) : null}
 
       {/* Signals */}
       {hasExtraSignals ? (
       <Card title="Signals">
         <View style={styles.signals}>
-          <Meter label="Fake-news risk" value={row.riskScore} color={colors.misleading} />
-          {isImage && textInImageChecked ? (
-            <AppText variant="caption" color="textMuted">
-              AI-generated image check skipped: this image contains text, so its text was checked instead.
-            </AppText>
-          ) : isImage ? (
-            <Meter
-              label={pictureChecked ? 'Image authenticity: chance it is AI-generated' : 'Image analysis'}
-              value={row.aiGeneratedLikelihood == null ? null : row.aiGeneratedLikelihood / 100}
-              color={colors.uncertain}
-              note={pictureChecked
-                ? `${row.aiGeneratedLabel}. This is about the picture, not whether any news claim is true.`
-                : row.aiGeneratedLabel}
-            />
-          ) : null}
+          <Meter
+            label="Fake-news risk"
+            value={row.riskScore}
+            color={colors.misleading}
+            note={isImage ? 'From the text classification only; the image analysis is never mixed in.' : undefined}
+          />
           {row.languageQuality != null ? (
             <Meter label="Language quality" value={row.languageQuality / 100} note={row.languageQualityLabel} />
           ) : null}

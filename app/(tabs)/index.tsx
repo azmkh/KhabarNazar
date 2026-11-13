@@ -1,6 +1,6 @@
 import * as ImagePicker from 'expo-image-picker';
 import { useRouter } from 'expo-router';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Image, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
 import { SubmissionRow } from '@/components/SubmissionRow';
@@ -30,6 +30,8 @@ export default function CheckScreen() {
   const [text, setText] = useState('');
   const [imageAsset, setImageAsset] = useState<ImagePicker.ImagePickerAsset | null>(null);
   const [busy, setBusy] = useState(false);
+  // State updates are async, so a quick second tap could start a second upload; a ref cannot.
+  const submittingRef = useRef(false);
 
   const firstName = user?.name?.trim().split(/\s+/)[0] || user?.email?.split('@')[0] || 'there';
   const recent = submissions.slice(0, 3);
@@ -58,6 +60,8 @@ export default function CheckScreen() {
   }
 
   async function onSubmit() {
+    if (submittingRef.current) return;
+    submittingRef.current = true;
     try {
       if (!accessToken) throw new Error('Your session is missing. Please sign in again.');
       setBusy(true);
@@ -82,6 +86,12 @@ export default function CheckScreen() {
           type: inferredType,
         });
       }
+      // Only open a result the server actually saved for this upload.
+      const expectedType = mode === 'image' ? 'image' : 'text';
+      if (!response || typeof response.id !== 'number' || response.submission_type !== expectedType
+        || (mode === 'image' ? !response.image_submission : !response.text_submission)) {
+        throw new Error('The server returned an incomplete result. Please try again.');
+      }
       const id = addServerSubmission(response, mode === 'image' ? imageAsset?.uri : null);
       setText('');
       setImageAsset(null);
@@ -90,6 +100,7 @@ export default function CheckScreen() {
       const msg = e instanceof Error ? e.message : 'Something went wrong.';
       showAlert('Could not analyze', msg);
     } finally {
+      submittingRef.current = false;
       setBusy(false);
     }
   }

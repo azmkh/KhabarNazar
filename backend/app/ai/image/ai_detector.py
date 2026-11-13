@@ -114,16 +114,31 @@ class AIImageDetector:
             dino_features = self.dino(pixel_values=imagenet_x).pooler_output.numpy()
         p_clip = float(self.clip_head.predict_proba(clip_features)[0, REAL_INDEX])
         p_dino = float(self.dino_head.predict_proba(dino_features)[0, REAL_INDEX])
-        p_resnet, cam = self._resnet_with_gradcam(imagenet_x)
+        p_resnet, cam, gradcam_error = self._resnet_with_gradcam(imagenet_x)
         p_real = (p_clip + p_dino + p_resnet) / 3
+        attribution_map = None
+        if cam is not None:
+            try:
+                attribution_map = self._place_in_image(cam, img.size)
+            except Exception:
+                logger.exception("Could not place the Grad-CAM map in the image")
+                gradcam_error = "the Grad-CAM map could not be placed on the image"
+            if attribution_map is None and gradcam_error is None:
+                gradcam_error = "the Grad-CAM map was flat (no region stood out)"
         return {
             "p_real": p_real,
             "members": {"clip_vitl14": p_clip, "dinov2_l": p_dino, "resnet18_robust": p_resnet},
-            "attribution_map": self._place_in_image(cam, img.size),
+            "attribution_map": attribution_map,
+            "gradcam_error": gradcam_error,
         }
 
     def _resnet_with_gradcam(self, x):
-        """Notebook 04's Grad-CAM on the last ResNet18 block, for the class the ResNet member predicts."""
+        """Notebook 04's Grad-CAM on the last ResNet18 block, for the class the ResNet member predicts.
+
+        Returns (p_real, cam or None, error or None). The ResNet18 prediction does not depend on
+        Grad-CAM: if the backward pass fails, the forward-pass probability is still returned and
+        the failure is reported, so no heatmap is invented and no prediction is lost.
+        """
         torch = self.torch
         store: dict = {}
 
@@ -136,15 +151,19 @@ class AIImageDetector:
             x = x.clone().requires_grad_(True)
             with torch.enable_grad():
                 logits = self.resnet(x)
-                p_real = float(torch.softmax(logits, 1)[0, REAL_INDEX])
-                logits[0, int(logits.argmax(1))].backward()
-            weights = store["grads"].mean(dim=(2, 3), keepdim=True)
-            cam = torch.relu((weights * store["acts"]).sum(1))[0].detach()
-            cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
+                p_real = float(torch.softmax(logits, 1)[0, REAL_INDEX].detach())
+                try:
+                    logits[0, int(logits.argmax(1))].backward()
+                    weights = store["grads"].mean(dim=(2, 3), keepdim=True)
+                    cam = torch.relu((weights * store["acts"]).sum(1))[0].detach()
+                    cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
+                except Exception:
+                    logger.exception("Grad-CAM failed; the ResNet18 prediction is kept without a heatmap")
+                    return p_real, None, "Grad-CAM could not be computed for this image"
         finally:
             handle.remove()
             self.resnet.zero_grad(set_to_none=True)
-        return p_real, cam.numpy()
+        return p_real, cam.numpy(), None
 
     @staticmethod
     def _place_in_image(cam, size: tuple[int, int]):
