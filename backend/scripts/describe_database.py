@@ -355,6 +355,7 @@ def markdown(tables, server_version: str, revision: str, history, head: str) -> 
     add("| Do the models match the migrations? | `.\\.venv\\Scripts\\python.exe -m alembic check` |")
     add("| Regenerate this document and `schema.sql` | `.\\.venv\\Scripts\\python.exe scripts\\describe_database.py` |")
     add("| Is this document still accurate? | `.\\.venv\\Scripts\\python.exe scripts\\describe_database.py --check` |")
+    add("| Redraw `database-schema.png` from the diagram above (needs Edge or Chrome and internet) | `.\\.venv\\Scripts\\python.exe scripts\\render_schema_diagram.py` |")
     add("")
     add("The exact SQL that creates every table and index is in [`schema.sql`](schema.sql).")
     add("")

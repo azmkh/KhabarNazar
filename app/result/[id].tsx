@@ -216,8 +216,9 @@ export default function ResultScreen() {
                   <AuthImage uri={row.heatmapPath} style={styles.image} resizeMode="contain" />
                 </View>
                 <AppText variant="caption" color="textMuted" style={styles.mt4}>
-                  Where the detector's ResNet18 model looked (it analyses the centre of the image). It
-                  explains the image model's output; it does not show edits or prove a claim true or false.
+                  Where the detector's ResNet18 model looked. Only the outlined centre area is analysed;
+                  the rest of the picture is shown as it is. It explains the image model's output; it
+                  does not show edits or prove a claim true or false.
                 </AppText>
               </>
             ) : (

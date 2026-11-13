@@ -1,5 +1,7 @@
 import logging
-from typing import Generator
+from functools import lru_cache
+from pathlib import Path
+from typing import Generator, Optional
 from sqlalchemy import create_engine, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from app.config import settings
@@ -42,3 +44,41 @@ def check_db_connection() -> dict:
         # Log details server-side only; connection errors can contain hostnames or usernames.
         logger.exception("Database health check failed")
         return {"status": "disconnected", "database": engine.dialect.name}
+
+
+ALEMBIC_DIR = Path(__file__).resolve().parents[1] / "alembic"
+
+
+@lru_cache(maxsize=1)
+def migration_head() -> Optional[str]:
+    """The newest migration in backend/alembic/versions (read once per process)."""
+    try:
+        from alembic.script import ScriptDirectory
+
+        return ScriptDirectory(str(ALEMBIC_DIR)).get_current_head()
+    except Exception:
+        logger.exception("Could not read the Alembic migration scripts")
+        return None
+
+
+def check_migrations() -> dict:
+    """Compare the database's migration revision with the newest one in the code.
+
+    After a `git pull` that adds a migration, the code expects columns the database does not have
+    yet, and requests fail with "no such column" errors until `alembic upgrade head` is run.
+    """
+    head = migration_head()
+    try:
+        from alembic.runtime.migration import MigrationContext
+
+        with engine.connect() as conn:
+            current = MigrationContext.configure(conn).get_current_revision()
+    except Exception:
+        # Same as the connection check: details stay in the server log.
+        logger.exception("Could not read the database migration revision")
+        return {"status": "unknown", "current": None, "head": head}
+    if head is None:
+        status = "unknown"
+    else:
+        status = "up_to_date" if current == head else "behind"
+    return {"status": status, "current": current, "head": head}

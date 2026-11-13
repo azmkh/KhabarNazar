@@ -24,6 +24,7 @@ from typing import Optional
 
 from app.ai.image.ocr import has_usable_text, run_ocr
 from app.ai.image.predict import analyze_image
+from app.ai.image.preprocess import upright_image
 from app.ai.text.explain import explain_text
 from app.ai.text.predict import UNAVAILABLE_MODEL_VERSION, predict_text
 from app.config import settings
@@ -72,17 +73,20 @@ def run_image_pipeline(image_path: str) -> dict:
     Each part handles its own failure, so an OCR error never stops the image analysis and a
     detector or Grad-CAM error never discards the OCR text or its classification.
     """
-    ocr = run_ocr(image_path)
-    text = None
-    if has_usable_text(ocr, settings.OCR_MIN_LETTERS, settings.OCR_MIN_CONFIDENCE):
-        # Image pair: the same text pipeline as typed text, on the extracted text of this image.
-        try:
-            text = run_text_pipeline(ocr["text"], language=ocr.get("language"))
-        except Exception:
-            logger.exception("Text pipeline failed on OCR text")
-            text = _text_pipeline_failed(ocr.get("language"))
-    # Always analyse the original uploaded picture, whatever OCR found.
-    image = analyze_image(image_path)
+    # OCR and the detector both read the upright image, so the heatmap (drawn over the stored
+    # upload, which OpenCV shows upright) lines up with what the detector analysed.
+    with upright_image(image_path) as upright_path:
+        ocr = run_ocr(upright_path)
+        text = None
+        if has_usable_text(ocr, settings.OCR_MIN_LETTERS, settings.OCR_MIN_CONFIDENCE):
+            # Image pair: the same text pipeline as typed text, on the extracted text of this image.
+            try:
+                text = run_text_pipeline(ocr["text"], language=ocr.get("language"))
+            except Exception:
+                logger.exception("Text pipeline failed on OCR text")
+                text = _text_pipeline_failed(ocr.get("language"))
+        # Always analyse the uploaded picture, whatever OCR found.
+        image = analyze_image(upright_path)
     return {
         "branch": BRANCH_IMAGE_PAIR if text is not None else BRANCH_AI_OR_REAL,
         "ocr": ocr,

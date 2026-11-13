@@ -476,7 +476,9 @@ decides whether there is a news claim to classify; it never decides whether the 
   `Likely AI-generated` or `Likely real photo`. Preprocessing copies the notebooks: shorter side to
   512, then a 224x224 centre crop, so only the centre of the image is analysed. The Grad-CAM heatmap
   (last ResNet18 block, for the class that member predicts) is drawn over the original upload and
-  stored as `explanations/<id>_heatmap.png`. A Grad-CAM failure keeps the detector's prediction and
+  stored as `explanations/<id>_heatmap.png`; only the analysed centre area is coloured, and it is
+  outlined. Phone photos stored sideways with an EXIF rotation tag are analysed upright (OCR and
+  the detector read a temporary upright copy; the stored upload is not changed). A Grad-CAM failure keeps the detector's prediction and
   is reported (`gradcam_status` is `unavailable`); a detector failure keeps any OCR text result.
 - **Evaluation.** `evaluate()` does not combine the paths. The verdict and risk come from the text
   classification only. Without a classified claim the verdict is always `Uncertain`. The image
@@ -486,6 +488,10 @@ decides whether there is a news claim to classify; it never decides whether the 
   (`completed`, `unavailable`, `not_run`) and `image_analysis_status` (`completed`, `unavailable`, or
   `skipped` on rows saved before this change); the submission adds `gradcam_status` (`completed`,
   `unavailable`, `not_run`).
+
+If the database is behind the code (a `git pull` added a migration that was not applied), the
+server logs a warning at startup, `/health` answers `503` with `"migrations": {"status": "behind"}`,
+and failing requests return `503` with the instruction to run `alembic upgrade head`.
 
 Every unavailable part (missing weights, missing packages, a model error) is reported in the
 explanation instead of being replaced by a made-up result.

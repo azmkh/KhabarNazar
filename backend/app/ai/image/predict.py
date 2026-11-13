@@ -63,6 +63,7 @@ def analyze_image(image_path: str) -> dict:
             "This is about the picture itself, not whether any news claim is true or false."
         ),
         "attribution_map": attribution_map,
+        "analysed_region": result.get("analysed_region"),
         # Grad-CAM explains the ResNet18 member's prediction; it is reported separately so a
         # failed heatmap never hides (or fakes) the detector's result.
         "gradcam_status": "completed" if attribution_map is not None else "failed",

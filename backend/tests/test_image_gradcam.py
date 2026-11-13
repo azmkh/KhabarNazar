@@ -383,3 +383,81 @@ def test_real_models_run_ocr_and_gradcam_on_every_image(name):
     assert image["image_analysis_status"] == "completed" and 0 <= image["image_score"] <= 1
     assert image["manipulation_prediction"] in {"Likely AI-generated", "Likely real photo"}
     _assert_gradcam_completed(data, headers)
+
+
+# ─── Orientation and the analysed region ─────────────────────────────────────
+
+def _sideways_jpeg(size=(400, 200)) -> bytes:
+    """Pixels stored landscape with EXIF Orientation 6, so people see it portrait (200x400)."""
+    img = Image.new("RGB", size, (200, 60, 60))
+    ImageDraw.Draw(img).rectangle((0, 0, 60, 60), fill=(20, 20, 20))
+    exif = img.getexif()
+    exif[0x0112] = 6
+    buf = io.BytesIO()
+    img.save(buf, format="JPEG", exif=exif)
+    return buf.getvalue()
+
+
+def test_upright_image_applies_exif_rotation_and_cleans_up(tmp_path):
+    from app.ai.image.preprocess import upright_image
+
+    rotated = tmp_path / "phone.jpg"
+    rotated.write_bytes(_sideways_jpeg())
+    with upright_image(rotated) as path:
+        assert path != str(rotated)
+        with Image.open(path) as img:
+            assert img.size == (200, 400)
+    assert not Path(path).exists()                 # the temporary copy is removed
+    assert rotated.read_bytes() == _sideways_jpeg()  # the stored upload is never changed
+
+    plain = tmp_path / "plain.png"
+    plain.write_bytes(_png())
+    with upright_image(plain) as path:
+        assert path == str(plain)                  # no tag: passed through untouched
+
+
+def test_ocr_detector_and_heatmap_all_see_the_upright_photo(monkeypatch, text_models):
+    seen = {}
+
+    def ocr(path):
+        with Image.open(path) as img:
+            seen["ocr"] = img.size
+        return _ocr_reading(None)(path)
+
+    stand_in = Detector()
+
+    def analyze(path):
+        with Image.open(path) as img:
+            seen["detector"] = img.size
+        return stand_in(path)
+
+    monkeypatch.setattr(pipeline, "run_ocr", ocr)
+    monkeypatch.setattr(pipeline, "analyze_image", analyze)
+    data = _upload(_headers("exif.rotated@example.com"), _sideways_jpeg()).json()
+    assert seen == {"ocr": (200, 400), "detector": (200, 400)}
+    with Image.open(_heatmap_file(data)) as heatmap:
+        assert heatmap.size == (200, 400)
+    assert not Path(stand_in.paths[0]).exists()  # the upright copy was temporary
+    assert (Path(settings.UPLOAD_DIR).resolve() / data["image_submission"]["image_path"]).is_file()
+
+
+def test_heatmap_colours_only_the_analysed_region(tmp_path):
+    from app.ai.image.explain import save_attribution_heatmap
+
+    source = tmp_path / "source.png"
+    Image.new("RGB", (400, 200), (120, 120, 120)).save(source)
+    output = tmp_path / "heatmap.png"
+    save_attribution_heatmap(source, np.linspace(0, 1, 64).reshape(8, 8), output, region=(0.25, 0.25, 0.75, 0.75))
+    with Image.open(output) as heatmap:
+        pixels = np.asarray(heatmap.convert("RGB")).astype(int)
+    assert (pixels[:30, :80] == 120).all()                         # outside the region: untouched
+    assert np.abs(pixels[90:110, 180:220] - 120).max() > 30          # inside: coloured by the map
+    assert (pixels[50, 120:280] == 255).all() or (pixels[50, 120:280] == 0).all()  # outlined edge
+    with pytest.raises(ValueError):
+        save_attribution_heatmap(source, np.linspace(0, 1, 64).reshape(8, 8), output, region=(0.5, 0, 0.4, 1))
+
+
+def test_detector_reports_the_centre_crop_it_analysed():
+    assert ai_detector.AIImageDetector.analysed_region((683, 512)) == pytest.approx(
+        (230 / 683, 144 / 512, 454 / 683, 368 / 512))
+    assert ai_detector.AIImageDetector.analysed_region((224, 224)) == (0.0, 0.0, 1.0, 1.0)

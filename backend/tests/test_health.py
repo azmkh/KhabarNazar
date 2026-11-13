@@ -57,3 +57,49 @@ def test_short_jwt_secret_is_rejected():
 
     with pytest.raises(ValidationError):
         Settings(DATABASE_URL="sqlite://", JWT_SECRET="too-short")
+
+
+def test_health_reports_migrations_up_to_date():
+    data = client.get("/health").json()
+    assert data["migrations"]["status"] == "up_to_date"
+    assert data["migrations"]["current"] == data["migrations"]["head"]
+
+
+def _behind():
+    return {"status": "behind", "current": "d2e7b4c19a35", "head": "e5b1c7a3d920"}
+
+
+def test_health_is_degraded_when_the_database_is_behind_the_code():
+    with patch("app.main.check_migrations", _behind):
+        response = client.get("/health")
+    assert response.status_code == 503
+    data = response.json()
+    assert data["status"] == "degraded" and data["migrations"]["status"] == "behind"
+    assert "alembic upgrade head" in data["message"]
+
+
+def test_database_errors_explain_a_missing_migration():
+    from sqlalchemy.exc import OperationalError
+
+    register = client.post("/auth/register", json={"name": "Migration Tester", "email": "behind@example.com", "password": "Password123!"})
+    headers = {"Authorization": f"Bearer {register.json()['access_token']}"}
+
+    def broken(*args, **kwargs):
+        raise OperationalError("SELECT ...", {}, Exception("no such column: image_submissions.ocr_status"))
+
+    with patch("app.routers.submissions.get_user_submissions", broken):
+        with patch("app.main.check_migrations", _behind):
+            behind = client.get("/submissions", headers=headers)
+        current = client.get("/submissions", headers=headers)
+    assert behind.status_code == 503 and "alembic upgrade head" in behind.json()["detail"]
+    # A database error with an up-to-date schema stays a plain 500 that leaks nothing.
+    assert current.status_code == 500 and current.json() == {"detail": "Internal server error"}
+
+
+def test_migration_head_is_the_single_newest_script():
+    from alembic.script import ScriptDirectory
+
+    from app.database import ALEMBIC_DIR, migration_head
+
+    heads = ScriptDirectory(str(ALEMBIC_DIR)).get_heads()
+    assert len(heads) == 1 and migration_head() == heads[0]

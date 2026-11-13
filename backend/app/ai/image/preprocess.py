@@ -1,6 +1,13 @@
 """Basic image validation and resizing; this does not assess authenticity."""
 
+import logging
+import os
+import tempfile
+from contextlib import contextmanager
 from pathlib import Path
+from typing import Iterator, Optional
+
+logger = logging.getLogger(__name__)
 
 SUPPORTED_EXTENSIONS = {".jpg", ".jpeg", ".png", ".webp"}
 
@@ -72,3 +79,38 @@ def preprocess_image(
 
     write_image(destination, image)
     return destination
+
+
+EXIF_ORIENTATION = 0x0112
+
+
+@contextmanager
+def upright_image(image_path: str | Path) -> Iterator[str]:
+    """Yield a path to the image as people see it (EXIF rotation applied).
+
+    Phone cameras often store pixels sideways with an EXIF "Orientation" tag. Pillow and
+    EasyOCR's colour loader ignore the tag while OpenCV applies it, so OCR, the image detector
+    and the heatmap could each see a different orientation. When the tag asks for a rotation, a
+    temporary upright PNG copy (lossless) is made and deleted afterwards; the stored upload is
+    never changed. Images without the tag are passed through untouched.
+    """
+    temporary: Optional[str] = None
+    try:
+        from PIL import Image, ImageOps
+
+        with Image.open(image_path) as img:
+            if img.getexif().get(EXIF_ORIENTATION, 1) not in (None, 1):
+                upright = ImageOps.exif_transpose(img)
+                handle, temporary = tempfile.mkstemp(prefix="khabarnazar-upright-", suffix=".png")
+                os.close(handle)
+                upright.save(temporary, format="PNG")
+    except Exception:
+        logger.exception("Could not apply the EXIF orientation; using the image as stored")
+        if temporary:
+            Path(temporary).unlink(missing_ok=True)
+        temporary = None
+    try:
+        yield temporary or str(image_path)
+    finally:
+        if temporary:
+            Path(temporary).unlink(missing_ok=True)

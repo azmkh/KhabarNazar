@@ -130,7 +130,15 @@ class AIImageDetector:
             "members": {"clip_vitl14": p_clip, "dinov2_l": p_dino, "resnet18_robust": p_resnet},
             "attribution_map": attribution_map,
             "gradcam_error": gradcam_error,
+            "analysed_region": self.analysed_region(img.size),
         }
+
+    @staticmethod
+    def analysed_region(size: tuple[int, int]) -> tuple[float, float, float, float]:
+        """The centre crop the detector analysed, as (left, top, right, bottom) fractions of the image."""
+        width, height = size
+        left, top, right, bottom = crop_box(size)
+        return (max(0, left) / width, max(0, top) / height, min(width, right) / width, min(height, bottom) / height)
 
     def _resnet_with_gradcam(self, x):
         """Notebook 04's Grad-CAM on the last ResNet18 block, for the class the ResNet member predicts.

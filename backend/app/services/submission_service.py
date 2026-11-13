@@ -130,6 +130,7 @@ def create_image_submission(
                 abs_image_path,
                 attribution_map=img_result["attribution_map"],
                 output_path=Path(settings.UPLOAD_DIR).resolve() / candidate,
+                region=img_result.get("analysed_region"),
             )
             if visual.get("heatmap_path"):
                 heatmap_relative_path = candidate

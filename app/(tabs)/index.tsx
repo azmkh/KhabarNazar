@@ -221,9 +221,9 @@ export default function CheckScreen() {
               <View style={styles.flex}>
                 <AppText variant="bodyStrong">Decision support, not a final verdict</AppText>
                 <AppText variant="caption" color="textMuted" style={styles.noteBody}>
-                  The connected text model currently supports Urdu script. Roman Urdu and English may
-                  return Uncertain until compatible models are connected. Any model result can be wrong;
-                  check the explanation and dispute results you disagree with.
+                  Urdu and Roman Urdu text is classified by trained models; English is not classified
+                  and returns Uncertain. Images are also checked for signs of AI generation. Any model
+                  result can be wrong; check the explanation and dispute results you disagree with.
                 </AppText>
               </View>
             </View>
