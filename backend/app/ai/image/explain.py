@@ -75,7 +75,7 @@ def explain_image(
     if attribution_map is None:
         return {
             "heatmap_path": None,
-            "summary": "No image heatmap is available because no visual model attribution was produced.",
+            "summary": "No image heatmap is available because the image detector produced no attribution.",
             "is_stub": True,
         }
     if output_path is None:
@@ -83,6 +83,6 @@ def explain_image(
     heatmap_path = save_attribution_heatmap(image_path, attribution_map, output_path, region=region)
     return {
         "heatmap_path": str(heatmap_path),
-        "summary": "Heatmap visualizes the supplied image model attribution; it does not establish whether the associated news claim is true.",
+        "summary": "Heatmap visualizes the image detector's attribution; it does not establish whether the associated news claim is true.",
         "is_stub": False,
     }

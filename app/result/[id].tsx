@@ -122,7 +122,7 @@ export default function ResultScreen() {
                 <AuthImage uri={row.heatmapPath} style={styles.image} resizeMode="contain" />
               </View>
               <AppText variant="caption" color="textMuted" style={styles.mt4}>
-                Grad-CAM heatmap of the detector's ResNet18 model. Only the outlined centre area is analysed.
+                Grad-CAM heatmap from the image detector. Only the outlined centre area is analysed.
                 It does not show edits.
               </AppText>
             </>
@@ -151,7 +151,7 @@ export default function ResultScreen() {
           </View>
         </View>
         <View style={styles.heroStats}>
-          <HeroStat label="Model score (uncalibrated)" value={percent(row.confidence)} />
+          <HeroStat label="Confidence (uncalibrated)" value={percent(row.confidence)} />
           <HeroStat label="Fake-news risk" value={percent(row.riskScore)} />
         </View>
       </View>
@@ -248,7 +248,7 @@ export default function ResultScreen() {
         ) : null}
         {!isImage && row.processingStatus === 'unavailable' ? (
           <AppText variant="caption" color="uncertain" style={styles.mt4}>
-            This text was not classified by a compatible model.
+            This text could not be classified.
           </AppText>
         ) : null}
         <AppText variant="caption" color="textSubtle" style={styles.mt12}>Checked {fullDate(row.createdAt)}</AppText>
@@ -261,7 +261,7 @@ export default function ResultScreen() {
         {words?.length ? (
           <View style={isImage ? null : styles.mt12}>
             {!isImage ? (
-              <AppText variant="caption" color="textMuted" style={styles.mb6}>Words that most influenced the model</AppText>
+              <AppText variant="caption" color="textMuted" style={styles.mb6}>Words that most influenced the result</AppText>
             ) : null}
             <View style={styles.words}>
               {words.map((item, index) => {

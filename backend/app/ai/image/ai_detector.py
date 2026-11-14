@@ -199,7 +199,7 @@ def load_detector() -> tuple[Optional[AIImageDetector], Optional[str]]:
     directory = model_dir()
     missing = [name for name in REQUIRED_FILES if not (directory / name).is_file()]
     if missing:
-        return None, "The AI-generated image detector is not installed (model files are missing)."
+        return None, "The AI-generated image detector is not installed (its files are missing)."
     key = str(directory.resolve())
     with _lock:
         if key not in _cache:

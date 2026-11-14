@@ -153,7 +153,7 @@ def test_english_text_image_is_classified_by_the_roman_model_and_still_gets_grad
     # English has no model of its own: the Roman Urdu model reads it, and the result says so.
     assert image["detected_language"] == "english" and roman.calls >= 1 and urdu.calls == 0
     assert image["text_classification_status"] == "completed" and image["text_confidence"] is not None
-    assert "There is no English model" in data["explainability"]["explanation_summary"]
+    assert "There is no English classifier" in data["explainability"]["explanation_summary"]
     assert data["final_label"] in {"Real", "Fake"} and data["combined_risk_score"] is not None
     assert len(detector.paths) == 1 and image["image_analysis_status"] == "completed"
     _assert_gradcam_completed(data, headers)

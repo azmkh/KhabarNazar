@@ -35,10 +35,10 @@ ARABIC_SCRIPT = ("\u0600", "\u06ff")
 # model actually read it.
 ROUTING_NOTES = {
     "english": (
-        " The text looks like English. There is no English model, so it was checked with the Roman Urdu "
-        "model, which was not trained on English; treat this result as less reliable."
+        " The text looks like English. There is no English classifier, so it was checked with the Roman Urdu "
+        "classifier, which was not trained on English; treat this result as less reliable."
     ),
-    "unknown": " The language was not clearly identified, so the text was checked with the Roman Urdu model.",
+    "unknown": " The language was not clearly identified, so the text was checked with the Roman Urdu classifier.",
 }
 
 
@@ -60,7 +60,7 @@ def routing_note(detected: str, route: str) -> str:
     """A sentence saying which model read the text when it is not plain Urdu or Roman Urdu."""
     if detected == "mixed":
         name = "Urdu" if route == "urdu" else "Roman Urdu"
-        return f" The text mixes Urdu and Latin script; it was checked with the {name} model, for its main script."
+        return f" The text mixes Urdu and Latin script; it was checked with the {name} classifier, for its main script."
     return ROUTING_NOTES.get(detected, "")
 
 
@@ -87,7 +87,7 @@ def classifier_for_language(language: str):
         classifier, reason = xlmr.get_classifier(script)
     except Exception:
         logger.exception("Could not initialize %s XLM-R classifier", script)
-        return script, None, "The trained text model could not be initialized. Check backend logs."
+        return script, None, "The text classifier could not be started. Check backend logs."
     return script, classifier, reason
 
 
@@ -124,7 +124,7 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
                 **result,
                 "detected_language": resolved_language,
                 "summary": (
-                    f"The long-article Urdu model (TF-IDF, trained on full FIRE 2021 articles) predicted "
+                    f"The long-article Urdu classifier (TF-IDF, trained on full FIRE 2021 articles) predicted "
                     f"{result['prediction'].lower()}. Its score is not independent verification of the claim."
                     + note
                 ),
@@ -134,7 +134,7 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
             logger.exception("Long-article Urdu model inference failed; using the Urdu XLM-R model")
     if classifier is None:
         language_name = "Urdu" if script == "urdu" else "Roman Urdu"
-        return _unavailable(resolved_language, reason or f"The trained {language_name} model is unavailable.")
+        return _unavailable(resolved_language, reason or f"The trained {language_name} classifier is unavailable.")
 
     try:
         result = classifier.predict(text)
@@ -145,7 +145,7 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
         label_language = "Urdu-script" if script == "urdu" else "Roman Urdu"
         if result.get("input_truncated"):
             detail = (
-                f" Input was truncated to the model's {result['max_input_tokens']}-token training limit."
+                f" Input was truncated to the classifier's {result['max_input_tokens']}-token training limit."
             )
         else:
             detail = ""
@@ -153,7 +153,7 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
             **result,
             "detected_language": resolved_language,
             "summary": (
-                f"The trained {label_language} XLM-R model predicted {result['prediction'].lower()}. "
+                f"The trained {label_language} XLM-R classifier predicted {result['prediction'].lower()}. "
                 "Its score is not independent verification of the claim." + detail + note
             ),
             "model_language": route,
@@ -162,4 +162,4 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
         }
     except Exception:
         logger.exception("%s XLM-R inference failed", script)
-        return _unavailable(resolved_language, f"The trained {script.replace('_', ' ')} model could not complete inference.")
+        return _unavailable(resolved_language, f"The trained {script.replace('_', ' ')} classifier could not complete the check.")

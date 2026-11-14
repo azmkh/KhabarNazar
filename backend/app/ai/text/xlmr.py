@@ -238,17 +238,17 @@ def _load(path: str, modified_at: int, script: str) -> XlmrClassifier:
 def get_classifier(script: str) -> tuple[Optional[XlmrClassifier], Optional[str]]:
     path = model_dir(script)
     if not _artifact_files_present(path):
-        return None, f"The trained {script.replace('_', ' ')} XLM-R model is unavailable or incomplete."
+        return None, f"The trained {script.replace('_', ' ')} XLM-R classifier is unavailable or incomplete."
     weight = next(path / filename for filename in ("model.safetensors", "pytorch_model.bin")
                   if (path / filename).is_file())
     try:
         with _LOAD_LOCK:
             return _load(str(path.resolve()), weight.stat().st_mtime_ns, script), None
     except ImportError:
-        return None, "XLM-R model found, but torch/transformers are not installed in the backend environment."
+        return None, "XLM-R classifier files found, but torch/transformers are not installed in the backend environment."
     except Exception:
         logger.exception("Could not load %s XLM-R model from %s", script, path)
-        return None, f"The trained {script.replace('_', ' ')} XLM-R model could not be loaded. Check backend logs."
+        return None, f"The trained {script.replace('_', ' ')} XLM-R classifier could not be loaded. Check backend logs."
 
 
 def warmup_models() -> None:

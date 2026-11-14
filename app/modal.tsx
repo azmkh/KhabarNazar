@@ -6,8 +6,8 @@ import { APP_TAGLINE } from '@/lib/config';
 
 const STEPS: { icon: IconName; title: string; body: string }[] = [
   { icon: 'type', title: 'Submit', body: 'Paste Urdu or Roman Urdu text, or upload a news screenshot.' },
-  { icon: 'scan-text', title: 'Analyze', body: 'OCR reads text in images; the text model estimates whether the content is fake.' },
-  { icon: 'sparkles', title: 'Explain', body: 'See the words that influenced the model and, for images, any heatmap.' },
+  { icon: 'scan-text', title: 'Analyze', body: 'OCR reads text in images; the AI estimates whether the content is fake.' },
+  { icon: 'sparkles', title: 'Explain', body: 'See the words that influenced the result and, for images, a heatmap.' },
   { icon: 'scale', title: 'Dispute', body: 'Disagree? An administrator reviews it and can override the verdict.' },
 ];
 

@@ -99,10 +99,10 @@ def test_language_routes_to_its_own_model(text, script, language, monkeypatch):
 @pytest.mark.parametrize(("text", "script", "language", "note"), [
     # No text is refused for its language: English and unclear Latin text use the Roman Urdu model,
     # mixed text uses the model for its main script, and the result says which model read it.
-    (ENGLISH, "roman", "english", "There is no English model"),
+    (ENGLISH, "roman", "english", "There is no English classifier"),
     ("Headline from Lahore", "roman", "unknown", "not clearly identified"),
-    ("وزیر اعظم نے کہا prime minister", "urdu", "mixed", "checked with the Urdu model"),
-    ("Breaking news وزیر prime minister said today", "roman", "mixed", "checked with the Roman Urdu model"),
+    ("وزیر اعظم نے کہا prime minister", "urdu", "mixed", "checked with the Urdu classifier"),
+    ("Breaking news وزیر prime minister said today", "roman", "mixed", "checked with the Roman Urdu classifier"),
 ])
 def test_english_mixed_and_unclear_text_are_classified_and_labelled(text, script, language, note, monkeypatch):
     calls = []

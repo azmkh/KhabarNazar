@@ -92,7 +92,7 @@ def test_xlmr_explanation_by_occlusion(models):
 def test_long_urdu_explanation_uses_tfidf_weights(models):
     explanation = explain_text(LONG_FAKE_URDU)
     assert explanation["is_stub"] is False
-    assert "long-article Urdu model" in explanation["summary"]
+    assert "long-article Urdu classifier" in explanation["summary"]
     assert explanation["highlighted_words"][0]["direction"] == "supports_prediction"
 
 

@@ -26,7 +26,7 @@ def _unavailable(reason: str) -> dict:
         "summary": f"Image authenticity was not analyzed: {reason}",
         "attribution_map": None,
         "gradcam_status": "not_run",
-        "gradcam_error": "the image model did not run, so there is nothing to explain",
+        "gradcam_error": "the image detector did not run, so there is nothing to explain",
         "model_version": None,
     }
 

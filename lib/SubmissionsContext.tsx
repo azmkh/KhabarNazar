@@ -79,7 +79,7 @@ export function fromApi(item: ApiSubmission, imageUri?: string | null): Submissi
     imageAnalysisStatus: item.image_submission?.image_analysis_status ?? null,
     gradcamStatus: item.gradcam_status ?? null,
     aiGeneratedLikelihood: imageScore == null ? null : Math.round(imageScore * 100),
-    aiGeneratedLabel: item.image_submission?.manipulation_prediction ?? 'Not evaluated by a connected image model.',
+    aiGeneratedLabel: item.image_submission?.manipulation_prediction ?? 'Not evaluated by the image detector.',
   };
 }
 

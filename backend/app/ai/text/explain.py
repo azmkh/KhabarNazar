@@ -46,8 +46,8 @@ def explain_text(
                 return {
                     "highlighted_words": highlights,
                     "summary": (
-                        f"The long-article Urdu model predicted {prediction['prediction']}. Highlights show the "
-                        "words whose features weighed most in this model's output; they are not fact verification."
+                        f"The long-article Urdu classifier predicted {prediction['prediction']}. Highlights show the "
+                        "words whose features weighed most in this classifier's output; they are not fact verification."
                         + note
                     ),
                     "is_stub": False,
@@ -56,14 +56,14 @@ def explain_text(
                 logger.exception("Long-article Urdu explanation failed")
                 return {
                     "highlighted_words": [],
-                    "summary": "The model result is available, but its word explanation could not be generated.",
+                    "summary": "The result is available, but its word explanation could not be generated.",
                     "is_stub": True,
                 }
     script, classifier, reason = classifier_for_language(route) if route else (None, None, None)
     if script is None or classifier is None:
         return {
             "highlighted_words": [],
-            "summary": "No model-based word explanation is available for this input language.",
+            "summary": "No word explanation is available for this input language.",
             "is_stub": True,
         }
 
@@ -73,9 +73,9 @@ def explain_text(
             return {
                 "highlighted_words": [],
                 "summary": (
-                    f"The {language_name} model predicted {prediction['prediction']}. The input was "
-                    f"truncated to {prediction['max_input_tokens']} model tokens. Word-level attribution "
-                    "is omitted for truncated text; the model output is not fact verification."
+                    f"The {language_name} classifier predicted {prediction['prediction']}. The input was "
+                    f"truncated to {prediction['max_input_tokens']} tokens. Word-level attribution "
+                    "is omitted for truncated text; the classifier output is not fact verification."
                     + note
                 ),
                 "is_stub": False,
@@ -87,8 +87,8 @@ def explain_text(
             base_fake_probability=prediction.get("fake_probability"),
         )
         summary = (
-            f"The {language_name} model predicted {prediction['prediction']}. Word highlights show how "
-            "removing each selected word changed the model output; they are not fact verification."
+            f"The {language_name} classifier predicted {prediction['prediction']}. Word highlights show how "
+            "removing each selected word changed the classifier output; they are not fact verification."
             + note
         )
         return {"highlighted_words": highlights, "summary": summary, "is_stub": False}
@@ -96,6 +96,6 @@ def explain_text(
         logger.exception("%s XLM-R explanation failed", script)
         return {
             "highlighted_words": [],
-            "summary": "The model result is available, but its word explanation could not be generated.",
+            "summary": "The result is available, but its word explanation could not be generated.",
             "is_stub": True,
         }

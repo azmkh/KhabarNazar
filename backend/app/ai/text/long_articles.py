@@ -58,15 +58,15 @@ def get_model() -> tuple[Optional[object], Optional[str]]:
     """Return (pipeline, None) or (None, reason it is unavailable)."""
     path = model_path()
     if not path.is_file():
-        return None, "The long-article Urdu model file is not installed."
+        return None, "The long-article Urdu classifier file is not installed."
     try:
         with _LOAD_LOCK:
             return _load(str(path.resolve()), path.stat().st_mtime_ns), None
     except ImportError:
-        return None, "The long-article Urdu model needs scikit-learn and joblib."
+        return None, "The long-article Urdu classifier needs scikit-learn and joblib."
     except Exception:
         logger.exception("Could not load the long-article Urdu model from %s", path)
-        return None, "The long-article Urdu model could not be loaded. Check backend logs."
+        return None, "The long-article Urdu classifier could not be loaded. Check backend logs."
 
 
 def _fake_probability(pipeline, cleaned: str) -> float:

@@ -360,7 +360,7 @@ def test_real_long_urdu_article_uses_the_long_article_model(monkeypatch):
     assert body["final_label"] in {"Fake", "Real"}
     assert 0 <= body["combined_risk_score"] <= 1
     assert body["explainability"]["model_version"] == "tfidf-urdu-long-articles"
-    assert "long-article Urdu model" in body["explainability"]["explanation_summary"]
+    assert "long-article Urdu classifier" in body["explainability"]["explanation_summary"]
 
 
 @pytest.mark.real_models
@@ -376,7 +376,7 @@ def test_real_urdu_text_over_model_limit_uses_training_truncation():
     assert body["combined_risk_score"] is not None
     assert body["text_submission"]["processing_status"] == "completed"
     assert body["text_submission"]["text_confidence"] is not None
-    assert re.search(r"truncated to (64|256) model tokens", body["explainability"]["explanation_summary"])
+    assert re.search(r"truncated to (64|256) tokens", body["explainability"]["explanation_summary"])
 
 
 @pytest.mark.real_models

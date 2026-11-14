@@ -224,9 +224,9 @@ export default function CheckScreen() {
               <View style={styles.flex}>
                 <AppText variant="bodyStrong">Decision support, not a final verdict</AppText>
                 <AppText variant="caption" color="textMuted" style={styles.noteBody}>
-                  Urdu and Roman Urdu text is classified by trained models. English is checked with the
-                  Roman Urdu model and is less reliable. Images are checked for signs of AI generation.
-                  Any model result can be wrong; check the explanation and dispute results you disagree with.
+                  Urdu and Roman Urdu text is classified by trained AI. English is checked with the Roman
+                  Urdu classifier and is less reliable. Images are checked for signs of AI generation. Any
+                  result can be wrong; check the explanation and dispute results you disagree with.
                 </AppText>
               </View>
             </View>

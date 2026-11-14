@@ -228,7 +228,7 @@ database.
 | `JWT_SECRET must be a random string of at least 32 characters` | Step 4: set `JWT_SECRET` in `backend/.env` |
 | `pip` pulls a large CUDA torch, or torch fails to install | Install torch first with the CPU index URL (step 3) |
 | `download_models.py` stops with "Incomplete download" | The connection dropped; run the same command again, and it resumes from the `.part` file |
-| A result says "The trained urdu XLM-R model is unavailable or incomplete" | Run `download_models.py` (step 6); check the folder holds `config.json`, `model.safetensors` and `tokenizer.json` |
+| A result says "The trained urdu XLM-R classifier is unavailable or incomplete" | Run `download_models.py` (step 6); check the folder holds `config.json`, `model.safetensors` and `tokenizer.json` |
 | The long-article model fails to load | Make sure `scikit-learn==1.9.1` is installed (`pip show scikit-learn`) |
 | "max length must be between 3 and its trained limit" | Remove or lower the `KHABARNAZAR_*_MAX_LEN` override in `backend/.env` |
 | The first image check is very slow | The CLIP/DINOv2 and EasyOCR weights download on first use; wait for the backend log to settle |
