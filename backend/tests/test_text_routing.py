@@ -92,7 +92,7 @@ def test_xlmr_explanation_by_occlusion(models):
 def test_long_urdu_explanation_uses_tfidf_weights(models):
     explanation = explain_text(LONG_FAKE_URDU)
     assert explanation["is_stub"] is False
-    assert "long-article Urdu classifier" in explanation["summary"]
+    assert "Long articles are checked as a whole" in explanation["summary"]
     assert explanation["highlighted_words"][0]["direction"] == "supports_prediction"
 
 
@@ -100,7 +100,7 @@ def test_long_urdu_falls_back_to_truncated_xlmr_without_tfidf(models, monkeypatc
     monkeypatch.setenv("KHABARNAZAR_TEXT_MODEL_PATH", str(tmp_path / "missing.joblib"))
     result = predict_text(LONG_URDU)
     assert result["model_version"] == "xlmr-urdu"
-    assert "truncated" in result["summary"]
+    assert "only its first part was checked" in result["summary"]
 
 
 def test_short_urdu_is_not_sent_to_the_long_article_model(models, monkeypatch):

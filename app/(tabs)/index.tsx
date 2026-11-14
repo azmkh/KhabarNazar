@@ -197,7 +197,7 @@ export default function CheckScreen() {
                 </View>
                 <AppText variant="bodyStrong" align="center">Add a news screenshot or poster</AppText>
                 <AppText variant="caption" color="textMuted" align="center">
-                  JPG, PNG or WEBP up to 10 MB. Text in the image is read with OCR.
+                  JPG, PNG or WEBP up to 10 MB.
                 </AppText>
                 <View style={styles.pickRow}>
                   <Button label="Gallery" icon="image" variant="secondary" size="sm" onPress={() => void pickImage('library')} />
@@ -222,11 +222,11 @@ export default function CheckScreen() {
             <View style={styles.noteRow}>
               <Icon name="info" size={18} color="info" />
               <View style={styles.flex}>
-                <AppText variant="bodyStrong">Decision support, not a final verdict</AppText>
+                <AppText variant="bodyStrong">A second opinion, not the final word</AppText>
                 <AppText variant="caption" color="textMuted" style={styles.noteBody}>
-                  Urdu and Roman Urdu text is classified by trained AI. English is checked with the Roman
-                  Urdu classifier and is less reliable. Images are checked for signs of AI generation. Any
-                  result can be wrong; check the explanation and dispute results you disagree with.
+                  KhabarNazar flags news that looks fake and spots AI-made images. It works best with
+                  Urdu and Roman Urdu, and it can still be wrong. Check trusted sources before you share,
+                  and dispute any result you disagree with.
                 </AppText>
               </View>
             </View>

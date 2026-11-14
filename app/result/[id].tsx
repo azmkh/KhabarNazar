@@ -151,7 +151,7 @@ export default function ResultScreen() {
           </View>
         </View>
         <View style={styles.heroStats}>
-          <HeroStat label="Confidence (uncalibrated)" value={percent(row.confidence)} />
+          <HeroStat label="Score" value={percent(row.confidence)} />
           <HeroStat label="Fake-news risk" value={percent(row.riskScore)} />
         </View>
       </View>
@@ -256,12 +256,12 @@ export default function ResultScreen() {
 
       {/* Explanation */}
       {!isImage || words?.length ? (
-      <Card title={isImage ? 'Words that most influenced the verdict' : 'Why this result'}>
+      <Card title={isImage ? 'Words that influenced the result' : 'Why this result'}>
         {!isImage ? <AppText variant="body">{row.summary}</AppText> : null}
         {words?.length ? (
           <View style={isImage ? null : styles.mt12}>
             {!isImage ? (
-              <AppText variant="caption" color="textMuted" style={styles.mb6}>Words that most influenced the result</AppText>
+              <AppText variant="caption" color="textMuted" style={styles.mb6}>Words that influenced the result</AppText>
             ) : null}
             <View style={styles.words}>
               {words.map((item, index) => {
@@ -300,9 +300,10 @@ export default function ResultScreen() {
       ) : null}
 
       {/* Dispute (shown above once filed) */}
-      {row.dispute || row.adminReview ? null : (
+      {/* One dispute at a time; once it is reviewed the user may dispute again */}
+      {row.dispute?.status === 'pending' ? null : (
         <Button
-          label="Dispute this result"
+          label={row.dispute ? 'Dispute again' : 'Dispute this result'}
           icon="scale"
           variant="secondary"
           onPress={() => router.push(hrefDisputeDetail(row.id))}

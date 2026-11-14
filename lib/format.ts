@@ -36,3 +36,19 @@ export function languageLabel(language: string | null | undefined) {
     default: return language ?? 'Not detected';
   }
 }
+
+/**
+ * Accept links the way people type them: "geo.tv/news" becomes "https://geo.tv/news".
+ * Returns null when the text is not a usable web link.
+ */
+export function normalizeEvidenceLink(raw: string): string | null {
+  const value = raw.trim();
+  if (!value) return '';
+  // Same rule as the backend: add https:// only when there is no scheme at all ("geo.tv/x"),
+  // so "javascript:..." or "mailto:..." are rejected rather than rewritten.
+  const hasScheme = /^[a-z][a-z0-9+-]*:/i.test(value);
+  const withScheme = hasScheme ? value : `https://${value.replace(/^\/+/, '')}`;
+  if (!/^https?:\/\//i.test(withScheme)) return null;
+  // A host with a dot (example.com) and no spaces.
+  return /^https?:\/\/[^\s/?#]+\.[^\s/?#]+\S*$/i.test(withScheme) ? withScheme : null;
+}

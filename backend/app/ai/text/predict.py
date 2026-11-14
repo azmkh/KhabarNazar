@@ -31,15 +31,34 @@ LONG_TEXT_WORDS = settings.LONG_TEXT_WORDS
 SUPPORTED_TEXT_LANGUAGES = {"urdu", "roman_urdu"}
 ARABIC_SCRIPT = ("\u0600", "\u06ff")
 
-# Shown with results when the text is not plain Urdu or Roman Urdu, so the reader knows which
-# model actually read it.
+# Shown with results when the text is not plain Urdu or Roman Urdu, so the reader knows how it
+# was read (English has no checker of its own and goes to the Roman Urdu one).
 ROUTING_NOTES = {
-    "english": (
-        " The text looks like English. There is no English classifier, so it was checked with the Roman Urdu "
-        "classifier, which was not trained on English; treat this result as less reliable."
-    ),
-    "unknown": " The language was not clearly identified, so the text was checked with the Roman Urdu classifier.",
+    "english": " KhabarNazar is built for Urdu and Roman Urdu, so results for English text are less reliable.",
+    "unknown": " The language was not clear, so the text was checked as Roman Urdu.",
 }
+REMINDER = " This is an AI estimate, not a fact-check: confirm important news with trusted sources."
+LONG_ARTICLE_NOTE = " Long articles are checked as a whole."
+
+
+def verdict_summary(prediction: dict, truncated: bool = False, words: bool = False) -> str:
+    """Plain-language explanation of a Real/Fake result: what it means and how sure the AI is."""
+    lead = "This looks like fake or misleading news." if prediction["prediction"] == "Fake" else "This looks like genuine news."
+    confidence = float(prediction["confidence"])
+    # One decimal, like the Score shown beside this text in the app (99.7%, not a rounded 100%).
+    percent = f"{confidence * 100:.1f}"
+    if confidence >= 0.9:
+        certainty = f" The AI is highly confident ({percent}%)."
+    elif confidence >= 0.7:
+        certainty = f" The AI is fairly confident ({percent}%)."
+    else:
+        certainty = f" The AI is unsure ({percent}%), so treat this result with caution."
+    summary = lead + certainty
+    if truncated:
+        summary += " The text is long, so only its first part was checked."
+    if words:
+        summary += " The highlighted words below had the biggest effect on this result."
+    return summary
 
 
 def model_language(text: str, detected: str) -> Optional[str]:
@@ -60,7 +79,7 @@ def routing_note(detected: str, route: str) -> str:
     """A sentence saying which model read the text when it is not plain Urdu or Roman Urdu."""
     if detected == "mixed":
         name = "Urdu" if route == "urdu" else "Roman Urdu"
-        return f" The text mixes Urdu and Latin script; it was checked with the {name} classifier, for its main script."
+        return f" The text mixes Urdu and English script, so it was checked as {name}."
     return ROUTING_NOTES.get(detected, "")
 
 
@@ -123,11 +142,7 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
             return {
                 **result,
                 "detected_language": resolved_language,
-                "summary": (
-                    f"The long-article Urdu classifier (TF-IDF, trained on full FIRE 2021 articles) predicted "
-                    f"{result['prediction'].lower()}. Its score is not independent verification of the claim."
-                    + note
-                ),
+                "summary": verdict_summary(result) + LONG_ARTICLE_NOTE + note + REMINDER,
                 "model_language": route,
             }
         except Exception:
@@ -142,20 +157,10 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
             raise ValueError("XLM-R returned a label outside its verified label mapping")
         if result.get("confidence") is None or result.get("fake_probability") is None:
             raise ValueError("XLM-R returned no score")
-        label_language = "Urdu-script" if script == "urdu" else "Roman Urdu"
-        if result.get("input_truncated"):
-            detail = (
-                f" Input was truncated to the classifier's {result['max_input_tokens']}-token training limit."
-            )
-        else:
-            detail = ""
         return {
             **result,
             "detected_language": resolved_language,
-            "summary": (
-                f"The trained {label_language} XLM-R classifier predicted {result['prediction'].lower()}. "
-                "Its score is not independent verification of the claim." + detail + note
-            ),
+            "summary": verdict_summary(result, truncated=bool(result.get("input_truncated"))) + note + REMINDER,
             "model_language": route,
             "is_stub": False,
             "status": "completed",

@@ -9,13 +9,15 @@ import { useAppTheme } from './theme';
 type Props = TextInputProps & {
   label?: string;
   hint?: string;
+  /** Shown in red instead of the hint, with a red border, when the value cannot be used. */
+  error?: string | null;
   icon?: IconName;
   /** Adds a show/hide toggle for passwords. */
   secureToggle?: boolean;
 };
 
 export const TextField = forwardRef<TextInput, Props>(function TextField(
-  { label, hint, icon, secureToggle, multiline, style, value, onFocus, onBlur, secureTextEntry, ...rest },
+  { label, hint, error, icon, secureToggle, multiline, style, value, onFocus, onBlur, secureTextEntry, ...rest },
   ref,
 ) {
   const { colors } = useAppTheme();
@@ -32,8 +34,8 @@ export const TextField = forwardRef<TextInput, Props>(function TextField(
           multiline && styles.multiline,
           {
             backgroundColor: colors.surface,
-            borderColor: focused ? colors.primary : colors.border,
-            borderWidth: focused ? 1.5 : 1,
+            borderColor: error ? colors.misleading : focused ? colors.primary : colors.border,
+            borderWidth: focused || error ? 1.5 : 1,
           },
         ]}>
         {icon ? <View style={multiline ? styles.iconTop : null}><Icon name={icon} size={18} color="textSubtle" /></View> : null}
@@ -65,7 +67,11 @@ export const TextField = forwardRef<TextInput, Props>(function TextField(
           </Pressable>
         ) : null}
       </View>
-      {hint ? <AppText variant="caption" color="textSubtle" style={styles.hint}>{hint}</AppText> : null}
+      {error ? (
+        <AppText variant="caption" color="misleading" style={styles.hint}>{error}</AppText>
+      ) : hint ? (
+        <AppText variant="caption" color="textSubtle" style={styles.hint}>{hint}</AppText>
+      ) : null}
     </View>
   );
 });

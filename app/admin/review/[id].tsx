@@ -132,7 +132,7 @@ export default function AdminReviewScreen() {
         <Card title="AI result">
           <View style={styles.between}>
             <VerdictBadge verdict={verdictOf(submission?.final_label)} />
-            <AppText variant="caption" color="textMuted">Confidence {percent(confidence)}</AppText>
+            <AppText variant="caption" color="textMuted">Score {percent(confidence)}</AppText>
           </View>
           {submission?.explainability?.explanation_summary ? (
             <AppText variant="caption" color="textMuted" style={styles.mt8}>{submission.explainability.explanation_summary}</AppText>

@@ -58,9 +58,9 @@ def analyze_image(image_path: str) -> dict:
         "is_stub": False,
         "status": "completed",
         "summary": (
-            f"The image detector rates this picture {label.lower()} "
-            f"({1 - p_real:.0%} chance it is AI-generated, judged from the centre of the image). "
-            "This is about the picture itself, not whether any news claim is true or false."
+            f"The picture {'looks AI-generated' if label == ai_detector.LABEL_AI_GENERATED else 'looks like a real photo'} "
+            f"({1 - p_real:.0%} chance it is AI-generated, judged from its centre). "
+            "This is about the picture only, not whether any news claim is true."
         ),
         "attribution_map": attribution_map,
         "analysed_region": result.get("analysed_region"),

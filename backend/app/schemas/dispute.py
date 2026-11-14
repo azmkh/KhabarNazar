@@ -1,4 +1,5 @@
 from app.schemas.common import UTCDateTime
+import re
 from typing import Literal, Optional
 from urllib.parse import urlparse
 
@@ -27,9 +28,13 @@ class DisputeCreate(BaseModel):
         if value is None or not value.strip():
             return None
         value = value.strip()
+        # Accept links as people type them ("geo.tv/news/1" -> "https://geo.tv/news/1"). Only text
+        # with no scheme at all gets https://, so "javascript:..." is still rejected below.
+        if not re.match(r"^[a-z][a-z0-9+-]*:", value, re.IGNORECASE):
+            value = "https://" + value.lstrip("/")
         parsed = urlparse(value)
-        if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-            raise ValueError("Evidence link must be an HTTP or HTTPS URL")
+        if parsed.scheme not in {"http", "https"} or "." not in (parsed.hostname or "") or " " in value:
+            raise ValueError("Evidence link must be a web link, for example https://geo.tv/news/12345")
         return value
 
 

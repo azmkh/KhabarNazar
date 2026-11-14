@@ -117,3 +117,34 @@ def test_admin_submission_list_requires_admin():
     response = client.get("/admin/submissions", headers=admin)
     assert response.status_code == 200
     assert len(response.json()) >= 1
+
+
+def test_evidence_links_are_accepted_as_people_type_them():
+    owner = _headers("dispute.links@example.com")
+    admin = _headers("dispute.links.admin@example.com", role="admin")
+    submission_id = _submission(owner)
+
+    def dispute_with(link):
+        return client.post(
+            "/disputes",
+            json={"submission_id": submission_id, "justification": JUSTIFICATION, "evidence_link": link},
+            headers=owner,
+        )
+
+    for rejected in ["javascript:alert(1)", "mailto:someone@example.com", "not a link", "localhost"]:
+        assert dispute_with(rejected).status_code == 422, rejected
+
+    first = dispute_with("github.com/azmkh")
+    assert first.status_code == 201, first.text
+    assert first.json()["evidence_link"] == "https://github.com/azmkh"
+
+    # One pending dispute at a time; after the review the user may dispute again.
+    assert dispute_with("https://geo.tv/").status_code == 409
+    review = client.patch(
+        f"/disputes/{first.json()['id']}",
+        json={"admin_decision": "uphold_ai", "admin_comment": "The result stands."},
+        headers=admin,
+    )
+    assert review.status_code == 200
+    again = dispute_with("www.dawn.com/news/1")
+    assert again.status_code == 201 and again.json()["evidence_link"] == "https://www.dawn.com/news/1"

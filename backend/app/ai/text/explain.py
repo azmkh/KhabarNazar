@@ -11,7 +11,16 @@ import logging
 
 from app.ai.text.language_detection import detect_language
 from app.ai.text import long_articles
-from app.ai.text.predict import classifier_for_language, long_article_model, model_language, predict_text, routing_note
+from app.ai.text.predict import (
+    LONG_ARTICLE_NOTE,
+    REMINDER,
+    classifier_for_language,
+    long_article_model,
+    model_language,
+    predict_text,
+    routing_note,
+    verdict_summary,
+)
 
 logger = logging.getLogger(__name__)
 MAX_EXPLANATION_WORDS = 8
@@ -45,11 +54,7 @@ def explain_text(
                 highlights = long_articles.explain(pipeline, text, top_k=min(max(0, top_k), MAX_EXPLANATION_WORDS))
                 return {
                     "highlighted_words": highlights,
-                    "summary": (
-                        f"The long-article Urdu classifier predicted {prediction['prediction']}. Highlights show the "
-                        "words whose features weighed most in this classifier's output; they are not fact verification."
-                        + note
-                    ),
+                    "summary": verdict_summary(prediction, words=bool(highlights)) + LONG_ARTICLE_NOTE + note + REMINDER,
                     "is_stub": False,
                 }
             except Exception:
@@ -68,16 +73,11 @@ def explain_text(
         }
 
     try:
-        language_name = "Urdu-script" if script == "urdu" else "Roman Urdu"
         if prediction.get("input_truncated"):
+            # Word highlights are left out for long text: only its first part was read.
             return {
                 "highlighted_words": [],
-                "summary": (
-                    f"The {language_name} classifier predicted {prediction['prediction']}. The input was "
-                    f"truncated to {prediction['max_input_tokens']} tokens. Word-level attribution "
-                    "is omitted for truncated text; the classifier output is not fact verification."
-                    + note
-                ),
+                "summary": verdict_summary(prediction, truncated=True) + note + REMINDER,
                 "is_stub": False,
             }
         highlights = classifier.explain(
@@ -86,11 +86,7 @@ def explain_text(
             max_words=MAX_EXPLANATION_WORDS,
             base_fake_probability=prediction.get("fake_probability"),
         )
-        summary = (
-            f"The {language_name} classifier predicted {prediction['prediction']}. Word highlights show how "
-            "removing each selected word changed the classifier output; they are not fact verification."
-            + note
-        )
+        summary = verdict_summary(prediction, words=bool(highlights)) + note + REMINDER
         return {"highlighted_words": highlights, "summary": summary, "is_stub": False}
     except Exception:
         logger.exception("%s XLM-R explanation failed", script)
