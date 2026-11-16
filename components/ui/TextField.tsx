@@ -1,5 +1,5 @@
 import { forwardRef, useState } from 'react';
-import { Platform, Pressable, StyleSheet, TextInput, View, type TextInputProps } from 'react-native';
+import { Platform, Pressable, StyleSheet, TextInput, View, type TextInputInstance, type TextInputProps } from 'react-native';
 
 import { fonts, radius, space } from '@/constants/theme';
 import { Icon, type IconName } from './Icon';
@@ -16,7 +16,7 @@ type Props = TextInputProps & {
   secureToggle?: boolean;
 };
 
-export const TextField = forwardRef<TextInput, Props>(function TextField(
+export const TextField = forwardRef<TextInputInstance, Props>(function TextField(
   { label, hint, error, icon, secureToggle, multiline, style, value, onFocus, onBlur, secureTextEntry, ...rest },
   ref,
 ) {

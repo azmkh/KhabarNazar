@@ -73,7 +73,7 @@ export default function AdminSubmissionsScreen() {
           <AppText variant="caption" color="textMuted" style={styles.header}>
             {total} submissions from all users · disputed ones open the review screen.
           </AppText>
-        ) : null
+        ) : undefined
       }
       ItemSeparatorComponent={() => <View style={styles.separator} />}
       onEndReached={() => void loadMore()}
