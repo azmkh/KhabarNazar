@@ -5,6 +5,7 @@ from __future__ import annotations
 import logging
 import os
 import threading
+import warnings
 from functools import lru_cache
 from pathlib import Path
 
@@ -21,12 +22,16 @@ def _get_ocr_reader(model_directory: str):
     import easyocr
 
     Path(model_directory).mkdir(parents=True, exist_ok=True)
-    return easyocr.Reader(
-        list(SUPPORTED_OCR_LANGUAGES),
-        gpu=False,
-        model_storage_directory=model_directory,
-        download_enabled=True,
-    )
+    with warnings.catch_warnings():
+        # EasyOCR's CPU recognizer quantizes itself with a torch API that PyTorch now flags as
+        # deprecated; it still works, and the warning is not actionable from this project.
+        warnings.filterwarnings("ignore", message=r"torch\.quantize_per_tensor", category=UserWarning)
+        return easyocr.Reader(
+            list(SUPPORTED_OCR_LANGUAGES),
+            gpu=False,
+            model_storage_directory=model_directory,
+            download_enabled=True,
+        )
 
 
 def load_ocr_reader():
