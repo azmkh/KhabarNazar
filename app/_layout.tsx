@@ -7,7 +7,7 @@ import {
 } from '@expo-google-fonts/plus-jakarta-sans';
 import { NotoNastaliqUrdu_400Regular, NotoNastaliqUrdu_700Bold } from '@expo-google-fonts/noto-nastaliq-urdu';
 import { useFonts } from 'expo-font';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { DarkTheme, DefaultTheme, Stack, ThemeProvider, useRouter, useSegments } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useCallback, useEffect, useMemo, useState } from 'react';
@@ -84,8 +84,30 @@ function RootLayoutBody() {
   );
 }
 
+/** Routes anyone may open: the start page (it redirects itself), sign-in/register and not-found. */
+const PUBLIC_ROUTES = new Set<string>(['(auth)', '+not-found', '_sitemap']);
+
+/**
+ * Sends signed-out users to /login from every other route: (tabs), result, dispute, admin and
+ * any route added later. It runs only after the session check (RootLayoutBody renders this tree
+ * once `ready`), so a valid saved session is never redirected, and an expired one (cleared by
+ * AuthContext at start-up, or by its 401 handler later) is. Admin routes keep their own role check.
+ */
+function useSignedInGuard() {
+  const { user } = useAuth();
+  const segments = useSegments();
+  const router = useRouter();
+  const first = segments[0] as string | undefined;
+  const isPublic = first === undefined || first === 'index' || PUBLIC_ROUTES.has(first);
+
+  useEffect(() => {
+    if (!user && !isPublic) router.replace('/login');
+  }, [user, isPublic, router]);
+}
+
 function RootLayoutNav() {
   const { colors, scheme } = useAppTheme();
+  useSignedInGuard();
 
   // Navigation theme uses our palette so screen transitions never flash white/black.
   const navigationTheme = useMemo(() => {

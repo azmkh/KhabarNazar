@@ -149,10 +149,12 @@ Expected: both lines end in `True` and the limit, which is `256` for Urdu (`urdu
 
 See `backend/README.md`, "Stage 5", for routing and preprocessing.
 
-> The first PC still runs the older Urdu checkpoint `text-model-v1` (in `models/text/xlmr/`), and
-> its GitHub release has been removed. A new PC gets `urdu-xlmr-v1`, the team's current model.
-> Results for the same Urdu sentence can therefore differ between the two PCs. Copy the old
-> folder over (see the last section) only if you need identical results.
+> **One Urdu checkpoint for every PC: release `urdu-xlmr-v1`** (since 2026-11-21). The backend
+> loads `text_module/urdu/models/xlmr/` whenever it holds a complete model. The older
+> `text-model-v1` folder (`models/text/xlmr/`, whose release was removed) is used only if the
+> release folder is missing, so keep `urdu-xlmr-v1` downloaded on every PC. Do not set
+> `KHABARNAZAR_URDU_XLMR_DIR` unless you mean to override this. The check command above must print
+> `text_module\urdu\models\xlmr True 256` for Urdu on every PC.
 
 ## 7. Frontend
 
@@ -270,7 +272,7 @@ git push -u origin HEAD              # 6. push, then confirm with git status
 | `backend/.venv`, `node_modules` | yes | **Recreate** with pip / `npm ci` |
 | Urdu XLM-R `urdu-xlmr-v1`, Roman Urdu XLM-R | yes | **Download** with `text_module/download_models.py` |
 | CLIP, DINOv2, EasyOCR weights | yes | **Downloaded automatically** on first use |
-| Older Urdu checkpoint `text-model-v1` (`models/text/xlmr/`, 1.1 GB) | no | Only on the first PC; its release was removed. **Manual transfer** (USB drive or a private cloud folder) only if you need identical results |
+| Older Urdu checkpoint `text-model-v1` (`models/text/xlmr/`, 1.1 GB) | no | Only on the first PC; its release was removed. Not used for testing: every PC uses `urdu-xlmr-v1` (step 6). Do not copy it |
 | Development database records (on the first PC: 2 users, 41 submissions, 2 disputes) | no | Test data; **recreate** by using the app. If you really need it, take a `pg_dump` and move it privately. Never put it in GitHub, because it holds account emails and password hashes |
 | `backend/uploads/` (images for those submissions) | no | Belongs to the database records above: move both together or neither |
 | Training datasets | only for retraining | Not in the repository or on the first PC (only `.gitkeep` placeholders). The notebooks in `text_module/` and `image_module/` say where each dataset comes from |

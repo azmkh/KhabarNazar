@@ -264,7 +264,7 @@ important data; source files remain untouched. Generated files are written to
 
 | Input | Model | Location | Reported score (macro-F1) |
 |---|---|---|---|
-| Urdu script, up to 150 words | XLM-R base, trained on Hook and Bait | `text_module/urdu/models/xlmr/` (or the older `models/text/xlmr/`) | 0.974 Hook and Bait test (release `urdu-xlmr-v1`) |
+| Urdu script, up to 150 words | XLM-R base, trained on Hook and Bait | `text_module/urdu/models/xlmr/` (release `urdu-xlmr-v1`; the older `models/text/xlmr/` only if the release is missing) | 0.974 Hook and Bait test (release `urdu-xlmr-v1`) |
 | Urdu script, longer than 150 words | word + character TF-IDF + Logistic Regression, trained on FIRE 2021 | `text_module/urdu/models/tfidf_long_articles.joblib` (in git) | 0.639 FIRE 2021 test |
 | Roman Urdu | XLM-R large, trained on the KhabarNazar Roman Urdu dataset | `text_module/roman_urdu/models/xlmr/` | see `text_module/roman_urdu/README.md` |
 | Mixed script, mostly Urdu letters | the Urdu models above | as above | as above |
@@ -504,7 +504,7 @@ explanation instead of being replaced by a made-up result.
 
 | Model | Location | How to get it |
 |---|---|---|
-| Urdu XLM-RoBERTa | `models/text/xlmr/` (existing local checkpoint) or `text_module/urdu/models/xlmr/` | `python text_module/download_models.py urdu` downloads the verified `urdu-xlmr-v1` release if you need a fresh copy. |
+| Urdu XLM-RoBERTa | `text_module/urdu/models/xlmr/` (release `urdu-xlmr-v1`, used on every PC; the older `models/text/xlmr/` is only a fallback when it is missing) | `python text_module/download_models.py urdu` downloads the verified `urdu-xlmr-v1` release. |
 | Roman Urdu XLM-RoBERTa-large (~1.12 GB weights) | `text_module/roman_urdu/models/xlmr/` (git-ignored) | `python text_module/download_models.py roman_urdu` downloads the `roman-urdu-xlmr-v1` release. |
 | Image heads + robust ResNet18 | `image_module/models/` (in git) | comes with the repo |
 | CLIP ViT-L/14, DINOv2-L (about 2.9 GB) | Hugging Face cache | downloaded automatically on first load |

@@ -206,3 +206,129 @@ section 15.
 - **Verified:** real inference works for Urdu, long Urdu, Roman Urdu and English. OCR, image analysis and Grad-CAM
   all run for every image. The evaluation keeps the outputs separate. The frontend shows the real results.
 - **Not cleared for formal testing:** image-authenticity results on screenshots, until item 2 is decided.
+
+---
+
+## Finalization — 2026-11-21 (after the audit)
+
+Work done to close the audit's open items. Every result below was run on this PC on 2026-11-21; nothing is
+carried over from earlier runs.
+
+### Changes implemented
+
+| Audit item | Change | Files |
+|---|---|---|
+| Web build (critical) | Already committed in `3c351e9`. Re-verified: every exported page carries its scripts, `lang`, style reset, favicon and background CSS; the static build, served from disk, loads and redirects to `/login` | `app/+html.tsx` (no new change) |
+| Urdu checkpoint | **Every PC uses release `urdu-xlmr-v1`** (see below). The backend now prefers `text_module/urdu/models/xlmr/` whenever it is complete, and the older `models/text/xlmr/` only when the release is missing. An explicit `KHABARNAZAR_URDU_XLMR_DIR` still wins. No checkpoint was deleted | `backend/app/ai/text/xlmr.py`, `backend/tests/conftest.py`, setup guide, README, `.env.example` |
+| Image authenticity on screenshots | Investigated on 30 images (below). Presentation changed: when text read from the image was classified, its **verdict comes first**; image authenticity follows as a separate, clearly labelled card in a **neutral colour** (not the red/green of news verdicts), with every number still shown, plus a statement of the detector's known weakness. The backend summary carries the same caveat. Nothing is hidden or altered | `app/result/[id].tsx`, `backend/app/ai/image/predict.py` |
+| Grad-CAM consistency | Grad-CAM now back-propagates ResNet18's logit for the **class the ensemble shows**, so the heatmap explains the label on screen. The ensemble probability is unchanged (Grad-CAM only reads gradients after the forward pass). Captions say it is a ResNet18-based explanation that does not cover CLIP or DINOv2. When ResNet18 is near-certain of the other class, the map is flat and no heatmap is invented; the reason is reported | `backend/app/ai/image/ai_detector.py`, `predict.py`, `submission_service.py`, `app/result/[id].tsx` |
+| Route guards | One signed-in guard in the root layout (`useSignedInGuard`). It runs only after the session check (`ready`), and sends signed-out users from every non-public route (`(tabs)`, `result`, `dispute`, `admin`, `profile`, anything added later) to `/login`. The admin role check in `app/admin/_layout.tsx` is unchanged | `app/_layout.tsx` |
+
+**Selected Urdu checkpoint: release `urdu-xlmr-v1`** (`text_module/urdu/models/xlmr/`).
+- **Model:** `XLMRobertaForSequenceClassification` (xlm-roberta-base, 12 layers, hidden size 768).
+- **Labels:** `config.json` `id2label` {0: real, 1: fake}, read and checked at load.
+- **Tokenizer:** `XLMRobertaTokenizer` from `tokenizer.json`, loaded with `local_files_only`.
+- **Maximum length:** 256 tokens (the training notebook's `MAX_LEN` for run E1).
+- **Preprocessing:** the notebook's `clean_urdu`, with punctuation kept.
+- **Model version string:** `xlmr-urdu`.
+
+Why this one:
+- It is the only Urdu checkpoint that can still be downloaded (the `text-model-v1` release returns 404).
+- `text_module/download_models.py urdu` fetches it.
+- The university PC already uses it.
+
+**University PC:** run `python text_module/download_models.py urdu` and do not set `KHABARNAZAR_URDU_XLMR_DIR`. The check
+command in `docs/UNIVERSITY_PC_SETUP.md`, step 6, must print `text_module\urdu\models\xlmr True 256` for Urdu.
+**Verified here:** `xlmr.model_dir('urdu')` now resolves to `text_module\urdu\models\xlmr` and loads with
+max_len 256, labels {0: real, 1: fake}, fake index 1, notebook cleaning.
+
+### Image authenticity: what was found (no accuracy claimed)
+
+The real detector was run on 25 local uploads (your own phone tests) and 5 rendered variants. The images were
+grouped by eye; their true labels are not known.
+
+| Group | Rated AI-generated | Ensemble P(AI) range |
+|---|---|---|
+| Text graphics / screenshots (5) | 5 of 5 | 0.69 – 0.98 |
+| Rendered text: light, dark, colour, JPEG q60, photo with a caption bar (5) | 5 of 5 | 0.63 – 0.99 |
+| Camera photos that look real (12) | 7 of 12 | 0.62 – 0.77 for those 7 |
+| Images that look AI-made (8, including 2 memes) | 8 of 8 | 0.79 – 0.98 |
+
+Why the detector behaves this way:
+- **Training data:** it was trained on camera photos versus generated images (AI vs Real, Tiny-GenImage),
+  with Misinfo held out for testing. None of these contain screenshots or text graphics.
+- **What it sees:** after preprocessing (shorter side 512, 224×224 centre crop) a screenshot reaches the model
+  as a crop of flat background and text.
+- **Earlier evidence:** notebook 05 already reports that only 84% of real Misinfo photos were accepted.
+
+So for screenshots, posters and many re-shared web photos, the detector's output is **not reliable**. This is a
+limitation of the training data, not something that can be fixed without new data. **Validating it properly
+needs a labelled set of real news screenshots and web photos, which the project does not have.**
+
+### Grad-CAM consistency: verified
+
+- **Real models, 26 images:** ResNet18 on its own disagreed with the label shown on 4 images. With the change,
+  the heatmap explains the shown class on all 26 (0 mismatches, down from 4).
+- **Flat maps:** on 2 of those 4 images ResNet18 is near-certain of the other class, so the map for the shown
+  class is flat. No heatmap is shown, and the reason ("ResNet18 leaned strongly the other way …") is reported.
+- **New regression tests in `tests/test_image_gradcam.py`:**
+  - disagreement case (ensemble "real", ResNet18 "AI");
+  - the target class follows the ensemble;
+  - `analyze_image` reports the explained class;
+  - the no-evidence case.
+
+### Tests executed (2026-11-21, on the final code)
+
+| Check | Result | Audit |
+|---|---|---|
+| `pytest` (mocked, SQLite) | 156 passed, 13 skipped | 151 / 13 |
+| `pytest --postgres` | 156 passed, 13 skipped | 151 / 13 |
+| `pytest --real-models -m real_models` (now with `urdu-xlmr-v1`) | 13 passed | 13 |
+| `alembic check` / `current` / `describe_database.py --check` | no changes / `e5b1c7a3d920` / docs match | same |
+| `pytest text_module/tests` | 3 passed | 3 |
+| `npx tsc --noEmit` | clean | clean |
+| `npx expo-doctor` | 20/20 | 20/20 |
+| `expo export --platform web` | built; pages carry 5–7 script tags | was broken |
+| `expo export --platform ios` | bundle built (3.9 MB) | built |
+| End-to-end HTTP smoke test (real models, throwaway database) | 52 passed, 0 failed | 52 (after the script fix) |
+| Route guards in the browser (web dev build against the test backend) | all four scenarios pass (below) | was failing |
+
+The five new tests are the 4 Grad-CAM tests and 1 checkpoint-selection test.
+
+**Route-guard scenarios** (real browser, page reloads and deep links):
+- **Signed out:** `/history`, `/result/10`, `/dispute/10`, `/admin` and `/profile` all ended on `/login`, and
+  `/register` stayed open.
+- **Valid session:** reloading `/history` (2 checks shown) and `/result/11` kept the user there, and a
+  non-admin opening `/admin` was sent to `/`.
+- **Expired token at start:** the token and profile were cleared and the app landed on `/login`. Before this
+  change it stayed on an empty History screen.
+- **Admin:** `/admin` and `/admin/disputes` opened the moderation desk.
+
+### Remaining limitations and unresolved issues
+
+1. **Image authenticity is not reliable on screenshots and many web photos** (above). The presentation is now
+   honest about it, but the model itself is unchanged. Testers should record authenticity results on
+   screenshots as known behaviour, not as new bugs. They should not be counted as defects unless the
+   presentation is wrong.
+2. **Some heatmaps are missing:** when ResNet18 disagrees strongly with the ensemble (2 of 26 images here),
+   no heatmap is shown.
+3. **CPU latency** (Roman Urdu up to about 14 s per request, images 6–14 s) and **about 5 GB of RAM** with every
+   model loaded.
+4. **English** is classified by the Roman Urdu model (stated in the result). **Password reset** is not
+   implemented.
+5. **Not run in this pass:** the iPhone app, Android and a clean install on a fresh machine.
+6. **Housekeeping:** the `Co-Authored-By: Claude` trailer in `ea1a622`, a stale git stash, and
+   `react-test-renderer` 19.1 next to React 19.3 (unused).
+
+### Final recommendation
+
+**READY FOR MAJOR TESTING**, with limitations 1–5 written into the test plan. Every audit item was addressed
+and verified:
+- the web build works;
+- one Urdu checkpoint is used everywhere;
+- the image-result hierarchy separates the news verdict, image authenticity and Grad-CAM;
+- Grad-CAM explains the label shown;
+- the route guards work.
+
+Image-authenticity results on screenshots are presented acceptably for testing, but they are **not** evidence of
+model accuracy.

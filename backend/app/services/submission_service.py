@@ -149,8 +149,9 @@ def create_image_submission(
         explanation_parts.append(img_result["summary"])
     if heatmap_relative_path:
         explanation_parts.append(
-            "The Grad-CAM heatmap shows where the detector's ResNet18 member looked; it does not show edits "
-            "and does not say whether a claim is true."
+            "The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the "
+            "image-authenticity answer above (it does not cover the detector's other two models); it does "
+            "not show edits and does not say whether a claim is true."
         )
     elif not img_result.get("is_stub"):
         explanation_parts.append(f"Grad-CAM heatmap unavailable: {gradcam_error or 'no map was produced'}.")

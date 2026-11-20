@@ -60,12 +60,15 @@ def analyze_image(image_path: str) -> dict:
         "summary": (
             f"The picture {'looks AI-generated' if label == ai_detector.LABEL_AI_GENERATED else 'looks like a real photo'} "
             f"({1 - p_real:.0%} chance it is AI-generated, judged from its centre). "
-            "This is about the picture only, not whether any news claim is true."
+            "This is about the picture only, not whether any news claim is true. "
+            "The detector was trained on camera photos, so screenshots, posters and edited web "
+            "images are often rated AI-generated."
         ),
         "attribution_map": attribution_map,
         "analysed_region": result.get("analysed_region"),
-        # Grad-CAM explains the ResNet18 member's prediction; it is reported separately so a
-        # failed heatmap never hides (or fakes) the detector's result.
+        "gradcam_class": result.get("gradcam_class"),
+        # Grad-CAM explains the ensemble's label through the ResNet18 member's logit for that class.
+        # It is reported separately, so a failed heatmap never hides (or fakes) the detector's result.
         "gradcam_status": "completed" if attribution_map is not None else "failed",
         "gradcam_error": None if attribution_map is not None else (gradcam_error or "no Grad-CAM map was produced"),
         "members": {name: round(value, 4) for name, value in result["members"].items()},

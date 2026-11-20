@@ -234,14 +234,15 @@ def test_detector_keeps_its_prediction_when_the_gradcam_backward_pass_fails():
     stand_in.resnet = models.resnet18(weights=None, num_classes=2).eval()
     x = torch.rand(1, 3, 224, 224)
 
-    p_ok, cam, error = stand_in._resnet_with_gradcam(x)
-    assert error is None and cam.shape == (7, 7) and 0 <= p_ok <= 1
+    # The second argument is CLIP's + DINOv2's P(real); 1.0 keeps the ensemble near ResNet18's own call.
+    p_ok, cam, error, explained = stand_in._resnet_with_gradcam(x, 1.0)
+    assert error is None and cam.shape == (7, 7) and 0 <= p_ok <= 1 and explained in ai_detector.CLASSES
 
     def fail(*args):
         raise RuntimeError("backward failed")
 
     stand_in.resnet.fc.register_full_backward_hook(fail)
-    p_failed, cam, error = stand_in._resnet_with_gradcam(x)
+    p_failed, cam, error, _ = stand_in._resnet_with_gradcam(x, 1.0)
     assert cam is None and "Grad-CAM could not be computed" in error
     assert p_failed == pytest.approx(p_ok)            # the prediction itself is unchanged
     assert not stand_in.resnet.layer4[-1]._forward_hooks  # the Grad-CAM hook is always removed
@@ -462,3 +463,85 @@ def test_detector_reports_the_centre_crop_it_analysed():
     assert ai_detector.AIImageDetector.analysed_region((683, 512)) == pytest.approx(
         (230 / 683, 144 / 512, 454 / 683, 368 / 512))
     assert ai_detector.AIImageDetector.analysed_region((224, 224)) == (0.0, 0.0, 1.0, 1.0)
+
+
+# ─── Grad-CAM explains the class the ensemble shows (regression for the audit's mismatch) ─────
+
+def _stub_detector(p_clip_real, p_dino_real, resnet_bias_fake_real):
+    """An AIImageDetector with stand-in CLIP/DINOv2 heads and a small random ResNet18 whose
+    output is pinned by its final-layer bias, so members can be made to disagree."""
+    torch = pytest.importorskip("torch")
+    from types import SimpleNamespace
+    from torch import nn
+    from torchvision import models, transforms
+
+    class Head:
+        def __init__(self, p_real):
+            self.p_real = p_real
+
+        def predict_proba(self, features):
+            return np.array([[1 - self.p_real, self.p_real]])
+
+    torch.manual_seed(0)
+    resnet = models.resnet18(weights=None)
+    resnet.fc = nn.Linear(resnet.fc.in_features, 2)
+    with torch.no_grad():
+        resnet.fc.weight.mul_(0.01)
+        resnet.fc.bias.copy_(torch.tensor(resnet_bias_fake_real, dtype=torch.float32))
+    detector = ai_detector.AIImageDetector.__new__(ai_detector.AIImageDetector)
+    detector.torch = torch
+    detector.resnet = resnet.eval()
+    detector.clip = lambda pixel_values: SimpleNamespace(image_embeds=torch.zeros(1, 768))
+    detector.dino = lambda pixel_values: SimpleNamespace(pooler_output=torch.zeros(1, 1024))
+    detector.clip_head, detector.dino_head = Head(p_clip_real), Head(p_dino_real)
+    pipe = lambda mean, std: transforms.Compose([transforms.CenterCrop(224), transforms.ToTensor(), transforms.Normalize(mean, std)])
+    detector.imagenet_tf = pipe(ai_detector.IMAGENET_MEAN, ai_detector.IMAGENET_STD)
+    detector.clip_tf = pipe(ai_detector.CLIP_MEAN, ai_detector.CLIP_STD)
+    return detector
+
+
+def _noise_image():
+    rng = np.random.default_rng(0)
+    return Image.fromarray(rng.integers(0, 255, (480, 640, 3), dtype=np.uint8))
+
+
+def test_gradcam_explains_the_ensemble_label_when_resnet_disagrees():
+    # ResNet18 alone says AI-generated (P(real) ~ 0), CLIP and DINOv2 say real: the ensemble shows "real".
+    result = _stub_detector(0.95, 0.95, (6.0, -6.0)).analyse(_noise_image())
+    assert result["members"]["resnet18_robust"] < 0.01
+    assert result["p_real"] == pytest.approx((0.95 + 0.95 + result["members"]["resnet18_robust"]) / 3)
+    assert ai_detector.label_for(result["p_real"]) == ai_detector.LABEL_REAL      # the ensemble label is unchanged
+    assert result["gradcam_class"] == "real"                                      # the heatmap explains that label
+    assert result["gradcam_resnet_agrees"] is False
+    assert result["attribution_map"] is not None
+
+
+def test_gradcam_target_follows_the_ensemble_not_resnet():
+    image = _noise_image()
+    shown_real = _stub_detector(0.95, 0.95, (6.0, -6.0)).analyse(image)
+    shown_fake = _stub_detector(0.05, 0.05, (6.0, -6.0)).analyse(image)
+    assert (shown_real["gradcam_class"], shown_fake["gradcam_class"]) == ("real", "fake")
+    assert shown_fake["gradcam_resnet_agrees"] is True
+    # Same image and ResNet18, different explained class: the maps must differ.
+    assert not np.allclose(shown_real["attribution_map"], shown_fake["attribution_map"])
+
+
+def test_analyze_image_reports_the_explained_class(monkeypatch, tmp_path):
+    detector = _stub_detector(0.95, 0.95, (6.0, -6.0))
+    monkeypatch.setattr(ai_detector, "load_detector", lambda: (detector, None))
+    path = tmp_path / "x.png"
+    _noise_image().save(path)
+    result = image_predict.analyze_image(str(path))
+    assert result["manipulation_prediction"] == ai_detector.LABEL_REAL
+    assert result["gradcam_class"] == "real" and result["gradcam_status"] == "completed"
+    assert "trained on camera photos" in result["summary"]
+
+
+def test_no_heatmap_when_resnet_has_no_evidence_for_the_shown_label_says_why(monkeypatch):
+    # When ResNet18 is near-certain of the other class its map for the shown class is flat:
+    # no heatmap is invented, and the reason says why.
+    detector = _stub_detector(0.95, 0.95, (6.0, -6.0))
+    monkeypatch.setattr(detector, "_place_in_image", lambda cam, size: None)
+    result = detector.analyse(_noise_image())
+    assert result["attribution_map"] is None and result["gradcam_class"] == "real"
+    assert "leaned strongly the other way" in result["gradcam_error"]

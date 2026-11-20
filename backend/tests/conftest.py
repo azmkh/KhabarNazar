@@ -134,12 +134,14 @@ def _no_real_models(request, monkeypatch):
     loaded (and downloaded). Tests marked real_models use the real model folders."""
     if "real_models" in request.keywords:
         project_root = TEST_DIR.parent.parent
-        # The older text-model-v1 folder if this PC has it, otherwise the urdu-xlmr-v1 release
-        # folder that text_module/download_models.py fills. KHABARNAZAR_REAL_URDU_XLMR_DIR picks one.
+        # Same choice as the app (xlmr.model_dir): the urdu-xlmr-v1 release folder that
+        # text_module/download_models.py fills, or the older text-model-v1 folder only when the
+        # release is absent. KHABARNAZAR_REAL_URDU_XLMR_DIR picks one explicitly.
+        release_urdu = project_root / "text_module" / "urdu" / "models" / "xlmr"
         legacy_urdu = project_root / "models" / "text" / "xlmr"
         urdu_dir = os.environ.get("KHABARNAZAR_REAL_URDU_XLMR_DIR") or str(
-            legacy_urdu if (legacy_urdu / "config.json").is_file()
-            else project_root / "text_module" / "urdu" / "models" / "xlmr"
+            release_urdu if (release_urdu / "config.json").is_file() or not (legacy_urdu / "config.json").is_file()
+            else legacy_urdu
         )
         monkeypatch.setenv("KHABARNAZAR_URDU_XLMR_DIR", urdu_dir)
         monkeypatch.setenv(

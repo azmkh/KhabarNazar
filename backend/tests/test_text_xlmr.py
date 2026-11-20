@@ -162,3 +162,26 @@ def test_notebook_urdu_release_uses_its_training_length(monkeypatch):
     monkeypatch.delenv("KHABARNAZAR_URDU_XLMR_MAX_LEN", raising=False)
     monkeypatch.setattr(settings, "URDU_XLMR_MAX_LEN", None)
     assert xlmr.configured_max_length("urdu", xlmr.URDU_NOTEBOOK_MAX_LEN) == 256
+
+
+def _fake_checkpoint(folder):
+    folder.mkdir(parents=True)
+    for name in ("config.json", "tokenizer.json"):
+        (folder / name).write_text("{}", encoding="utf-8")
+    (folder / "model.safetensors").write_bytes(b"weights")
+
+
+def test_release_urdu_checkpoint_wins_over_the_older_folder(tmp_path, monkeypatch):
+    # Every PC must use release urdu-xlmr-v1; the older text-model-v1 is only a fallback.
+    release, legacy = tmp_path / "release", tmp_path / "legacy"
+    monkeypatch.delenv("KHABARNAZAR_URDU_XLMR_DIR", raising=False)
+    monkeypatch.setattr(settings, "URDU_XLMR_DIR", None)
+    monkeypatch.setattr(xlmr, "DEFAULT_DIRS", {**xlmr.DEFAULT_DIRS, "urdu": release})
+    monkeypatch.setattr(xlmr, "LEGACY_URDU_DIR", legacy)
+
+    _fake_checkpoint(legacy)
+    assert xlmr.model_dir("urdu") == legacy            # release not downloaded yet: fall back
+    _fake_checkpoint(release)
+    assert xlmr.model_dir("urdu") == release           # both present: the release wins
+    monkeypatch.setenv("KHABARNAZAR_URDU_XLMR_DIR", str(legacy))
+    assert xlmr.model_dir("urdu") == legacy            # an explicit setting still overrides

@@ -49,8 +49,10 @@ def model_dir(script: str) -> Path:
     )
     if configured:
         return Path(configured).expanduser()
-    if script == "urdu" and _artifact_files_present(LEGACY_URDU_DIR):
-        # Reuse the already-present Urdu model instead of downloading a duplicate.
+    # The Urdu checkpoint for every PC is release urdu-xlmr-v1 (text_module/download_models.py).
+    # The older text-model-v1 folder (models/text/xlmr) is used only when the release is absent:
+    # its GitHub release was removed, so preferring it made results differ between PCs.
+    if script == "urdu" and not _artifact_files_present(DEFAULT_DIRS["urdu"]) and _artifact_files_present(LEGACY_URDU_DIR):
         return LEGACY_URDU_DIR
     return DEFAULT_DIRS[script]
 

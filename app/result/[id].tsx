@@ -75,17 +75,18 @@ export default function ResultScreen() {
   const showVerdict = !isImage || claimClassified || row.adminReview?.resolution === 'override';
   const authenticity = imageAuthenticity(row, colors);
 
-  return (
-    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
-      {/* Image authenticity comes first for images: it is always produced, unlike a claim verdict */}
-      {isImage ? (
+  const leadWithVerdict = isImage && showVerdict;
+  // Image authenticity: the detector's answer about the picture itself.
+  const authenticityCard = isImage ? (
         <View style={[styles.hero, { backgroundColor: authenticity.soft, borderColor: authenticity.color }]}>
           <View style={styles.heroTop}>
             <View style={[styles.heroIcon, { backgroundColor: colors.surface }]}>
               <Icon name={authenticity.icon} size={28} color={authenticity.color} />
             </View>
             <View style={styles.flex}>
-              <AppText variant="overline" color={authenticity.color}>Image authenticity</AppText>
+              <AppText variant="overline" color={authenticity.color}>
+                {leadWithVerdict ? 'Image authenticity (separate from the verdict above)' : 'Image authenticity'}
+              </AppText>
               <AppText variant="title" color={authenticity.color}>{authenticity.label}</AppText>
             </View>
           </View>
@@ -98,11 +99,19 @@ export default function ResultScreen() {
           ) : null}
           <AppText variant="caption" color="textMuted">
             {row.imageAnalysisStatus === 'completed'
-              ? 'About the picture itself, not whether any news claim is true.'
+              ? 'About the picture itself, not whether any news claim is true. The detector was trained on '
+                + 'camera photos: screenshots, posters, memes and edited web images are often rated '
+                + 'AI-generated, so treat this as a hint, not proof.'
               : row.imageAnalysisStatus === 'skipped'
                 ? 'This older check did not analyse the picture because it contained text.'
                 : 'The image detector could not analyse this picture.'}
           </AppText>
+          {row.imageAnalysisStatus === 'completed' && textInImageChecked ? (
+            <AppText variant="caption" color="textMuted">
+              This image contains text, like a screenshot or poster: the kind of image the detector most
+              often rates as AI-generated.
+            </AppText>
+          ) : null}
           {!showVerdict ? (
             <AppText variant="caption" color="textMuted">
               {ocrFailed
@@ -111,10 +120,9 @@ export default function ResultScreen() {
             </AppText>
           ) : null}
         </View>
-      ) : null}
-
-      {/* Grad-CAM heatmap: where the image detector looked */}
-      {isImage && row.imageAnalysisStatus === 'completed' ? (
+      ) : null;
+  // Grad-CAM: what the detector's ResNet18 model looked at for that answer.
+  const heatmapCard = isImage && row.imageAnalysisStatus === 'completed' ? (
         <Card title="Where the detector looked">
           {row.heatmapPath ? (
             <>
@@ -122,20 +130,21 @@ export default function ResultScreen() {
                 <AuthImage uri={row.heatmapPath} style={styles.image} resizeMode="contain" />
               </View>
               <AppText variant="caption" color="textMuted" style={styles.mt4}>
-                Grad-CAM heatmap from the image detector. Only the outlined centre area is analysed.
-                It does not show edits.
+                Grad-CAM from the detector's ResNet18 model (one of its three models), showing what
+                supported the image-authenticity answer above. Only the outlined centre area is
+                analysed. It does not show edits and is not evidence about the news claim.
               </AppText>
             </>
           ) : (
             <AppText variant="caption" color="uncertain">
-              The heatmap could not be produced for this image.
+              The heatmap could not be produced for this image. Most often this means the detector's
+              ResNet18 model leaned strongly the other way, so it has no evidence for this answer to highlight.
             </AppText>
           )}
         </Card>
-      ) : null}
-
-      {/* Verdict on the claim (typed text, or text read from the image) */}
-      {showVerdict ? (
+      ) : null;
+  // Verdict on the claim (typed text, or text read from the image).
+  const verdictCard = showVerdict ? (
       <View style={[styles.hero, { backgroundColor: meta.soft, borderColor: meta.color }]}>
         <View style={styles.heroTop}>
           <View style={[styles.heroIcon, { backgroundColor: colors.surface }]}>
@@ -155,7 +164,25 @@ export default function ResultScreen() {
           <HeroStat label="Fake-news risk" value={percent(row.riskScore)} />
         </View>
       </View>
-      ) : null}
+      ) : null;
+
+  return (
+    <ScrollView style={{ backgroundColor: colors.background }} contentContainerStyle={styles.container}>
+      {/* When text read from an image was classified, the claim verdict leads: it answers the
+          news question. Image authenticity and its heatmap follow as separate, labelled results. */}
+      {leadWithVerdict ? (
+        <>
+          {verdictCard}
+          {authenticityCard}
+          {heatmapCard}
+        </>
+      ) : (
+        <>
+          {authenticityCard}
+          {heatmapCard}
+          {verdictCard}
+        </>
+      )}
 
       {/* The user's dispute and the administrator's reply, together */}
       {row.dispute || row.adminReview ? (
@@ -320,9 +347,11 @@ function imageAuthenticity(row: Submission, colors: Palette) {
     return { label: 'Not analysed', icon: 'image-off' as IconName, color: colors.uncertain, soft: colors.uncertainSoft };
   }
   // The backend's own label (its 0.5 threshold), not a re-rounded percentage.
+  // Neutral colours either way: red/green belong to news verdicts, and an AI-made picture does not
+  // make a claim false (nor a real photo make it true).
   return row.aiGeneratedLabel === 'Likely AI-generated'
-    ? { label: row.aiGeneratedLabel, icon: 'sparkles' as IconName, color: colors.misleading, soft: colors.misleadingSoft }
-    : { label: row.aiGeneratedLabel, icon: 'camera' as IconName, color: colors.credible, soft: colors.credibleSoft };
+    ? { label: row.aiGeneratedLabel, icon: 'sparkles' as IconName, color: colors.info, soft: colors.infoSoft }
+    : { label: row.aiGeneratedLabel, icon: 'camera' as IconName, color: colors.info, soft: colors.infoSoft };
 }
 
 function HeroStat({ label, value }: { label: string; value: string }) {

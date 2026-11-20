@@ -114,7 +114,7 @@ class AIImageDetector:
             dino_features = self.dino(pixel_values=imagenet_x).pooler_output.numpy()
         p_clip = float(self.clip_head.predict_proba(clip_features)[0, REAL_INDEX])
         p_dino = float(self.dino_head.predict_proba(dino_features)[0, REAL_INDEX])
-        p_resnet, cam, gradcam_error = self._resnet_with_gradcam(imagenet_x)
+        p_resnet, cam, gradcam_error, gradcam_class = self._resnet_with_gradcam(imagenet_x, p_clip + p_dino)
         p_real = (p_clip + p_dino + p_resnet) / 3
         attribution_map = None
         if cam is not None:
@@ -124,12 +124,20 @@ class AIImageDetector:
                 logger.exception("Could not place the Grad-CAM map in the image")
                 gradcam_error = "the Grad-CAM map could not be placed on the image"
             if attribution_map is None and gradcam_error is None:
-                gradcam_error = "the Grad-CAM map was flat (no region stood out)"
+                gradcam_error = (
+                    "the detector's ResNet18 model leaned strongly the other way, so it showed no evidence "
+                    "for this answer to highlight"
+                    if (p_resnet >= THRESHOLD) != (p_real >= THRESHOLD)
+                    else "the Grad-CAM map was flat (no region stood out)"
+                )
         return {
             "p_real": p_real,
             "members": {"clip_vitl14": p_clip, "dinov2_l": p_dino, "resnet18_robust": p_resnet},
             "attribution_map": attribution_map,
             "gradcam_error": gradcam_error,
+            # The class the heatmap explains: always the ensemble's label (see _resnet_with_gradcam).
+            "gradcam_class": gradcam_class,
+            "gradcam_resnet_agrees": (p_resnet >= THRESHOLD) == (p_real >= THRESHOLD),
             "analysed_region": self.analysed_region(img.size),
         }
 
@@ -140,12 +148,22 @@ class AIImageDetector:
         left, top, right, bottom = crop_box(size)
         return (max(0, left) / width, max(0, top) / height, min(width, right) / width, min(height, bottom) / height)
 
-    def _resnet_with_gradcam(self, x):
-        """Notebook 04's Grad-CAM on the last ResNet18 block, for the class the ResNet member predicts.
+    def _resnet_with_gradcam(self, x, other_members_p_real: float):
+        """Notebook 04's Grad-CAM on the last ResNet18 block, for the class the ENSEMBLE predicts.
 
-        Returns (p_real, cam or None, error or None). The ResNet18 prediction does not depend on
-        Grad-CAM: if the backward pass fails, the forward-pass probability is still returned and
-        the failure is reported, so no heatmap is invented and no prediction is lost.
+        The label users see is the average of three models, and only ResNet18 has a convolutional
+        layer to explain. So the gradient of ResNet18's logit for the ensemble's class is used: the
+        heatmap shows ResNet18's evidence for the label actually displayed, even when ResNet18 on
+        its own would have chosen the other class. It is a ResNet18-based explanation; it does not
+        explain the CLIP and DINOv2 members.
+
+        other_members_p_real is P(real) from CLIP plus P(real) from DINOv2 (their sum), needed to
+        know the ensemble's class once ResNet18's own probability is computed.
+
+        Returns (p_real, cam or None, error or None, explained class name). The ResNet18
+        prediction does not depend on Grad-CAM: if the backward pass fails, the forward-pass
+        probability is still returned and the failure is reported, so no heatmap is invented and
+        no prediction is lost.
         """
         torch = self.torch
         store: dict = {}
@@ -160,18 +178,20 @@ class AIImageDetector:
             with torch.enable_grad():
                 logits = self.resnet(x)
                 p_real = float(torch.softmax(logits, 1)[0, REAL_INDEX].detach())
+                ensemble_real = (other_members_p_real + p_real) / 3 >= THRESHOLD
+                target = REAL_INDEX if ensemble_real else 1 - REAL_INDEX
                 try:
-                    logits[0, int(logits.argmax(1))].backward()
+                    logits[0, target].backward()
                     weights = store["grads"].mean(dim=(2, 3), keepdim=True)
                     cam = torch.relu((weights * store["acts"]).sum(1))[0].detach()
                     cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
                 except Exception:
                     logger.exception("Grad-CAM failed; the ResNet18 prediction is kept without a heatmap")
-                    return p_real, None, "Grad-CAM could not be computed for this image"
+                    return p_real, None, "Grad-CAM could not be computed for this image", CLASSES[target]
         finally:
             handle.remove()
             self.resnet.zero_grad(set_to_none=True)
-        return p_real, cam.numpy(), None
+        return p_real, cam.numpy(), None, CLASSES[target]
 
     @staticmethod
     def _place_in_image(cam, size: tuple[int, int]):
