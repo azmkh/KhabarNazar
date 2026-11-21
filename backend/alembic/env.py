@@ -18,8 +18,12 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Set database URL dynamically from app settings (.env)
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Set database URL dynamically from app settings (.env). MIGRATION_DATABASE_URL, when set, is a
+# direct (non-pooled) connection: on Neon, migrations should not go through PgBouncer.
+# "%" is doubled because Alembic's config treats it as interpolation (URL-encoded passwords).
+config.set_main_option(
+    "sqlalchemy.url", (settings.MIGRATION_DATABASE_URL or settings.DATABASE_URL).replace("%", "%%")
+)
 
 target_metadata = Base.metadata
 

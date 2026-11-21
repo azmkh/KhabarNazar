@@ -17,6 +17,14 @@ class Settings(BaseSettings):
 
     # Database — required, set in .env (no credentials are hard-coded here)
     DATABASE_URL: str
+    # Optional direct (non-pooled) URL for Alembic migrations. Neon's pooled "-pooler" host runs
+    # PgBouncer in transaction mode, which migrations should not use. Empty = DATABASE_URL.
+    MIGRATION_DATABASE_URL: str | None = None
+    # Connection pool per server process (PostgreSQL only). Neon's free plan is small, so keep it small.
+    DB_POOL_SIZE: int = Field(default=5, ge=1)
+    DB_MAX_OVERFLOW: int = Field(default=5, ge=0)
+    # Recycle connections before an idle database (Neon scales to zero after 5 minutes) drops them.
+    DB_POOL_RECYCLE_SECONDS: int = Field(default=300, ge=-1)
 
     # Security — required, set in .env
     JWT_SECRET: str
@@ -27,6 +35,15 @@ class Settings(BaseSettings):
     LOGIN_MAX_FAILURES_PER_ACCOUNT: int = 5
     LOGIN_MAX_FAILURES_PER_CLIENT: int = 20
     LOGIN_LOCKOUT_MINUTES: int = 15
+
+    # Checks (text/image analysis) one signed-in user may run; 0 disables a limit.
+    CHECK_RATE_LIMIT_PER_MINUTE: int = Field(default=10, ge=0)
+    CHECK_RATE_LIMIT_PER_HOUR: int = Field(default=100, ge=0)
+
+    # Behind a hosting proxy (Modal) every request comes from the proxy's address. When true, the
+    # client address for the login limiter is read from X-Forwarded-For. Never enable this when
+    # clients can reach the server directly, or they could spoof the header.
+    TRUST_PROXY_HEADERS: bool = False
 
     # File uploads
     UPLOAD_DIR: str = str(BASE_DIR / "uploads")
@@ -60,6 +77,9 @@ class Settings(BaseSettings):
 
     # CORS
     CORS_ORIGINS: Union[List[str], str] = ["http://localhost:8081", "http://localhost:19006"]
+    # Optional regex for extra browser origins, e.g. EAS Hosting preview URLs:
+    # ^https://khabarnazar(--[a-z0-9-]+)?\.expo\.app$
+    CORS_ORIGIN_REGEX: str | None = None
 
     model_config = SettingsConfigDict(
         env_file=str(BASE_DIR / ".env"),
@@ -95,10 +115,12 @@ class Settings(BaseSettings):
         path = Path(v).expanduser()
         return str(path if path.is_absolute() else (BASE_DIR / path).resolve())
 
-    @field_validator("DATABASE_URL")
+    @field_validator("DATABASE_URL", "MIGRATION_DATABASE_URL")
     @classmethod
-    def resolve_sqlite_path(cls, v: str) -> str:
+    def resolve_sqlite_path(cls, v: str | None) -> str | None:
         # sqlite:///./file.db would otherwise create a new database in the current directory.
+        if not v:
+            return v or None
         prefix = "sqlite:///"
         if v.startswith(prefix) and not v.startswith(prefix + "/") and ":memory:" not in v:
             path = Path(v[len(prefix):])

@@ -119,17 +119,49 @@ def ocr_summary(ocr: dict, branch: str) -> str:
     return "OCR found no readable text, so no news claim was checked."
 
 
+# Warm-up progress for /health: not_started (PRELOAD_MODELS off, models load on first use),
+# loading, done (every loader ran; a model that failed is reported as not loaded), failed.
+_warmup_state = "not_started"
+
+
 def model_warmup() -> None:
     """Load every model once (startup, background thread); failures are logged by the loaders."""
+    global _warmup_state
     from app.ai.image.ai_detector import load_detector
     from app.ai.image.ocr import load_ocr_reader
     from app.ai.text.xlmr import warmup_models
 
-    warmup_models()
-    load_detector()
+    _warmup_state = "loading"
     try:
-        load_ocr_reader()
+        warmup_models()
+        load_detector()
+        try:
+            load_ocr_reader()
+        except Exception:
+            logger.exception("EasyOCR warm-up failed; OCR will retry on first use")
+        _warmup_state = "done"
     except Exception:
-        import logging
+        _warmup_state = "failed"
+        logger.exception("Model warm-up failed; models will load on first use")
 
-        logging.getLogger(__name__).exception("EasyOCR warm-up failed; OCR will retry on first use")
+
+def model_status() -> dict:
+    """Which models are loaded in this process. Cheap: never loads or downloads anything.
+
+    `ready` is true when every configured model is loaded; models whose files are not installed
+    (e.g. no Roman Urdu weights) are listed as not configured and do not block readiness.
+    """
+    from app.ai.image import ai_detector, ocr
+    from app.ai.text import xlmr
+
+    models = {}
+    for script, name in (("urdu", "urdu_text"), ("roman", "roman_urdu_text")):
+        configured = xlmr.is_configured(script)
+        models[name] = "loaded" if xlmr.is_loaded(script) else ("not_loaded" if configured else "not_configured")
+    detector_files = all((ai_detector.model_dir() / f).is_file() for f in ai_detector.REQUIRED_FILES)
+    models["image_detector"] = (
+        "loaded" if ai_detector.is_loaded() else ("not_loaded" if detector_files else "not_configured")
+    )
+    models["ocr"] = "loaded" if ocr.is_loaded() else "not_loaded"
+    ready = all(state != "not_loaded" for state in models.values())
+    return {"ready": ready, "warmup": _warmup_state, "models": models}

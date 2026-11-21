@@ -7,7 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from sqlalchemy.exc import SQLAlchemyError
 
-from app.ai.pipeline import model_warmup
+from app.ai.pipeline import model_status, model_warmup
 from app.config import settings
 from app.database import check_db_connection, check_migrations
 import app.models  # ensure models are registered with Base.metadata
@@ -51,6 +51,8 @@ origins = settings.CORS_ORIGINS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins if isinstance(origins, list) else [origins],
+    # e.g. EAS Hosting preview deployments, whose URLs change on every deploy
+    allow_origin_regex=settings.CORS_ORIGIN_REGEX or None,
     allow_credentials=False,
     # Browsers hide non-standard headers unless listed; the web app reads list totals from this one.
     expose_headers=["X-Total-Count"],
@@ -85,7 +87,12 @@ def root():
 
 @app.get("/health", tags=["Health"])
 def health_check():
-    """Health check endpoint monitoring system and database availability."""
+    """Database, migration and AI model status.
+
+    The status code reflects the database only: models are still loading for about a minute
+    after a cold start, and requests that arrive then simply wait for them. `models.ready` says
+    whether every installed model is loaded in this server process.
+    """
     db_status = check_db_connection()
     migrations = check_migrations() if db_status.get("status") == "connected" else None
     is_healthy = db_status.get("status") == "connected" and migrations["status"] != "behind"
@@ -96,6 +103,7 @@ def health_check():
         "version": settings.PROJECT_VERSION,
         "environment": settings.ENVIRONMENT,
         "database": db_status,
+        "models": model_status(),
     }
     if migrations is not None:
         payload["migrations"] = migrations

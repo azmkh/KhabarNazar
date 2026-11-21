@@ -6,7 +6,7 @@ from app.database import get_db
 from app.schemas.auth import LoginRequest, Token
 from app.schemas.user import UserCreate, UserResponse
 from app.services.auth_service import authenticate_user, register_user
-from app.utils.login_limiter import login_limiter
+from app.utils.login_limiter import client_address, login_limiter
 from app.utils.security import create_access_token
 
 router = APIRouter(prefix="/auth", tags=["Authentication"])
@@ -40,7 +40,7 @@ def login(credentials: LoginRequest, request: Request, db: Session = Depends(get
     Repeated failures from the same client are refused with 429 for a while
     (see app/utils/login_limiter.py).
     """
-    client = request.client.host if request.client else "unknown"
+    client = client_address(request)
     account_key = f"account:{client}:{str(credentials.email).strip().lower()}"
     client_key = f"client:{client}"
     window = settings.LOGIN_LOCKOUT_MINUTES * 60

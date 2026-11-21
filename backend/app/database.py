@@ -2,21 +2,39 @@ import logging
 from functools import lru_cache
 from pathlib import Path
 from typing import Generator, Optional
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine, make_url, text
 from sqlalchemy.orm import declarative_base, sessionmaker
 from app.config import settings
 
-# Engine setup with appropriate connection arguments
-connect_args = {}
-if settings.DATABASE_URL.startswith("sqlite"):
-    connect_args = {"check_same_thread": False}
+def engine_options(database_url: str) -> dict:
+    """create_engine() keyword arguments for this database.
 
-engine = create_engine(
-    settings.DATABASE_URL,
-    connect_args=connect_args,
-    pool_pre_ping=True,
-    echo=False,
-)
+    PostgreSQL gets a small pool (DB_POOL_SIZE + DB_MAX_OVERFLOW per process) whose connections
+    are checked before use (pool_pre_ping) and recycled, because Neon closes connections when it
+    scales to zero. Neon hosts always use TLS (sslmode=require unless the URL sets it). On Neon's
+    pooled "-pooler" host (PgBouncer, transaction mode) psycopg's automatic server-side prepared
+    statements are turned off, since a later statement may run on a different server connection.
+    """
+    url = make_url(database_url)
+    if url.get_backend_name() == "sqlite":
+        return {"connect_args": {"check_same_thread": False}, "pool_pre_ping": True}
+
+    connect_args: dict = {}
+    host = (url.host or "").lower()
+    if host.endswith(".neon.tech") and "sslmode" not in url.query:
+        connect_args["sslmode"] = "require"
+    if "-pooler" in host and url.get_driver_name() == "psycopg":
+        connect_args["prepare_threshold"] = None
+    return {
+        "connect_args": connect_args,
+        "pool_pre_ping": True,
+        "pool_size": settings.DB_POOL_SIZE,
+        "max_overflow": settings.DB_MAX_OVERFLOW,
+        "pool_recycle": settings.DB_POOL_RECYCLE_SECONDS,
+    }
+
+
+engine = create_engine(settings.DATABASE_URL, echo=False, **engine_options(settings.DATABASE_URL))
 
 logger = logging.getLogger(__name__)
 

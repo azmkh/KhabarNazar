@@ -63,3 +63,19 @@ class LoginAttemptLimiter:
 
 
 login_limiter = LoginAttemptLimiter()
+
+
+def client_address(request) -> str:
+    """The caller's IP address for rate limiting.
+
+    Behind a hosting proxy (TRUST_PROXY_HEADERS=true, e.g. on Modal) the socket address is the
+    proxy's, so the first address in X-Forwarded-For (the original client) is used instead.
+    """
+    from app.config import settings
+
+    if settings.TRUST_PROXY_HEADERS:
+        forwarded = request.headers.get("x-forwarded-for", "")
+        first = forwarded.split(",")[0].strip()
+        if first:
+            return first[:64]
+    return request.client.host if request.client else "unknown"

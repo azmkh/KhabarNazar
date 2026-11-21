@@ -37,6 +37,8 @@ URDU_NOTEBOOK_MAX_LEN = 256
 MODEL_VERSION = {"urdu": "xlmr-urdu", "roman": "xlmr-roman-urdu"}
 LANGUAGE_TO_MODEL = {"urdu": "urdu", "roman_urdu": "roman"}
 _LOAD_LOCK = threading.Lock()
+# Scripts whose classifier is loaded in this process (reported by /health; never triggers a load).
+_LOADED_SCRIPTS: set[str] = set()
 _WORD = re.compile(r"\w+", flags=re.UNICODE)
 
 
@@ -245,12 +247,18 @@ def get_classifier(script: str) -> tuple[Optional[XlmrClassifier], Optional[str]
                   if (path / filename).is_file())
     try:
         with _LOAD_LOCK:
-            return _load(str(path.resolve()), weight.stat().st_mtime_ns, script), None
+            classifier = _load(str(path.resolve()), weight.stat().st_mtime_ns, script)
+            _LOADED_SCRIPTS.add(script)
+            return classifier, None
     except ImportError:
         return None, "XLM-R classifier files found, but torch/transformers are not installed in the backend environment."
     except Exception:
         logger.exception("Could not load %s XLM-R model from %s", script, path)
         return None, f"The trained {script.replace('_', ' ')} XLM-R classifier could not be loaded. Check backend logs."
+
+
+def is_loaded(script: str) -> bool:
+    return script in _LOADED_SCRIPTS
 
 
 def warmup_models() -> None:

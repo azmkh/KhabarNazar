@@ -19,6 +19,8 @@ from app.services.submission_service import (
     get_user_submissions,
 )
 from app.utils.dependencies import TOTAL_COUNT_HEADER, get_current_user
+from app.utils.rate_limit import limit_checks
+from app.utils.storage import ensure_visible, persist
 from app.utils.upload import delete_upload, save_upload
 
 router = APIRouter(prefix="/submissions", tags=["Submissions"])
@@ -33,7 +35,7 @@ router = APIRouter(prefix="/submissions", tags=["Submissions"])
 def submit_text(
     body: TextSubmitRequest,
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(limit_checks),
 ):
     """
     Accepts plaintext (Urdu, Roman Urdu, or English), runs language detection and the
@@ -57,7 +59,7 @@ def submit_text(
 def submit_image(
     file: UploadFile = File(..., description="Image file (JPEG, PNG, or WEBP, max 10 MB)"),
     db: Session = Depends(get_db),
-    current_user: User = Depends(get_current_user),
+    current_user: User = Depends(limit_checks),
 ):
     """
     Validates and stores the uploaded image, then runs the image pipeline: images
@@ -79,6 +81,8 @@ def submit_image(
         db.rollback()
         delete_upload(rel_path)
         raise
+    # Make the upload and its heatmap visible to other containers (Modal Volume; no-op locally).
+    persist()
     return SubmissionResponse.model_validate(submission)
 
 
@@ -167,7 +171,7 @@ def get_submission_image(
         image_file.relative_to(upload_root)
     except ValueError:
         raise HTTPException(status_code=404, detail="Image not found.")
-    if not image_file.is_file():
+    if not ensure_visible(image_file):
         raise HTTPException(status_code=404, detail="Image file is no longer available.")
     return FileResponse(image_file, media_type=row[0].mime_type or "application/octet-stream")
 
@@ -192,6 +196,6 @@ def get_submission_heatmap(
         heatmap_file.relative_to(upload_root)
     except ValueError:
         raise HTTPException(status_code=404, detail="Heatmap not found.")
-    if not heatmap_file.is_file():
+    if not ensure_visible(heatmap_file):
         raise HTTPException(status_code=404, detail="Heatmap file is no longer available.")
     return FileResponse(heatmap_file, media_type="image/png")

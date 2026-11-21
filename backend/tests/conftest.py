@@ -113,10 +113,13 @@ def _reset_login_limiter():
     """Every test request comes from the same fake client, so failed logins in
     one test must not lock out the next."""
     from app.utils.login_limiter import login_limiter
+    from app.utils.rate_limit import check_limiter
 
     login_limiter.clear()
+    check_limiter.clear()
     yield
     login_limiter.clear()
+    check_limiter.clear()
 
 
 def pytest_collection_modifyitems(config, items):

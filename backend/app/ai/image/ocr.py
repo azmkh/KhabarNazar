@@ -14,6 +14,7 @@ from app.ai.text.language_detection import detect_language
 logger = logging.getLogger(__name__)
 SUPPORTED_OCR_LANGUAGES = ("ur", "en")
 _load_lock = threading.Lock()
+_loaded = False
 
 
 @lru_cache(maxsize=1)
@@ -36,8 +37,16 @@ def _get_ocr_reader(model_directory: str):
 
 def load_ocr_reader():
     """Load (or return the already loaded) EasyOCR reader; used to warm up at startup."""
+    global _loaded
     with _load_lock:  # two first requests at once must not load EasyOCR twice
-        return _get_ocr_reader(str(_model_directory().resolve()))
+        reader = _get_ocr_reader(str(_model_directory().resolve()))
+        _loaded = True
+        return reader
+
+
+def is_loaded() -> bool:
+    """True once EasyOCR is loaded in this process (does not load it)."""
+    return _loaded
 
 
 def _model_directory() -> Path:

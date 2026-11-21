@@ -214,6 +214,11 @@ _lock = threading.Lock()
 _cache: dict[str, AIImageDetector] = {}
 
 
+def is_loaded() -> bool:
+    """True once the image detector is loaded in this process (does not load it)."""
+    return bool(_cache)
+
+
 def load_detector() -> tuple[Optional[AIImageDetector], Optional[str]]:
     """Return (detector, None) or (None, reason it is unavailable). Loads once per process."""
     directory = model_dir()
