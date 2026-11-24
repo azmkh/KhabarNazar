@@ -1,0 +1,564 @@
+[
+ {
+  "id": "U01",
+  "category": "urdu_short",
+  "text": "حکومت نے آج اعلان کیا ہے کہ یکم نومبر سے تمام سرکاری اسکولوں میں مفت کتابیں فراہم کی جائیں گی۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "given sentence; pair of R01",
+  "report_tc": "TC-TXT-02"
+ },
+ {
+  "id": "U02",
+  "category": "urdu_short",
+  "text": "حکومت نے اعلان کیا ہے کہ ملک بھر میں سات دن کے لیے انٹرنیٹ سروس بند کر دی جائے گی۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "given sentence; pair of R02",
+  "report_tc": null
+ },
+ {
+  "id": "U03",
+  "category": "urdu_short",
+  "text": "شہر میں نئے ہسپتال کی تعمیر کا کام اگلے مہینے مکمل ہو جائے گا۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "credible style",
+  "report_tc": null
+ },
+ {
+  "id": "U04",
+  "category": "urdu_short",
+  "text": "سائنسدانوں نے دریافت کیا ہے کہ روزانہ پیاز کھانے سے ہر بیماری ختم ہو جاتی ہے۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "fake style",
+  "report_tc": null
+ },
+ {
+  "id": "U05",
+  "category": "urdu_short",
+  "text": "فوری خبر! کل سے ملک کے تمام بینک ایک مہینے کے لیے بند رہیں گے، فوراً اپنی رقم نکال لیں۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "fake style",
+  "report_tc": null
+ },
+ {
+  "id": "UL1",
+  "category": "urdu_long",
+  "text": "سوشل میڈیا پر ایک پیغام تیزی سے پھیل رہا ہے جس میں دعویٰ کیا گیا ہے کہ ایک خفیہ دوا ہر بیماری کا علاج کر سکتی ہے۔ پیغام کے مطابق یہ دوا صرف ایک دن میں شوگر، بلڈ پریشر اور دل کے امراض ختم کر دیتی ہے۔ پیغام بھیجنے والوں کا کہنا ہے کہ ڈاکٹر اس دوا کو جان بوجھ کر چھپا رہے ہیں۔ دعویٰ کیا گیا ہے کہ دوا گھر میں عام چیزوں سے تیار کی جا سکتی ہے اور اس کا کوئی نقصان نہیں۔ پیغام میں لوگوں سے کہا گیا ہے کہ وہ اپنی تمام ادویات فوراً چھوڑ دیں اور صرف یہی نسخہ استعمال کریں۔ ساتھ ہی لکھا ہے کہ اگر یہ پیغام دس لوگوں کو نہ بھیجا گیا تو بدقسمتی آ سکتی ہے۔ پیغام میں کسی ہسپتال، تحقیق یا ماہر کا نام نہیں دیا گیا۔ کئی لوگوں نے بغیر تصدیق کے یہ پیغام اپنے خاندان کے گروپوں میں آگے بھیج دیا ہے۔ پیغام کے آخر میں ایک نامعلوم نمبر دیا گیا ہے جس پر رقم بھیج کر دوا منگوانے کا کہا گیا ہے۔ دعویٰ کرنے والوں کا کہنا ہے کہ حکومت جلد اس دوا پر پابندی لگا دے گی اس لیے ابھی خرید لیں۔ پیغام کے ساتھ",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "tfidf-urdu-long-articles",
+   "detected_language": "urdu",
+   "disclosure": [
+    "Long articles are checked as a whole"
+   ]
+  },
+  "note": "200 words",
+  "report_tc": "TC-TXT-03"
+ },
+ {
+  "id": "UL2",
+  "category": "urdu_long",
+  "text": "شہر کی بلدیہ نے پانی کی فراہمی بہتر بنانے کے لیے ایک نیا منصوبہ شروع کیا ہے۔ منصوبے کے تحت پرانی پائپ لائنوں کو مرحلہ وار تبدیل کیا جائے گا۔ حکام کے مطابق پہلا مرحلہ تین مہینوں میں مکمل ہونے کی توقع ہے۔ اس دوران کچھ علاقوں میں پانی کی فراہمی چند گھنٹوں کے لیے معطل رہ سکتی ہے۔ شہریوں کو ہدایت کی گئی ہے کہ وہ پانی ذخیرہ کرنے کا پہلے سے انتظام کر لیں۔ بلدیہ کے ترجمان نے بتایا کہ منصوبے کے لیے رقم صوبائی بجٹ سے فراہم کی گئی ہے۔ ماہرین کا کہنا ہے کہ پرانی لائنوں سے روزانہ بڑی مقدار میں پانی ضائع ہو رہا تھا۔ نئی لائنوں کی تنصیب کے بعد پانی کے دباؤ میں بھی بہتری متوقع ہے۔ مقامی تاجروں نے منصوبے کا خیرمقدم کیا ہے لیکن کام کے دوران ٹریفک کے مسائل پر تشویش ظاہر کی ہے۔ انتظامیہ نے متبادل راستوں کی",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "149 words: just below the cutoff (XLM-R)",
+  "report_tc": null
+ },
+ {
+  "id": "UL3",
+  "category": "urdu_long",
+  "text": "شہر کی بلدیہ نے پانی کی فراہمی بہتر بنانے کے لیے ایک نیا منصوبہ شروع کیا ہے۔ منصوبے کے تحت پرانی پائپ لائنوں کو مرحلہ وار تبدیل کیا جائے گا۔ حکام کے مطابق پہلا مرحلہ تین مہینوں میں مکمل ہونے کی توقع ہے۔ اس دوران کچھ علاقوں میں پانی کی فراہمی چند گھنٹوں کے لیے معطل رہ سکتی ہے۔ شہریوں کو ہدایت کی گئی ہے کہ وہ پانی ذخیرہ کرنے کا پہلے سے انتظام کر لیں۔ بلدیہ کے ترجمان نے بتایا کہ منصوبے کے لیے رقم صوبائی بجٹ سے فراہم کی گئی ہے۔ ماہرین کا کہنا ہے کہ پرانی لائنوں سے روزانہ بڑی مقدار میں پانی ضائع ہو رہا تھا۔ نئی لائنوں کی تنصیب کے بعد پانی کے دباؤ میں بھی بہتری متوقع ہے۔ مقامی تاجروں نے منصوبے کا خیرمقدم کیا ہے لیکن کام کے دوران ٹریفک کے مسائل پر تشویش ظاہر کی ہے۔ انتظامیہ نے متبادل راستوں کی نشاندہی کے",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "tfidf-urdu-long-articles",
+   "detected_language": "urdu",
+   "disclosure": [
+    "Long articles are checked as a whole"
+   ]
+  },
+  "note": "151 words: just above the cutoff (TF-IDF)",
+  "report_tc": null
+ },
+ {
+  "id": "UL4",
+  "category": "urdu_long",
+  "text": "سال ۲۰۲۴ میں ۱۲۳۴۵۶۷ روپے کی لاگت سے ۸۹۰۱۲ گھروں کو ۳۴۵۶۷۸ لیٹر پانی ملا۔ رپورٹ نمبر ۵۶۷۸۹۰۱ کے مطابق ۲۳۴۵۶ شکایات میں سے ۱۹۸۷۶ حل ہو چکی ہیں۔ منصوبہ ۷۶۵۴۳۲۱ اور منصوبہ ۱۰۲۹۳۸۴ کی رقم ۴۵۶۷۸۹۰۱۲ روپے بتائی گئی ہے۔ شمارہ ۹۸۷۶۵۴ میں ۱۲۰۳۴۵ صارفین اور ۶۷۸۹۰۱ کنکشنز کا ذکر ہے۔ سال ۲۰۲۴ میں ۱۲۳۴۵۶۷ روپے کی لاگت سے ۸۹۰۱۲ گھروں کو ۳۴۵۶۷۸ لیٹر پانی ملا۔ رپورٹ نمبر ۵۶۷۸۹۰۱ کے مطابق ۲۳۴۵۶ شکایات میں سے ۱۹۸۷۶ حل ہو چکی ہیں۔ منصوبہ ۷۶۵۴۳۲۱ اور منصوبہ ۱۰۲۹۳۸۴ کی رقم ۴۵۶۷۸۹۰۱۲ روپے بتائی گئی ہے۔ شمارہ ۹۸۷۶۵۴ میں ۱۲۰۳۴۵ صارفین اور ۶۷۸۹۰۱ کنکشنز کا ذکر ہے۔ سال ۲۰۲۴ میں ۱۲۳۴۵۶۷ روپے کی لاگت سے ۸۹۰۱۲ گھروں کو ۳۴۵۶۷۸ لیٹر پانی ملا۔ رپورٹ نمبر ۵۶۷۸۹۰۱ کے مطابق ۲۳۴۵۶ شکایات میں سے ۱۹۸۷۶ حل ہو چکی ہیں۔ منصوبہ ۷۶۵۴۳۲۱ اور منصوبہ ۱۰۲۹۳۸۴ کی رقم ۴۵۶۷۸۹۰۱۲ روپے بتائی گئی ہے۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": [
+    "only its first part was checked"
+   ]
+  },
+  "note": "145 words but 271 XLM-R tokens after cleaning (limit 256): truncated",
+  "report_tc": null
+ },
+ {
+  "id": "R01",
+  "category": "roman_urdu",
+  "text": "Hukoomat ne aaj elan kiya hai ke 1 November se tamam sarkari schools mein muft kitaabein faraham ki jayengi.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": []
+  },
+  "note": "pair of U01",
+  "report_tc": "TC-TXT-04"
+ },
+ {
+  "id": "R02",
+  "category": "roman_urdu",
+  "text": "Hukoomat ne elan kiya hai ke mulk bhar mein saat din ke liye internet service band kar di jayegi.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": []
+  },
+  "note": "pair of U02",
+  "report_tc": null
+ },
+ {
+  "id": "R03",
+  "category": "roman_urdu",
+  "text": "Hukoomat ne petrol ki qeemat mein 20 rupay kami ka elan kar diya hai ke yeh kal se lagu hogi.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": []
+  },
+  "note": "spelling A of one claim",
+  "report_tc": null
+ },
+ {
+  "id": "R04",
+  "category": "roman_urdu",
+  "text": "Hakumat ne petrol ki qimat me 20 rupay kami ka elaan kar dia he k yeh kal se lagu hogi.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": []
+  },
+  "note": "spelling B of the same claim",
+  "report_tc": null
+ },
+ {
+  "id": "R05",
+  "category": "roman_urdu",
+  "text": "Hkumat ne petrol ki keemat mai 20 rupe kmi ka elan kr diya hai k ye kal se lagu hogi.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": []
+  },
+  "note": "spelling C of the same claim",
+  "report_tc": null
+ },
+ {
+  "id": "R06",
+  "category": "roman_urdu",
+  "text": "Social media par khabar phail rahi hai ke kal raat shehar mein zalzala aaya tha lekin mehkama mosamiat ne tasdeeq nahi ki.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": []
+  },
+  "note": "",
+  "report_tc": null
+ },
+ {
+  "id": "R07",
+  "category": "roman_urdu",
+  "text": "Lahore mein aaj subah halki barish hui aur mosam khushgawar ho gaya, mehkama ne kal bhi barish ka imkan zahir kiya hai.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": []
+  },
+  "note": "credible style",
+  "report_tc": null
+ },
+ {
+  "id": "E01",
+  "category": "english",
+  "text": "The government has announced that all schools will remain closed for a week because of heavy rain.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "english",
+   "disclosure": [
+    "results for English text are less reliable"
+   ]
+  },
+  "note": "",
+  "report_tc": "TC-TXT-05"
+ },
+ {
+  "id": "E02",
+  "category": "english",
+  "text": "Scientists have confirmed that drinking hot water with lemon cures every disease within a day.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "english",
+   "disclosure": [
+    "results for English text are less reliable"
+   ]
+  },
+  "note": "",
+  "report_tc": null
+ },
+ {
+  "id": "E03",
+  "category": "english",
+  "text": "The city council said that the new bus route will start operating from next Monday morning.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "english",
+   "disclosure": [
+    "results for English text are less reliable"
+   ]
+  },
+  "note": "",
+  "report_tc": null
+ },
+ {
+  "id": "M01",
+  "category": "mixed",
+  "text": "حکومت نے نئی ٹیکس پالیسی کا اعلان کیا ہے جس کے تحت online shopping پر اضافی tax لگایا جائے گا۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "mostly Urdu letters (>=70%) with English words",
+  "report_tc": null
+ },
+ {
+  "id": "M02",
+  "category": "mixed",
+  "text": "Breaking news: government ne petrol ki price 50 rupees barha di hai, according to sources yeh kal se lagu hogi.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": []
+  },
+  "note": "Roman Urdu with English",
+  "report_tc": null
+ },
+ {
+  "id": "M03",
+  "category": "mixed",
+  "text": "حکومت نے اعلان کیا hai ke kal se tamam schools band rahenge aur imtihanat agle mahine honge",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "mixed",
+   "disclosure": [
+    "mixes Urdu and English script"
+   ]
+  },
+  "note": "Urdu script + Roman Urdu, Urdu letters < 50%",
+  "report_tc": null
+ },
+ {
+  "id": "M04",
+  "category": "mixed",
+  "text": "حُکُومَت نے اِعلان کِیا ہے کہ اَگلے ہَفتے سے بِجلی کی قِیمَت کَم ہو جائے گی۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "Urdu with diacritics (zabar/zer/pesh)",
+  "report_tc": null
+ },
+ {
+  "id": "M05",
+  "category": "mixed",
+  "text": "حکومت نے ۱۵ دسمبر سے ۲۰ فیصد سستی بجلی کا اعلان کیا ہے، ٣٠ لاکھ صارفین مستفید ہوں گے۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "Urdu (U+06F0) and Arabic-Indic (U+0660) digits",
+  "report_tc": null
+ },
+ {
+  "id": "M06",
+  "category": "mixed",
+  "text": "🚨 فوری خبر 🚨 کل سے ملک بھر میں پٹرول پمپ بند رہیں گے 😱🔥",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "Urdu with emoji",
+  "report_tc": null
+ },
+ {
+  "id": "O01",
+  "category": "other_language",
+  "text": "أعلنت الحكومة اليوم عن إغلاق جميع المدارس لمدة أسبوع بسبب الأمطار الغزيرة في البلاد.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": null,
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "Arabic: Arabic script; record the route",
+  "report_tc": null
+ },
+ {
+  "id": "O02",
+  "category": "other_language",
+  "text": "دولت امروز اعلام کرد که همه مدارس به مدت یک هفته تعطیل خواهند شد.",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": null,
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "Persian: Arabic script; record the route",
+  "report_tc": null
+ },
+ {
+  "id": "O03",
+  "category": "other_language",
+  "text": "सरकार ने आज घोषणा की कि सभी स्कूल एक हफ्ते के लिए बंद रहेंगे।",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": null,
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "Hindi (Devanagari); record the route",
+  "report_tc": null
+ },
+ {
+  "id": "N01",
+  "category": "not_news",
+  "text": "بریانی بنانے کے لیے پہلے چاول بھگو دیں، پھر پیاز سنہری ہونے تک تلیں اور مصالحہ ڈال کر دم پر رکھ دیں۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "recipe; use case 3-B expects 'does not appear to be news'",
+  "report_tc": null
+ },
+ {
+  "id": "N02",
+  "category": "not_news",
+  "text": "عید مبارک! آپ کو اور آپ کے پورے خاندان کو دل کی گہرائیوں سے مبارکباد۔",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "greeting; use case 3-B",
+  "report_tc": null
+ },
+ {
+  "id": "X01",
+  "category": "edge",
+  "text": "",
+  "expected": {
+   "outcome": "rejected_422",
+   "model_version": null,
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "empty",
+  "report_tc": "TC-TXT-06"
+ },
+ {
+  "id": "X02",
+  "category": "edge",
+  "text": "     \n\t  ",
+  "expected": {
+   "outcome": "rejected_422",
+   "model_version": null,
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "whitespace only",
+  "report_tc": null
+ },
+ {
+  "id": "X03",
+  "category": "edge",
+  "text": "ab",
+  "expected": {
+   "outcome": "rejected_422",
+   "model_version": null,
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "2 characters, below the 3-character minimum",
+  "report_tc": null
+ },
+ {
+  "id": "X04",
+  "category": "edge",
+  "text": "خبر",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "exactly 3 characters",
+  "report_tc": null
+ },
+ {
+  "id": "X05",
+  "category": "edge",
+  "text": "Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus ro",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": [
+    "only its first part was checked"
+   ]
+  },
+  "note": "exactly 10,000 characters (Roman Urdu, beyond 512 tokens)",
+  "report_tc": null
+ },
+ {
+  "id": "X06",
+  "category": "edge",
+  "text": "Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus routes shuru kiye jayenge aur kiraya bhi kam rakha jayega. Hukoomat ne aaj elan kiya hai ke shehar mein naye bus rob",
+  "expected": {
+   "outcome": "rejected_422",
+   "model_version": null,
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "10,001 characters",
+  "report_tc": null
+ },
+ {
+  "id": "X07",
+  "category": "edge",
+  "text": "😀😀😀🎉🎉",
+  "expected": {
+   "outcome": "uncertain_no_score",
+   "model_version": "text-model-unavailable",
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "emoji only (no letters)",
+  "report_tc": null
+ },
+ {
+  "id": "X08",
+  "category": "edge",
+  "text": "1234567890",
+  "expected": {
+   "outcome": "uncertain_no_score",
+   "model_version": "text-model-unavailable",
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "digits only",
+  "report_tc": null
+ },
+ {
+  "id": "X09",
+  "category": "edge",
+  "text": "https://example.com/news/2026/11/24/story-12345",
+  "expected": {
+   "outcome": "uncertain_no_score",
+   "model_version": "text-model-unavailable",
+   "detected_language": null,
+   "disclosure": []
+  },
+  "note": "URL only: the test plan expects Uncertain; the URL does contain letters",
+  "report_tc": null
+ },
+ {
+  "id": "X10",
+  "category": "edge",
+  "text": "<script>alert('x')</script><b>حکومت نے</b> آج <i>نئی</i> پالیسی کا اعلان کیا ہے",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "mixed",
+   "disclosure": []
+  },
+  "note": "HTML/script tags: must be stored and returned as plain text; tag letters are Latin, so 'mixed' with the Urdu route is expected",
+  "report_tc": null
+ },
+ {
+  "id": "X11",
+  "category": "edge",
+  "text": "حکومت​ نے‌ آج‍ اعلان﻿ کیا ہے کہ کل چھٹی ہوگی",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-urdu",
+   "detected_language": "urdu",
+   "disclosure": []
+  },
+  "note": "zero-width space, non-joiner, joiner and BOM inside the text",
+  "report_tc": null
+ },
+ {
+  "id": "X12",
+  "category": "edge",
+  "text": "'; DROP TABLE submissions; -- hukoomat ne elan kiya hai ke kal chutti hogi",
+  "expected": {
+   "outcome": "accepted",
+   "model_version": "xlmr-roman-urdu",
+   "detected_language": "roman_urdu",
+   "disclosure": []
+  },
+  "note": "SQL-injection-style text: stored verbatim, tables unaffected",
+  "report_tc": null
+ }
+]

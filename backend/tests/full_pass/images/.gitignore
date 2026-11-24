@@ -1,0 +1,5 @@
+# copies of local web pictures; not ours to publish
+local_*
+# large uncompressed noise images; rebuild with tests/full_pass/make_assets.py
+format_just_under_10mb.png
+format_just_over_10mb.png

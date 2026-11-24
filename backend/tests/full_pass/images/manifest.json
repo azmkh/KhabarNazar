@@ -1,0 +1,384 @@
+[
+ {
+  "id": "C01",
+  "file": "urdu_headline.png",
+  "category": "content",
+  "how_made": "Edge-rendered Urdu headline, black on white, Segoe UI",
+  "content_type": "image/png",
+  "bytes": 24653,
+  "sha256": "00b704894b442239475d782f14542769470ae8beca4ce96749361dd84de89602",
+  "expected": {
+   "http_status": 201,
+   "analysis_branch": "image_pair",
+   "ocr_status": "completed",
+   "route": "xlmr-urdu"
+  },
+  "report_tc": "TC-IMG-02"
+ },
+ {
+  "id": "C02",
+  "file": "roman_headline.png",
+  "category": "content",
+  "how_made": "Edge-rendered Roman Urdu headline",
+  "content_type": "image/png",
+  "bytes": 27951,
+  "sha256": "ed6c863f00256ec4063ccf4fd9360a19ff2173b8b3d6e6233c8046aedca932dc",
+  "expected": {
+   "http_status": 201,
+   "analysis_branch": "image_pair",
+   "ocr_status": "completed",
+   "route": "xlmr-roman-urdu"
+  },
+  "report_tc": "TC-IMG-03"
+ },
+ {
+  "id": "C03",
+  "file": "english_headline.png",
+  "category": "content",
+  "how_made": "Edge-rendered English headline",
+  "content_type": "image/png",
+  "bytes": 25261,
+  "sha256": "e71a2e77627c0bd3764ecd66be1d643ecd16fdfe6c8bd01fef4c5ec5399ea951",
+  "expected": {
+   "http_status": 201,
+   "analysis_branch": "image_pair",
+   "ocr_status": "completed",
+   "route": "xlmr-roman-urdu",
+   "disclosure": "English"
+  },
+  "report_tc": null
+ },
+ {
+  "id": "C04",
+  "file": "mixed_scripts.png",
+  "category": "content",
+  "how_made": "Edge-rendered: one Urdu line and one English line",
+  "content_type": "image/png",
+  "bytes": 21037,
+  "sha256": "27552088afaefa79479f6f67655355bd311cd2ad0d55b31fab2f93bdf57880a1",
+  "expected": {
+   "http_status": 201,
+   "analysis_branch": "image_pair",
+   "ocr_status": "completed"
+  },
+  "report_tc": null
+ },
+ {
+  "id": "C05",
+  "file": "multiline_paragraph.png",
+  "category": "content",
+  "how_made": "Edge-rendered: three numbered Roman Urdu lines (Pehli/Doosri/Teesri)",
+  "content_type": "image/png",
+  "bytes": 25348,
+  "sha256": "5f436635450203f545ce04271560f127d267da2d2b18023c520c15d4f14e2be6",
+  "expected": {
+   "http_status": 201,
+   "analysis_branch": "image_pair",
+   "ocr_status": "completed",
+   "reading_order": [
+    "Pehli",
+    "Doosri",
+    "Teesri"
+   ]
+  },
+  "report_tc": null
+ },
+ {
+  "id": "C06",
+  "file": "low_contrast_blurred.png",
+  "category": "content",
+  "how_made": "Edge-rendered light-grey text on grey, Gaussian blur r=2.2 (aims near the OCR cutoff)",
+  "content_type": "image/png",
+  "bytes": 16694,
+  "sha256": "103bc70bec58ab1af96be2697072a3c41933f9b8e25a380d5c470d12ce2021cd",
+  "expected": {
+   "http_status": 201,
+   "note": "either branch is acceptable; the reason must be consistent with ocr_status/confidence"
+  },
+  "report_tc": null
+ },
+ {
+  "id": "C07",
+  "file": "local_fox_no_text.jpg",
+  "category": "content",
+  "how_made": "copy of backend/uploads/393c64a1ecbc4ed380d25eae4c157bde.jpg (fox picture, no text)",
+  "content_type": "image/jpeg",
+  "bytes": 69579,
+  "sha256": "25dc2136bd8afc9d8cfa88cade37068723a698ecdf1ebf4b9ae7d95241e05320",
+  "expected": {
+   "http_status": 201,
+   "analysis_branch": "ai_or_real",
+   "final_label": "Uncertain",
+   "combined_risk_score": null
+  },
+  "report_tc": "TC-IMG-01"
+ },
+ {
+  "id": "C08",
+  "file": "local_photo_caption_bar.jpg",
+  "category": "content",
+  "how_made": "local wildebeest photo (watermark strip cut off, 2x) with an Edge-rendered red Urdu caption bar below",
+  "content_type": "image/jpeg",
+  "bytes": 77607,
+  "sha256": "9b6d03bb010079e49a246d96f059ae661446f34fda99ad7b79fdff4f70e33e2e",
+  "expected": {
+   "http_status": 201,
+   "analysis_branch": "image_pair",
+   "ocr_status": "completed"
+  },
+  "report_tc": null
+ },
+ {
+  "id": "C09",
+  "file": "local_meme.jpg",
+  "category": "content",
+  "how_made": "local roses picture with black Roman Urdu meme bars above and below",
+  "content_type": "image/jpeg",
+  "bytes": 92173,
+  "sha256": "2fea76f9e677123cf1b8bf57086a1d07669ba5ce61a1659d2a0e24d1b68e35a1",
+  "expected": {
+   "http_status": 201
+  },
+  "report_tc": null
+ },
+ {
+  "id": "C10",
+  "file": "synthetic_render.png",
+  "category": "content",
+  "how_made": "generated: gradient with blurred glowing circles (computer-made, no text)",
+  "content_type": "image/png",
+  "bytes": 107661,
+  "sha256": "7c0ec4e71da0f06f2e23ea15640d3c242f157a21ef722f3f9715fe3035b011e7",
+  "expected": {
+   "http_status": 201,
+   "analysis_branch": "ai_or_real"
+  },
+  "report_tc": null
+ },
+ {
+  "id": "C11",
+  "file": "local_roses_ai_look.jpg",
+  "category": "content",
+  "how_made": "copy of a local picture of roses with an AI-generated look",
+  "content_type": "image/jpeg",
+  "bytes": 39171,
+  "sha256": "301922411002383732f0e79a8e062f61248d90604d8cb3d54200869910c0a5ea",
+  "expected": {
+   "http_status": 201,
+   "analysis_branch": "ai_or_real"
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F01",
+  "file": "format_jpeg.jpg",
+  "category": "format",
+  "how_made": "English headline saved as JPEG",
+  "content_type": "image/jpeg",
+  "bytes": 27319,
+  "sha256": "a5fbd66f46f06194bf8c6ae583a5f7d1437a004b5d48a25add4ef2b6e09eb2ca",
+  "expected": {
+   "http_status": 201
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F02",
+  "file": "format_png.png",
+  "category": "format",
+  "how_made": "English headline saved as PNG",
+  "content_type": "image/png",
+  "bytes": 34747,
+  "sha256": "3841f0b039458c1dcd88cf5d5e025028df007c79abaf8c20833630ca82f3990f",
+  "expected": {
+   "http_status": 201
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F03",
+  "file": "format_webp.webp",
+  "category": "format",
+  "how_made": "English headline saved as WEBP",
+  "content_type": "image/webp",
+  "bytes": 12686,
+  "sha256": "f8cf9c2ab72c6ba0ebc03c297dd2c98ab5ba1abf5f8e271423bbd642e0282294",
+  "expected": {
+   "http_status": 201
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F04",
+  "file": "format_png_transparent.png",
+  "category": "format",
+  "how_made": "English headline PNG with alpha 140/255",
+  "content_type": "image/png",
+  "bytes": 28359,
+  "sha256": "87b2a364a3ffd730a16ae78b286faa70b3371351126559be8fce267e264005bd",
+  "expected": {
+   "http_status": 201
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F05",
+  "file": "format_greyscale.png",
+  "category": "format",
+  "how_made": "English headline, 8-bit greyscale PNG",
+  "content_type": "image/png",
+  "bytes": 16868,
+  "sha256": "6ff285add1c3262e94361929c495b91b0545392788d5bf037a48d34467b5c508",
+  "expected": {
+   "http_status": 201
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F06",
+  "file": "format_1x1.png",
+  "category": "format",
+  "how_made": "1x1 pixel PNG",
+  "content_type": "image/png",
+  "bytes": 69,
+  "sha256": "1c3e21abc9aff1fa47fc1c72c7022ed382943481e15f4b820c856ccc456c78a0",
+  "expected": {
+   "http_status": 201,
+   "note": "accepted; record what the pipeline does"
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F07",
+  "file": "format_8000x8000.png",
+  "category": "format",
+  "how_made": "8000x8000 flat PNG (64 Mpx, small file)",
+  "content_type": "image/png",
+  "bytes": 202513,
+  "sha256": "7a44dd55db6d77d6bb510bb981241bf641dd083e2768b12d5e929e42bf1ea970",
+  "expected": {
+   "http_status": 413,
+   "note": "over MAX_IMAGE_PIXELS (40 Mpx)"
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F07b",
+  "file": "format_6000x6000.png",
+  "category": "format",
+  "how_made": "6000x6000 flat PNG (36 Mpx, under the pixel cap)",
+  "content_type": "image/png",
+  "bytes": 119763,
+  "sha256": "82a01256de9ef8c62421b80e11197a1718f366dcc4747d169548389d15ecd118",
+  "expected": {
+   "http_status": 201
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F08",
+  "file": "format_just_under_10mb.png",
+  "category": "format",
+  "how_made": "uncompressed noise PNG just under 10 MiB",
+  "content_type": "image/png",
+  "bytes": 10406508,
+  "sha256": "285b740e1c0e75c0003912f211883bdece8f98e074cf36bfdadb6334d1b07185",
+  "expected": {
+   "http_status": 201
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F09",
+  "file": "format_just_over_10mb.png",
+  "category": "format",
+  "how_made": "uncompressed noise PNG just over 10 MiB",
+  "content_type": "image/png",
+  "bytes": 10835528,
+  "sha256": "1e07742101ccacf269231f6bdf399bfeaf3064e6bffc3703172cf07628698b86",
+  "expected": {
+   "http_status": 413
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F10",
+  "file": "format.gif",
+  "category": "format",
+  "how_made": "English headline as GIF",
+  "content_type": "image/gif",
+  "bytes": 8028,
+  "sha256": "1834a355d8d144101c907ccb802092aea55b84e2b967ac5dde7deec2142d7bfb",
+  "expected": {
+   "http_status": 415
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F11",
+  "file": "format.pdf",
+  "category": "format",
+  "how_made": "English headline as a one-page PDF",
+  "content_type": "application/pdf",
+  "bytes": 20480,
+  "sha256": "e0ec49a39b92660a09ff5cbbc06b4c2f7ea4cd0cd5e6dac8e0cb2946f9bc25e4",
+  "expected": {
+   "http_status": 415
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F12",
+  "file": "text_renamed.png",
+  "category": "format",
+  "how_made": "a .txt file renamed to .png",
+  "content_type": "image/png",
+  "bytes": 840,
+  "sha256": "d4820b9224344f4ab00f52207017c374747eb45abdb5f37b39134f991979f194",
+  "expected": {
+   "http_status": 415
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F13",
+  "file": "truncated.jpg",
+  "category": "format",
+  "how_made": "the JPEG above cut to half its bytes",
+  "content_type": "image/jpeg",
+  "bytes": 13659,
+  "sha256": "eda335c79184f39d3d3751a0f82a598103717f90c69757ac96bda732d950cde6",
+  "expected": {
+   "http_status": 415
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F14",
+  "file": "exif_orientation_6.jpg",
+  "category": "format",
+  "how_made": "Urdu headline stored rotated 90 deg CCW with EXIF Orientation=6 (upright when honoured)",
+  "content_type": "image/jpeg",
+  "bytes": 34035,
+  "sha256": "d57f8b55680f8b659534d0550766aed47c42b79407ef172750892bd14d125982",
+  "expected": {
+   "http_status": 201,
+   "ocr_reads_upright": true
+  },
+  "report_tc": null
+ },
+ {
+  "id": "F15",
+  "file": "png_content_named.jpg",
+  "category": "format",
+  "how_made": "PNG bytes in a file named .jpg, sent as image/jpeg",
+  "content_type": "image/jpeg",
+  "bytes": 34747,
+  "sha256": "3841f0b039458c1dcd88cf5d5e025028df007c79abaf8c20833630ca82f3990f",
+  "expected": {
+   "http_status": 201,
+   "mime_type": "image/png"
+  },
+  "report_tc": null
+ }
+]
