@@ -56,6 +56,10 @@ export default function ResultScreen() {
   }
 
   const meta = verdictMeta(row.verdict, colors);
+  // An admin override replaces the verdict; the AI's score and risk then describe the AI's
+  // original verdict, not this one (DEF-02).
+  const overridden = row.verdictSource === 'Admin' || row.adminReview?.resolution === 'override';
+  const aiMeta = overridden && row.aiVerdict ? verdictMeta(row.aiVerdict, colors) : null;
   const isImage = row.kind !== 'text';
   // Every image is analysed by the image detector (with Grad-CAM); OCR text is classified as the
   // news claim only when there was enough of it (the image-pair branch).
@@ -152,17 +156,28 @@ export default function ResultScreen() {
           </View>
           <View style={styles.flex}>
             <AppText variant="overline" color={meta.color}>
-              {row.adminReview?.resolution === 'override'
-                ? 'AI verdict (overridden)'
+              {overridden
+                ? 'Final verdict (set by an administrator)'
                 : isImage ? 'Verdict on the text in the image' : 'Verdict'}
             </AppText>
             <AppText variant="title" color={meta.color}>{meta.label}</AppText>
           </View>
         </View>
-        <View style={styles.heroStats}>
-          <HeroStat label="Score" value={percent(row.confidence)} />
-          <HeroStat label="Fake-news risk" value={percent(row.riskScore)} />
-        </View>
+        {overridden ? (
+          // The AI's numbers belong to the AI's verdict, so they are not shown as this verdict's score.
+          <AppText variant="caption" color="textMuted">
+            {aiMeta
+              ? `The AI's original estimate was ${aiMeta.label.toLowerCase()}`
+                + (row.confidence != null ? ` (score ${percent(row.confidence)}, fake-news risk ${percent(row.riskScore)})` : '')
+                + '. An administrator reviewed a dispute and changed the verdict.'
+              : 'An administrator reviewed a dispute and set this verdict.'}
+          </AppText>
+        ) : (
+          <View style={styles.heroStats}>
+            <HeroStat label="Score" value={percent(row.confidence)} />
+            <HeroStat label="Fake-news risk" value={percent(row.riskScore)} />
+          </View>
+        )}
       </View>
       ) : null;
 
@@ -315,7 +330,7 @@ export default function ResultScreen() {
       {hasExtraSignals ? (
       <Card title="Signals">
         <View style={styles.signals}>
-          <Meter label="Fake-news risk" value={row.riskScore} color={colors.misleading} />
+          <Meter label={overridden ? "Fake-news risk (AI's original estimate)" : 'Fake-news risk'} value={row.riskScore} color={colors.misleading} />
           {row.languageQuality != null ? (
             <Meter label="Language quality" value={row.languageQuality / 100} note={row.languageQualityLabel} />
           ) : null}

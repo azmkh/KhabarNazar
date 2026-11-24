@@ -1,4 +1,6 @@
-from fastapi import Depends, HTTPException, status
+from typing import Annotated
+
+from fastapi import Depends, HTTPException, Path, status
 from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 
@@ -9,6 +11,12 @@ from app.utils.security import decode_access_token
 
 # List endpoints report how many rows exist across all pages in this header.
 TOTAL_COUNT_HEADER = "X-Total-Count"
+
+# Largest value of a PostgreSQL `integer` column (every id here). Bigger ids and offsets are
+# refused with 422 instead of overflowing the database driver (a 500).
+MAX_DB_INT = 2_147_483_647
+# Path ids (submission_id, dispute_id): 1 .. MAX_DB_INT, else 422.
+DbId = Annotated[int, Path(ge=1, le=MAX_DB_INT)]
 
 # Swagger shows an "Authorize" box where the access_token from /auth/login is pasted.
 bearer_scheme = HTTPBearer(auto_error=False, description="Paste the access_token returned by /auth/login")

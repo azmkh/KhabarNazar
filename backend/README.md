@@ -380,6 +380,11 @@ header (exposed to browsers via CORS), so clients can page with
   on the server.
 - `GET /admin/submissions` items add `user_email`, `dispute_count`,
   `latest_dispute_id` and `latest_dispute_status` to the normal submission.
+  Optional server-side filters (combined with AND; `X-Total-Count` counts the
+  matching rows): `final_label=Fake|Real|Uncertain`, `submission_type=text|image`,
+  `disputed=true|false` and `user_email=<part of the email>` (case-insensitive).
+- Ids in paths (`/submissions/{id}`, `/disputes/{id}`) and `skip` must be within
+  the database integer range (1 to 2,147,483,647 for ids); others get 422.
 - `GET /admin/stats` returns totals counted across the whole database: users,
   submissions (by label and by type), admin overrides, and disputes
   (total / pending / reviewed).

@@ -43,6 +43,9 @@ export function fromApi(item: ApiSubmission, imageUri?: string | null): Submissi
     ? null
     : item.text_submission?.text_confidence ?? item.image_submission?.text_confidence ?? null;
   const imageScore = item.image_submission?.image_score;
+  const aiPrediction = textModelUnavailable
+    ? null
+    : item.text_submission?.text_prediction ?? item.image_submission?.text_prediction ?? null;
   let highlightedWords: Submission['highlightedWords'];
   try {
     const parsed = item.explainability?.highlighted_words;
@@ -62,6 +65,8 @@ export function fromApi(item: ApiSubmission, imageUri?: string | null): Submissi
     processingStatus: item.text_submission?.processing_status ?? null,
     imageUri: imageUri ?? (item.image_submission || item.has_image ? submissionImageUrl(item.id) : null),
     verdict: verdictFromApi(item.final_label),
+    verdictSource: item.final_label_source === 'Admin' ? 'Admin' : 'AI',
+    aiVerdict: aiPrediction ? verdictFromApi(aiPrediction) : null,
     confidence,
     riskScore: item.combined_risk_score ?? null,
     summary: item.explainability?.explanation_summary ?? 'The backend did not return an explanation for this submission.',
@@ -166,6 +171,7 @@ export function SubmissionsProvider({ children }: { children: React.ReactNode })
     return {
       ...detail,
       verdict: row.verdict,
+      verdictSource: row.verdictSource,
       riskScore: row.riskScore,
       dispute: row.dispute,
       adminReview: row.adminReview,

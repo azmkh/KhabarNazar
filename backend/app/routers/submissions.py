@@ -18,7 +18,7 @@ from app.services.submission_service import (
     get_submission_by_id,
     get_user_submissions,
 )
-from app.utils.dependencies import TOTAL_COUNT_HEADER, get_current_user
+from app.utils.dependencies import MAX_DB_INT, TOTAL_COUNT_HEADER, DbId, get_current_user
 from app.utils.rate_limit import limit_checks
 from app.utils.storage import ensure_visible, persist
 from app.utils.upload import delete_upload, save_upload
@@ -93,7 +93,7 @@ def submit_image(
 )
 def list_submissions(
     response: Response,
-    skip: int = Query(0, ge=0),
+    skip: int = Query(0, ge=0, le=MAX_DB_INT),
     limit: int = Query(50, ge=1, le=100),
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
@@ -135,7 +135,7 @@ def list_submissions(
     summary="Get a specific submission by ID",
 )
 def get_submission(
-    submission_id: int,
+    submission_id: DbId,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -151,7 +151,7 @@ def get_submission(
 
 @router.get("/{submission_id}/image", summary="Read an uploaded image owned by the user or admin")
 def get_submission_image(
-    submission_id: int,
+    submission_id: DbId,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -178,7 +178,7 @@ def get_submission_image(
 
 @router.get("/{submission_id}/heatmap", summary="Read a model heatmap for an owned submission or admin")
 def get_submission_heatmap(
-    submission_id: int,
+    submission_id: DbId,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):

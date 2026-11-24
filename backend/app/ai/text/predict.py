@@ -1,6 +1,7 @@
 """Language-aware routing to the separately trained text models.
 
-Every text with letters is classified; nothing is refused because of its language or its words.
+Every text with words is classified; nothing is refused because of its language or its words.
+Links and email addresses are not words: a text that is only links gets an explicit Uncertain.
 
 | Input                                          | Model                                         |
 |------------------------------------------------|-----------------------------------------------|
@@ -8,7 +9,7 @@ Every text with letters is classified; nothing is refused because of its languag
 | Urdu script, longer (full articles)            | TF-IDF + Logistic Regression (FIRE 2021)      |
 | Mixed script, mostly Urdu letters              | the Urdu models, as above                     |
 | Roman Urdu, English, other or unclear Latin    | Roman Urdu XLM-R (512-token limit)            |
-| No letters at all (only digits or symbols)     | none: an explicit Uncertain result            |
+| No words (only links, digits or symbols)       | none: an explicit Uncertain result            |
 
 English has no model of its own. It goes to the Roman Urdu XLM-R (a multilingual XLM-R large,
 fine-tuned on Roman Urdu news only), and the result says so: it is less reliable than Roman Urdu.
@@ -18,6 +19,7 @@ Long Urdu text falls back to the XLM-R model (truncated) when the TF-IDF file is
 from __future__ import annotations
 
 import logging
+import re
 from typing import Optional
 
 from app.ai.text import long_articles, xlmr
@@ -30,6 +32,12 @@ UNAVAILABLE_MODEL_VERSION = "text-model-unavailable"
 LONG_TEXT_WORDS = settings.LONG_TEXT_WORDS
 SUPPORTED_TEXT_LANGUAGES = {"urdu", "roman_urdu"}
 ARABIC_SCRIPT = ("\u0600", "\u06ff")
+# Web links and email addresses carry letters but no claim to check ("https://example.com/news/1").
+_LINKS = re.compile(r"(?:https?://|www\.)\S+|\S+@\S+\.\S+", re.IGNORECASE)
+
+
+def without_links(text: str) -> str:
+    return _LINKS.sub(" ", text)
 
 # Shown with results when the text is not plain Urdu or Roman Urdu, so the reader knows how it
 # was read (English has no checker of its own and goes to the Roman Urdu one).
@@ -66,7 +74,7 @@ def model_language(text: str, detected: str) -> Optional[str]:
 
     Detection only labels the text; it never stops it from being classified.
     """
-    letters = [character for character in text if character.isalpha()]
+    letters = [character for character in without_links(text) if character.isalpha()]
     if not letters:
         return None
     if detected in SUPPORTED_TEXT_LANGUAGES:
@@ -132,7 +140,7 @@ def predict_text(text: str, language: Optional[str] = None) -> dict:
     resolved_language = detect_language(text)
     route = model_language(text, resolved_language)
     if route is None:
-        return _unavailable(resolved_language, "The text has no words to classify (only numbers or symbols).")
+        return _unavailable(resolved_language, "The text has no words to classify (only links, numbers or symbols).")
     note = routing_note(resolved_language, route)
     script, classifier, reason = classifier_for_language(route)
     pipeline = long_article_model(text, route)

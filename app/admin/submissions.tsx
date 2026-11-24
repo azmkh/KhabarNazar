@@ -1,18 +1,29 @@
 import { useFocusEffect, useRouter } from 'expo-router';
 import { useCallback, useRef, useState } from 'react';
-import { FlatList, RefreshControl, StyleSheet, View } from 'react-native';
+import { FlatList, Pressable, RefreshControl, ScrollView, StyleSheet, View } from 'react-native';
 
 import { LoadMoreFooter } from '@/components/LoadMoreFooter';
 import { SubmissionRow } from '@/components/SubmissionRow';
 import { AppText, EmptyState, useAppTheme } from '@/components/ui';
-import { space } from '@/constants/theme';
-import { listAdminSubmissions } from '@/lib/api';
+import { radius, space } from '@/constants/theme';
+import { listAdminSubmissions, type AdminSubmissionFilters } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
 import { hrefAdminReview } from '@/lib/navigation';
 import { fromAdminApi } from '@/lib/SubmissionsContext';
 import type { Submission } from '@/types/submission';
 
 const PAGE_SIZE = 50;
+
+/** Filters run on the server, so the total and the pages always match the chosen filter. */
+const FILTERS: { key: string; label: string; query: AdminSubmissionFilters }[] = [
+  { key: 'all', label: 'All', query: {} },
+  { key: 'fake', label: 'Misleading', query: { finalLabel: 'Fake' } },
+  { key: 'uncertain', label: 'Uncertain', query: { finalLabel: 'Uncertain' } },
+  { key: 'real', label: 'Credible', query: { finalLabel: 'Real' } },
+  { key: 'disputed', label: 'Disputed', query: { disputed: true } },
+  { key: 'text', label: 'Text', query: { submissionType: 'text' } },
+  { key: 'image', label: 'Images', query: { submissionType: 'image' } },
+];
 
 /** Every user's submissions, paged. Kept separate from the admin's own history. */
 export default function AdminSubmissionsScreen() {
@@ -24,6 +35,8 @@ export default function AdminSubmissionsScreen() {
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [filterKey, setFilterKey] = useState('all');
+  const filter = FILTERS.find((option) => option.key === filterKey) ?? FILTERS[0];
   const rowsRef = useRef(rows);
   rowsRef.current = rows;
 
@@ -32,7 +45,7 @@ export default function AdminSubmissionsScreen() {
     setLoading(true);
     setError(null);
     try {
-      const page = await listAdminSubmissions(accessToken, 0, PAGE_SIZE);
+      const page = await listAdminSubmissions(accessToken, 0, PAGE_SIZE, filter.query);
       setRows(page.items.map(fromAdminApi));
       setTotal(page.total);
     } catch (err) {
@@ -40,13 +53,13 @@ export default function AdminSubmissionsScreen() {
     } finally {
       setLoading(false);
     }
-  }, [accessToken]);
+  }, [accessToken, filter]);
 
   const loadMore = useCallback(async () => {
     if (!accessToken || loading || loadingMore || rowsRef.current.length >= total) return;
     setLoadingMore(true);
     try {
-      const page = await listAdminSubmissions(accessToken, rowsRef.current.length, PAGE_SIZE);
+      const page = await listAdminSubmissions(accessToken, rowsRef.current.length, PAGE_SIZE, filter.query);
       setRows((current) => {
         const seen = new Set(current.map((row) => row.id));
         return [...current, ...page.items.map(fromAdminApi).filter((row) => !seen.has(row.id))];
@@ -57,7 +70,7 @@ export default function AdminSubmissionsScreen() {
     } finally {
       setLoadingMore(false);
     }
-  }, [accessToken, loading, loadingMore, total]);
+  }, [accessToken, filter, loading, loadingMore, total]);
 
   useFocusEffect(useCallback(() => { void refresh(); }, [refresh]));
 
@@ -69,11 +82,33 @@ export default function AdminSubmissionsScreen() {
       contentContainerStyle={styles.content}
       refreshControl={<RefreshControl refreshing={loading && rows.length > 0} onRefresh={() => void refresh()} tintColor={colors.primary} />}
       ListHeaderComponent={
-        total ? (
-          <AppText variant="caption" color="textMuted" style={styles.header}>
-            {total} submissions from all users · disputed ones open the review screen.
-          </AppText>
-        ) : undefined
+        <View style={styles.header}>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.filters}>
+            {FILTERS.map((option) => {
+              const selected = option.key === filterKey;
+              return (
+                <Pressable
+                  key={option.key}
+                  onPress={() => { setRows([]); setFilterKey(option.key); }}
+                  accessibilityRole="button"
+                  accessibilityState={{ selected }}
+                  style={[
+                    styles.chip,
+                    { backgroundColor: selected ? colors.text : colors.surface, borderColor: selected ? colors.text : colors.border },
+                  ]}>
+                  <AppText variant="caption" color={selected ? colors.background : 'textMuted'} style={styles.chipText}>
+                    {option.label}
+                  </AppText>
+                </Pressable>
+              );
+            })}
+          </ScrollView>
+          {total ? (
+            <AppText variant="caption" color="textMuted">
+              {total} {filterKey === 'all' ? 'submissions from all users' : 'matching submissions'} · disputed ones open the review screen.
+            </AppText>
+          ) : null}
+        </View>
       }
       ItemSeparatorComponent={() => <View style={styles.separator} />}
       onEndReached={() => void loadMore()}
@@ -85,7 +120,7 @@ export default function AdminSubmissionsScreen() {
         ) : loading ? (
           <EmptyState icon="list" title="Loading submissions…" loading />
         ) : (
-          <EmptyState icon="inbox" title="No submissions yet" />
+          <EmptyState icon="inbox" title={filterKey === 'all' ? 'No submissions have been recorded yet' : 'No submissions match this filter'} />
         )
       }
       renderItem={({ item }) => (
@@ -107,7 +142,10 @@ export default function AdminSubmissionsScreen() {
 
 const styles = StyleSheet.create({
   content: { padding: space.lg, paddingBottom: space.xxxl },
-  header: { marginBottom: space.md },
+  header: { marginBottom: space.md, gap: space.sm },
+  filters: { gap: space.sm, paddingVertical: space.xs },
+  chip: { borderWidth: 1, borderRadius: radius.pill, paddingHorizontal: space.lg, paddingVertical: 8 },
+  chipText: { fontFamily: 'PlusJakartaSans_700Bold' },
   separator: { height: space.sm },
   submitter: { marginTop: 4, marginLeft: space.sm },
 });

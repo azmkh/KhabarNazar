@@ -7,7 +7,7 @@ from app.database import get_db
 from app.models.user import User
 from app.schemas.dispute import DisputeCreate, DisputeResponse, DisputeReview
 from app.services.dispute_service import count_disputes, create_dispute, get_dispute, list_disputes, review_dispute
-from app.utils.dependencies import TOTAL_COUNT_HEADER, get_current_admin, get_current_user
+from app.utils.dependencies import MAX_DB_INT, TOTAL_COUNT_HEADER, DbId, get_current_admin, get_current_user
 
 
 router = APIRouter(prefix="/disputes", tags=["Disputes"])
@@ -27,7 +27,7 @@ def submit_dispute(
 def get_disputes(
     response: Response,
     dispute_status: Optional[str] = Query(default=None, alias="status", pattern="^(pending|reviewed|closed)$"),
-    skip: int = Query(default=0, ge=0),
+    skip: int = Query(default=0, ge=0, le=MAX_DB_INT),
     limit: int = Query(default=50, ge=1, le=100),
     mine: bool = Query(default=False, description="Admins: only disputes filed by yourself"),
     db: Session = Depends(get_db),
@@ -44,7 +44,7 @@ def get_disputes(
 
 @router.get("/{dispute_id}", response_model=DisputeResponse)
 def get_dispute_detail(
-    dispute_id: int,
+    dispute_id: DbId,
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ):
@@ -54,7 +54,7 @@ def get_dispute_detail(
 
 @router.patch("/{dispute_id}", response_model=DisputeResponse)
 def patch_dispute(
-    dispute_id: int,
+    dispute_id: DbId,
     review: DisputeReview,
     db: Session = Depends(get_db),
     current_admin: User = Depends(get_current_admin),

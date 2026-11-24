@@ -37,15 +37,27 @@ BRANCH_AI_OR_REAL = "ai_or_real"  # no usable OCR text: only the picture was ana
 # Stored in image_submissions.manipulation_prediction by older versions, which skipped the detector
 # for images with text. Kept so those rows are still recognised; new submissions never store it.
 SKIPPED_HAS_TEXT = "Skipped: image has text"
+EXPLANATION_UNAVAILABLE = "Detailed explanation is temporarily unavailable."
 
 
 def run_text_pipeline(text: str, language: Optional[str] = None) -> dict:
-    """Classify text; explain it only when a real model produced the prediction."""
+    """Classify text; explain it only when a real model produced the prediction.
+
+    The explanation is optional: if it cannot be built, the classification is still returned
+    (use case 4-A) with a summary that says the detailed explanation is unavailable.
+    """
     classification = predict_text(text, language=language)
-    explanation = (
-        explain_text(text, language=language, prediction=classification)
-        if not classification.get("is_stub") else None
-    )
+    explanation = None
+    if not classification.get("is_stub"):
+        try:
+            explanation = explain_text(text, language=language, prediction=classification)
+        except Exception:
+            logger.exception("Text explanation failed; returning the classification without it")
+            explanation = {
+                "highlighted_words": [],
+                "summary": f"{classification['summary']} {EXPLANATION_UNAVAILABLE}",
+                "is_stub": True,
+            }
     return {"classification": classification, "explanation": explanation}
 
 

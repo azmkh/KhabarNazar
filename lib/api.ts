@@ -241,9 +241,22 @@ export function submissionHeatmapUrl(id: string | number) {
   return apiUrl(`/submissions/${id}/heatmap`);
 }
 
+/** Optional server-side filters for the admin list (all combine with AND). */
+export type AdminSubmissionFilters = {
+  finalLabel?: 'Fake' | 'Real' | 'Uncertain';
+  submissionType?: 'text' | 'image';
+  disputed?: boolean;
+  userEmail?: string;
+};
+
 /** Admin only: every user's submissions with submitter and latest dispute, newest first. */
-export function listAdminSubmissions(token: string, skip = 0, limit = 50) {
-  return requestPage<ApiSubmission>(`/admin/submissions?skip=${skip}&limit=${limit}`, token);
+export function listAdminSubmissions(token: string, skip = 0, limit = 50, filters: AdminSubmissionFilters = {}) {
+  const query = new URLSearchParams({ skip: String(skip), limit: String(limit) });
+  if (filters.finalLabel) query.set('final_label', filters.finalLabel);
+  if (filters.submissionType) query.set('submission_type', filters.submissionType);
+  if (filters.disputed !== undefined) query.set('disputed', String(filters.disputed));
+  if (filters.userEmail?.trim()) query.set('user_email', filters.userEmail.trim());
+  return requestPage<ApiSubmission>(`/admin/submissions?${query.toString()}`, token);
 }
 
 export function getAdminStats(token: string) {

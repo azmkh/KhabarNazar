@@ -10,7 +10,7 @@ from app.schemas.user import UserResponse
 
 
 class DisputeCreate(BaseModel):
-    submission_id: int = Field(..., gt=0)
+    submission_id: int = Field(..., gt=0, le=2_147_483_647)  # PostgreSQL integer range
     justification: str = Field(..., min_length=10, max_length=5000)
     evidence_link: Optional[str] = Field(default=None, max_length=512)
 

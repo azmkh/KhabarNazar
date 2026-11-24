@@ -123,13 +123,15 @@ def create_image_submission(
     # A rendering failure is reported, never replaced by a placeholder image.
     gradcam_error = img_result.get("gradcam_error")
     heatmap_relative_path = None
+    heatmap_file = None  # set once a heatmap may exist on disk, so a later failure can remove it
     if img_result.get("attribution_map") is not None:
         candidate = f"explanations/{submission.id}_heatmap.png"
+        heatmap_file = Path(settings.UPLOAD_DIR).resolve() / candidate
         try:
             visual = explain_image(
                 abs_image_path,
                 attribution_map=img_result["attribution_map"],
-                output_path=Path(settings.UPLOAD_DIR).resolve() / candidate,
+                output_path=heatmap_file,
                 region=img_result.get("analysed_region"),
             )
             if visual.get("heatmap_path"):
@@ -138,44 +140,46 @@ def create_image_submission(
             logger.exception("Could not render the Grad-CAM heatmap for submission %s", submission.id)
             gradcam_error = "the heatmap image could not be rendered"
 
-    # Summarize each part; nothing is inferred beyond what a model returned.
-    explanation_parts = [ocr_summary(ocr_result, branch)]
-    if branch == BRANCH_IMAGE_PAIR:
-        if text_ai and not text_ai.get("is_stub"):
-            explanation_parts.append(text_explanation["summary"] if text_explanation else text_ai["summary"])
-        else:
-            explanation_parts.append(f"The extracted text could not be classified: {text_ai['summary']}")
-    if img_result.get("summary"):
-        explanation_parts.append(img_result["summary"])
-    if heatmap_relative_path:
-        explanation_parts.append(
-            "The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the "
-            "image-authenticity answer above (it does not cover the detector's other two models); it does "
-            "not show edits and does not say whether a claim is true."
-        )
-    elif not img_result.get("is_stub"):
-        explanation_parts.append(f"Grad-CAM heatmap unavailable: {gradcam_error or 'no map was produced'}.")
-    if branch != BRANCH_IMAGE_PAIR:
-        explanation_parts.append("No news claim was checked, so there is no fake-news verdict for this image.")
-
-    if branch == BRANCH_IMAGE_PAIR:
-        model_version = f"img-pair:{text_ai['model_version']}" if text_ai else "img-pair"
-    else:
-        model_version = img_result.get("model_version") or "image-model-unavailable"
-    db.add(Explainability(
-        submission_id=submission.id,
-        highlighted_words=_highlighted_words_json(text_explanation),
-        heatmap_path=heatmap_relative_path,
-        explanation_summary=" ".join(explanation_parts),
-        model_version=model_version[:50],
-    ))
-
     try:
+        # Summarize each part; nothing is inferred beyond what a model returned.
+        explanation_parts = [ocr_summary(ocr_result, branch)]
+        if branch == BRANCH_IMAGE_PAIR:
+            if text_ai and not text_ai.get("is_stub"):
+                explanation_parts.append(text_explanation["summary"] if text_explanation else text_ai["summary"])
+            else:
+                explanation_parts.append(f"The extracted text could not be classified: {text_ai['summary']}")
+        if img_result.get("summary"):
+            explanation_parts.append(img_result["summary"])
+        if heatmap_relative_path:
+            explanation_parts.append(
+                "The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the "
+                "image-authenticity answer above (it does not cover the detector's other two models); it does "
+                "not show edits and does not say whether a claim is true."
+            )
+        elif not img_result.get("is_stub"):
+            explanation_parts.append(f"Grad-CAM heatmap unavailable: {gradcam_error or 'no map was produced'}.")
+        if branch != BRANCH_IMAGE_PAIR:
+            explanation_parts.append("No news claim was checked, so there is no fake-news verdict for this image.")
+
+        if branch == BRANCH_IMAGE_PAIR:
+            model_version = f"img-pair:{text_ai['model_version']}" if text_ai else "img-pair"
+        else:
+            model_version = img_result.get("model_version") or "image-model-unavailable"
+        db.add(Explainability(
+            submission_id=submission.id,
+            highlighted_words=_highlighted_words_json(text_explanation),
+            heatmap_path=heatmap_relative_path,
+            explanation_summary=" ".join(explanation_parts),
+            model_version=model_version[:50],
+        ))
+
         db.commit()
     except Exception:
-        # Do not leave a heatmap behind for a submission that was never saved.
-        if heatmap_relative_path:
-            (Path(settings.UPLOAD_DIR).resolve() / heatmap_relative_path).unlink(missing_ok=True)
+        # Nothing of a failed submission may stay behind: its rows are rolled back and its heatmap
+        # file removed here, whichever step failed; the router then deletes the upload.
+        db.rollback()
+        if heatmap_file is not None:
+            heatmap_file.unlink(missing_ok=True)
         raise
     return get_submission_by_id(db, submission_id=submission.id, user_id=user_id)
 
@@ -230,10 +234,31 @@ def count_user_submissions(db: Session, user_id: int) -> int:
     return db.query(func.count(Submission.id)).filter(Submission.user_id == user_id).scalar() or 0
 
 
-def get_all_submissions(db: Session, skip: int = 0, limit: int = 50) -> List[Submission]:
-    """Return paginated submissions for the protected administrator console."""
+def _admin_query(db: Session, filters: Optional[dict] = None):
+    """Submissions for the admin console, narrowed by the optional filters:
+    final_label (Fake/Real/Uncertain), submission_type (text/image), disputed (bool) and
+    user_email (case-insensitive part of the submitter's email)."""
+    filters = filters or {}
+    query = db.query(Submission)
+    if filters.get("final_label"):
+        query = query.filter(Submission.final_label == filters["final_label"])
+    if filters.get("submission_type"):
+        query = query.filter(Submission.submission_type == filters["submission_type"])
+    if filters.get("disputed") is not None:
+        has_dispute = Submission.disputes.any()
+        query = query.filter(has_dispute if filters["disputed"] else ~has_dispute)
+    if filters.get("user_email"):
+        # The search text is matched literally: LIKE wildcards in it are escaped with "!".
+        needle = filters["user_email"].strip().lower()
+        needle = needle.replace("!", "!!").replace("%", "!%").replace("_", "!_")
+        query = query.filter(Submission.user.has(func.lower(User.email).like(f"%{needle}%", escape="!")))
+    return query
+
+
+def get_all_submissions(db: Session, skip: int = 0, limit: int = 50, filters: Optional[dict] = None) -> List[Submission]:
+    """Return paginated (optionally filtered) submissions for the protected administrator console."""
     return (
-        db.query(Submission)
+        _admin_query(db, filters)
         .options(
             joinedload(Submission.user),
             joinedload(Submission.text_submission),
@@ -248,8 +273,8 @@ def get_all_submissions(db: Session, skip: int = 0, limit: int = 50) -> List[Sub
     )
 
 
-def count_all_submissions(db: Session) -> int:
-    return db.query(func.count(Submission.id)).scalar() or 0
+def count_all_submissions(db: Session, filters: Optional[dict] = None) -> int:
+    return _admin_query(db, filters).with_entities(func.count(Submission.id)).scalar() or 0
 
 
 def get_admin_stats(db: Session) -> dict:

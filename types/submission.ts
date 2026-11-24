@@ -25,7 +25,11 @@ export type Submission = {
   textPreview?: string;
   imageUri?: string | null;
   verdict: Verdict;
-  /** Raw, uncalibrated model score 0–1; this is not a probability that the claim is true. */
+  /** Who set `verdict`: the AI, or an administrator who overrode it after a dispute. */
+  verdictSource?: 'AI' | 'Admin';
+  /** The AI's own verdict on the claim; differs from `verdict` after an admin override. Null when no claim was classified. */
+  aiVerdict?: Verdict | null;
+  /** Raw, uncalibrated model score 0–1 of the AI's verdict (not the admin's); not a probability that the claim is true. */
   confidence: number | null;
   detectedLanguage: string | null;
   processingStatus: 'completed' | 'unavailable' | null;
