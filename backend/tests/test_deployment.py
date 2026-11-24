@@ -142,3 +142,25 @@ def test_health_reports_model_status_without_loading_models():
     # The test settings point every model at a missing folder.
     assert models["models"]["urdu_text"] == "not_configured"
     assert models["models"]["image_detector"] == "not_configured"
+
+
+def test_env_overlay_changes_only_the_values_it_sets(tmp_path: Path, monkeypatch):
+    from app.config import Settings, _env_files
+
+    overlay = tmp_path / ".env.neon"
+    overlay.write_text("DATABASE_URL=postgresql+psycopg://u:p@ep-x-pooler.example.neon.tech/db\n", encoding="utf-8")
+    monkeypatch.delenv("DATABASE_URL", raising=False)  # tests set it; the overlay file must supply it here
+    monkeypatch.setenv("KHABARNAZAR_ENV_OVERLAY", str(overlay))
+    # The app reads the overlay at startup; here the file list is rebuilt after setting the variable.
+    loaded = Settings(_env_file=_env_files(), JWT_SECRET="x" * 40)
+    assert loaded.DATABASE_URL.endswith("@ep-x-pooler.example.neon.tech/db")
+
+
+def test_env_overlay_must_exist(tmp_path: Path, monkeypatch):
+    import pytest
+
+    from app.config import _env_files
+
+    monkeypatch.setenv("KHABARNAZAR_ENV_OVERLAY", str(tmp_path / "missing.env"))
+    with pytest.raises(FileNotFoundError):
+        _env_files()

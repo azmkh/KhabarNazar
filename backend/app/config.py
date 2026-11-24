@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 from typing import List, Union
 from pydantic import Field, field_validator
@@ -6,6 +7,25 @@ from pydantic_settings import BaseSettings, SettingsConfigDict
 
 # Base backend directory
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+
+def _env_files() -> tuple[str, ...]:
+    """backend/.env, then an optional overlay whose values win (KHABARNAZAR_ENV_OVERLAY).
+
+    Used to try another database without editing .env, e.g. KHABARNAZAR_ENV_OVERLAY=.env.neon
+    holding only DATABASE_URL and MIGRATION_DATABASE_URL. Relative paths are from backend/.
+    Real environment variables still override both files.
+    """
+    files = [str(BASE_DIR / ".env")]
+    overlay = os.environ.get("KHABARNAZAR_ENV_OVERLAY")
+    if overlay:
+        path = Path(overlay).expanduser()
+        path = path if path.is_absolute() else BASE_DIR / path
+        if not path.is_file():
+            raise FileNotFoundError(f"KHABARNAZAR_ENV_OVERLAY points to a missing file: {path}")
+        files.append(str(path))
+    return tuple(files)
+
 
 class Settings(BaseSettings):
     PROJECT_NAME: str = "KhabarNazar Backend"
@@ -82,7 +102,7 @@ class Settings(BaseSettings):
     CORS_ORIGIN_REGEX: str | None = None
 
     model_config = SettingsConfigDict(
-        env_file=str(BASE_DIR / ".env"),
+        env_file=_env_files(),
         env_file_encoding="utf-8",
         case_sensitive=True,
         extra="ignore",
