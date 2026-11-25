@@ -638,3 +638,33 @@ again with the real models. The tables above stay as the baseline that found the
 Regression tests: `backend/tests/test_defect_fixes.py` (20 tests). Suites after the fixes:
 `pytest` 187 passed / 13 skipped, `pytest --postgres` 187 / 13, `pytest --real-models` 200 passed,
 `text_module/tests` 3 passed, `tsc` clean. The rest of the fault-injected cases were re-run too and still pass.
+
+## 11. Manual checklist run in a browser (2026-11-25)
+
+Every step of `MANUAL_CHECKLIST.md` was run by `backend/tests/full_pass/manual_pass.py`. It used
+headless Edge at phone size (390×844, touch) on the Expo web app, against a throwaway backend
+(SQLite, real models, normal rate limits); the real `khabarnazar` database was not used. Results are in
+`backend/tests/full_pass/results_manual_2026-11-25.json`; screenshots are `screenshots/MC-*.png`.
+
+| Result | Steps |
+|---|---|
+| Pass (real browser) | 1–4, 6–9, 11–14, 17, 18, 20, 23–32 (25) |
+| Pass (emulated) | 15 rotation (viewport switched to landscape mid-check), 21 network loss (the upload's connection failed with `ERR_INTERNET_DISCONNECTED` mid-request), 22 backgrounding (page frozen for 20 s) |
+| Known limitation | 5 password reset, 10 English reliability note |
+| Blocked | 16 iPhone HEIC camera roll, 19 camera: both need a real phone |
+
+No new defects were found. Observations:
+
+- **Start screen on web (step 1).** The branded "News at a Glance" screen covers the session check, so
+  the "Loading your session…" text never appears on web. This is expected; the checklist wording is corrected.
+- **Whole-browser offline on the dev server (step 21, Info).** When the entire browser goes offline,
+  the check still finishes on the server. The app then has to fetch the result screen's code from the
+  Expo dev server, which loads screens lazily (`app/result/[id].bundle?lazy=true`), and shows "Something went
+  wrong / Failed to fetch". This happens only with `expo start --web`. Expo Go and a built app have the
+  screen code already, so they are not affected. With only the backend connection dropped, the app shows
+  "Cannot reach the backend at …" and a retry works.
+- **Checklist wording fixed in four steps.** Step 13: Analyze stays greyed out below 3 characters (no
+  message). Step 17: the picture is changed with the × on the preview (there is no "Change" button).
+  Step 20: the exact rejection messages. Step 28: the admin list now has filters (DEF-03 fix).
+
+Still worth repeating on a real phone in Expo Go: steps 15, 16, 19, 21 and 22.
