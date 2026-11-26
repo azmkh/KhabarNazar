@@ -668,3 +668,28 @@ No new defects were found. Observations:
   Step 20: the exact rejection messages. Step 28: the admin list now has filters (DEF-03 fix).
 
 Still worth repeating on a real phone in Expo Go: steps 15, 16, 19, 21 and 22.
+
+### 11.1 iPhone in Expo Go (2026-11-26)
+
+The project owner ran the app on an iPhone in Expo Go against the local backend. The screenshots are
+`screenshots/PHONE-*.jpg`; a personal notification banner was cropped out of one.
+
+| Step | Seen on the phone | Result |
+|---|---|---|
+| 5 Forgot password | "Password reset is not available yet…" | Known limitation |
+| 10 English | "Likely credible" 98.2 %, with the "less reliable" English note | Known limitation |
+| 17 Image with text (job poster) | The verdict on the text in the image comes first; "Image authenticity (separate from the verdict above)" follows with the screenshot/poster warning; the Grad-CAM card names ResNet18 and outlines the analysed centre area; the OCR text is shown as the claim | Pass |
+
+Observations (no defects):
+
+- **Blue gear button.** It is Expo Go's developer menu, not part of the app, and is absent from builds.
+- **OCR on a styled poster.** EasyOCR misread several words ("LABOR W / RLD", "Pokistan", "yedrs",
+  "sdles", "uppointment") and cut "Apply: la" short. These misread words then appear among the
+  highlighted words. This is an accuracy limitation.
+- **Non-news text gets a verdict.** A job advert still receives a credibility verdict, because any text
+  found in an image is checked as a claim. The card says "Verdict on the text in the image". This is a
+  design limitation.
+- **Poster rated "Likely AI-generated" (90 %).** This is the known screenshot/poster effect, and the app's
+  own warning on that card says so.
+
+Steps 15, 16, 19, 21 and 22 on the phone: no results recorded yet.

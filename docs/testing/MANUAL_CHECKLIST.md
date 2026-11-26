@@ -6,6 +6,8 @@ backgrounding. Fill in the last two columns.
 
 **Run on 2026-11-25 by Claude in a browser** (Expo web at phone size against a throwaway backend with the real models; results in `backend/tests/full_pass/results_manual_2026-11-25.json`, screenshots `MC-*.png`): 28 Pass (3 of them emulated), 2 Known limitation, 2 Blocked (16, 19: need a real phone). Steps 15, 16, 19, 21 and 22 are still worth repeating on a real phone in Expo Go.
 
+**iPhone in Expo Go (2026-11-26):** steps 5, 10 and 17 behaved as on web (screenshots `PHONE-*.jpg`; see section 11.1 of the report). Steps 15, 16, 19, 21 and 22: no phone results recorded yet.
+
 **Before you start**
 
 - Start the backend on the PC with your normal setup (`uvicorn app.main:app --host 0.0.0.0 --port 8000`,
