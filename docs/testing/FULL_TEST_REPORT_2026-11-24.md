@@ -692,4 +692,16 @@ Observations (no defects):
 - **Poster rated "Likely AI-generated" (90 %).** This is the known screenshot/poster effect, and the app's
   own warning on that card says so.
 
-Steps 15, 16, 19, 21 and 22 on the phone: no results recorded yet.
+Steps 15, 16, 19, 21 and 22 were then run on the same iPhone in Expo Go. The project owner reported all
+five as Pass; there are no screenshots for them.
+
+| Step | Result on the phone |
+|---|---|
+| 15 Rotate during analysis | Pass (reported) |
+| 16 Camera-roll photo (HEIC) | Pass (reported) |
+| 19 Camera | Pass (reported) |
+| 21 Network loss (Airplane mode) | Pass (reported) |
+| 22 Background and return | Pass (reported) |
+
+With these, steps 16 and 19 are no longer Blocked, and steps 15, 21 and 22 are confirmed on a real phone,
+not only by emulation. All 32 checklist steps now have a result: 30 Pass, 2 Known limitation (5, 10).
