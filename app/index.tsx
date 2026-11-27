@@ -4,6 +4,7 @@ import { ActivityIndicator, StyleSheet, View } from 'react-native';
 import { AppText, Wordmark, useAppTheme } from '@/components/ui';
 import { space } from '@/constants/theme';
 import { useAuth } from '@/lib/AuthContext';
+import { hrefHomeForRole } from '@/lib/navigation';
 
 /**
  * Chooses the first real screen after native splash + session hydration.
@@ -23,7 +24,8 @@ export default function Index() {
   }
 
   if (user) {
-    return <Redirect href="/(tabs)" />;
+    // The role comes from GET /users/me at startup (or the cached copy of it while offline).
+    return <Redirect href={hrefHomeForRole(user.role)} />;
   }
 
   return <Redirect href="/login" />;

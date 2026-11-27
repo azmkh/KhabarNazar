@@ -4,6 +4,7 @@ import React, { createContext, useCallback, useContext, useEffect, useMemo, useR
 
 import { ApiError, getCurrentUser, login, register, setUnauthorizedHandler, type ApiUser } from './api';
 import { showAlert } from './alert';
+import { hrefHomeForRole } from './navigation';
 import { API_BASE_URL } from './config';
 import { readToken, writeToken } from './tokenStorage';
 
@@ -126,7 +127,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     validatePassword(password);
     const response = await login(normalizedEmail, password);
     await persist({ accessToken: response.access_token, user: response.user });
-    router.replace('/(tabs)');
+    router.replace(hrefHomeForRole(response.user.role));
   }, [persist]);
 
   const signUp = useCallback(async (email: string, password: string, displayName?: string) => {
@@ -136,7 +137,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const name = displayName?.trim() || (emailName.length >= 2 ? emailName : 'KhabarNazar User');
     const response = await register(normalizedEmail, password, name);
     await persist({ accessToken: response.access_token, user: response.user });
-    router.replace('/(tabs)');
+    router.replace(hrefHomeForRole(response.user.role));
   }, [persist]);
 
   const updateProfile = useCallback(async (patch: {

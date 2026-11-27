@@ -113,7 +113,7 @@ export default function CheckScreen() {
         keyboardShouldPersistTaps="handled">
         <Masthead
           kicker={`Hello, ${firstName}`}
-          title={isAdmin ? 'Ready to review?' : 'What would you like to check?'}
+          title="What would you like to check?"
           accessory={
             <Pressable onPress={() => router.push(hrefProfileMe())} accessibilityRole="button" accessibilityLabel="My profile">
               <Avatar uri={user?.avatarUri} name={user?.name || user?.email} size={44} onInk />
@@ -128,7 +128,7 @@ export default function CheckScreen() {
 
         <View style={styles.body}>
           {isAdmin ? (
-            // Administrators get a clear way into the moderation desk from the first screen.
+            // This is the user view; administrators land on /admin and this card takes them back.
             <Card onPress={() => router.push(hrefAdminRoot())} style={[styles.adminCard, { borderColor: colors.primary }]}>
               <View style={styles.adminRow}>
                 <View style={[styles.adminIcon, { backgroundColor: colors.primarySoft }]}>
@@ -147,8 +147,6 @@ export default function CheckScreen() {
               </View>
             </Card>
           ) : null}
-          {/* Administrators only review; the submit box is for standard users. */}
-          {!isAdmin ? (
           <Card style={styles.composer}>
             <Segmented<Mode>
               value={mode}
@@ -216,19 +214,11 @@ export default function CheckScreen() {
               disabled={!canSubmit}
             />
           </Card>
-          ) : null}
 
           <Card tone="muted">
             <View style={styles.noteRow}>
               <Icon name="info" size={18} color="info" />
-              <View style={styles.flex}>
-                <AppText variant="bodyStrong">A second opinion, not the final word</AppText>
-                <AppText variant="caption" color="textMuted" style={styles.noteBody}>
-                  KhabarNazar flags news that looks fake and spots AI-made images. It works best with
-                  Urdu and Roman Urdu, and it can still be wrong. Check trusted sources before you share,
-                  and dispute any result you disagree with.
-                </AppText>
-              </View>
+              <AppText variant="bodyStrong" style={styles.flex}>A strong second opinion</AppText>
             </View>
           </Card>
 
@@ -307,7 +297,6 @@ const styles = StyleSheet.create({
   },
   dropIcon: { width: 56, height: 56, borderRadius: radius.lg, alignItems: 'center', justifyContent: 'center', marginBottom: space.xs },
   pickRow: { flexDirection: 'row', gap: space.sm, marginTop: space.sm },
-  noteRow: { flexDirection: 'row', gap: space.md },
-  noteBody: { marginTop: 2 },
+  noteRow: { flexDirection: 'row', alignItems: 'center', gap: space.md },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: space.sm },
 });

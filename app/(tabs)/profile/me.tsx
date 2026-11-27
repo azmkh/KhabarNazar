@@ -1,6 +1,6 @@
 import { ScrollView, StyleSheet, View } from 'react-native';
 
-import { AppText, Avatar, Card, Icon, type IconName, useAppTheme } from '@/components/ui';
+import { AppText, Avatar, Card, Icon, type IconName, Tag, useAppTheme } from '@/components/ui';
 import { space } from '@/constants/theme';
 import { useAuth } from '@/lib/AuthContext';
 import { fullDate } from '@/lib/format';
@@ -16,6 +16,9 @@ export default function MyProfileScreen() {
         <Avatar uri={user?.avatarUri} name={user?.name || user?.email} size={96} />
         <AppText variant="title" align="center">{user?.name || user?.email?.split('@')[0] || 'User'}</AppText>
         <AppText variant="body" color="textMuted" align="center">{user?.email ?? 'Email not available'}</AppText>
+        {user?.role === 'admin' ? (
+          <View style={styles.badge}><Tag label="Admin" tone="primary" icon="shield-check" /></View>
+        ) : null}
       </View>
 
       <Card padded={false}>
@@ -48,6 +51,7 @@ function Field({ icon, label, value, last }: { icon: IconName; label: string; va
 const styles = StyleSheet.create({
   container: { padding: space.lg, gap: space.lg, paddingBottom: space.xxxl },
   header: { alignItems: 'center', gap: space.xs, paddingVertical: space.md },
+  badge: { marginTop: space.xs },
   field: { flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg },
   fieldText: { flex: 1, gap: 2 },
 });

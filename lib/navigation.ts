@@ -21,6 +21,14 @@ export function hrefProfileLogout(): Href {
   return '/profile/logout' as Href;
 }
 
+/**
+ * Where a signed-in user lands (SRS Login: the role field decides the redirect target).
+ * Pass the role from the backend's user response only, never a value the client chose.
+ */
+export function hrefHomeForRole(role: string | null | undefined): Href {
+  return role === 'admin' ? hrefAdminRoot() : '/(tabs)';
+}
+
 export function hrefAdminRoot(): Href {
   return '/admin' as Href;
 }

@@ -8,8 +8,9 @@ export default function AdminLayout() {
   const { user } = useAuth();
   const { colors } = useAppTheme();
 
+  // Non-admins (and signed-out visitors) go to the start screen, which routes them by role.
   if (user?.role !== 'admin') {
-    return <Redirect href="/(tabs)" />;
+    return <Redirect href="/" />;
   }
 
   return (

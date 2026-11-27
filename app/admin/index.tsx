@@ -3,7 +3,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useCallback, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, View } from 'react-native';
 
-import { AppText, Card, Icon, type IconName, ListRow, Masthead, useAppTheme } from '@/components/ui';
+import { AppText, Card, Icon, type IconName, ListRow, Masthead, Tag, useAppTheme } from '@/components/ui';
 import { radius, space } from '@/constants/theme';
 import { getAdminStats, type ApiAdminStats } from '@/lib/api';
 import { useAuth } from '@/lib/AuthContext';
@@ -43,17 +43,19 @@ export default function AdminDashboardScreen() {
         kicker="Administration"
         title="Moderation desk"
         subtitle={`Signed in as ${user?.email ?? 'admin'}`}
-        accessory={
-          <Pressable
-            onPress={() => router.replace('/(tabs)')}
-            hitSlop={12}
-            accessibilityRole="button"
-            accessibilityLabel="Close admin console"
-            style={[styles.close, { backgroundColor: colors.inkSoft }]}>
-            <Icon name="x" size={20} color="onInk" />
-          </Pressable>
-        }
-      />
+        accessory={<Tag label="Admin" tone="primary" icon="shield-check" />}>
+        {/* Admins land here after login; the normal screens stay one tap away (and link back). */}
+        <Pressable
+          onPress={() => router.replace('/(tabs)')}
+          hitSlop={8}
+          accessibilityRole="link"
+          accessibilityLabel="Switch to user view"
+          style={[styles.switch, { backgroundColor: colors.inkSoft }]}>
+          <Icon name="user" size={16} color="onInk" />
+          <AppText variant="caption" color="onInk">Switch to user view</AppText>
+          <Icon name="chevron-right" size={16} color="onInkMuted" />
+        </Pressable>
+      </Masthead>
 
       <View style={styles.body}>
         <View style={styles.grid}>
@@ -114,7 +116,10 @@ function Stat({ icon, label, value, color, soft }: { icon: IconName; label: stri
 const styles = StyleSheet.create({
   flex: { flex: 1 },
   scroll: { paddingBottom: space.xxxl },
-  close: { width: 40, height: 40, borderRadius: radius.md, alignItems: 'center', justifyContent: 'center' },
+  switch: {
+    flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: space.sm,
+    marginTop: space.lg, paddingVertical: space.sm, paddingHorizontal: space.md, borderRadius: radius.pill,
+  },
   body: { padding: space.lg, gap: space.lg },
   grid: { flexDirection: 'row', flexWrap: 'wrap', gap: space.md },
   stat: { flexBasis: '47%', flexGrow: 1, gap: 4 },
