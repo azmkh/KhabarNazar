@@ -78,9 +78,6 @@ class Settings(BaseSettings):
     # goes to the AI-generated vs real branch.
     OCR_MIN_LETTERS: int = 10
     OCR_MIN_CONFIDENCE: float = 0.3
-    # Cutoff for text detected as Urdu script. EasyOCR scores correct Urdu reads far lower than
-    # Latin ones (Nastaliq headlines read ~84% accurately at 0.27-0.28; garbage reads score < 0.1).
-    OCR_MIN_CONFIDENCE_URDU: float = 0.2
 
     # Load the text, OCR and image models in a background thread at startup, so the first
     # request does not wait for them.
