@@ -1,0 +1,261 @@
+{
+ "_note": "All assets made locally for the image test cases; nothing downloaded, no real user upload used. Urdu text rendered by headless Edge with Noto Nastaliq Urdu (node_modules/@expo-google-fonts); photo-like images are SYNTHETIC.",
+ "font_urdu": "node_modules\\@expo-google-fonts\\noto-nastaliq-urdu\\400Regular\\NotoNastaliqUrdu_400Regular.ttf",
+ "images": [
+  {
+   "case": "TC-IMG-02",
+   "file": "img02_urdu_internet.png",
+   "how_made": "Rendered Urdu, black on white, Noto Nastaliq Urdu 46 px (1200×600, headless Edge)",
+   "bytes": 24161,
+   "sha256": "bf37ac7bd128b7ac48c8a5be40bb9865907d7808778c551fcee27a8a441bcddd",
+   "text": "حکومت نے اعلان کیا ہے کہ ملک بھر میں سات دن کے لیے انٹرنیٹ سروس بند کر دی جائے گی۔"
+  },
+  {
+   "case": "TC-IMG-07",
+   "file": "img07_roman_internet.png",
+   "how_made": "Rendered Roman Urdu, black on white, Segoe UI 46 px (1200×600, headless Edge)",
+   "bytes": 17372,
+   "sha256": "425cd67ab8b57df509b33aad1dc58df8cd3f0ce36b2dbd370180428b70809acf",
+   "text": "Hukoomat ne elan kiya hai ke mulk bhar mein saat din ke liye internet service band kar di jayegi."
+  },
+  {
+   "case": "TC-IMG-08",
+   "file": "img08_english_textbooks.png",
+   "how_made": "Rendered English, black on white, Segoe UI 48 px (1200×600, headless Edge)",
+   "bytes": 18012,
+   "sha256": "e30b520ece5dd7f3eba8dcc819e8c57aaea2e2cf4fed4430a8f21cd7dd9fa49c",
+   "text": "The government has announced free textbooks for all public schools from 1 November."
+  },
+  {
+   "case": "TC-IMG-09",
+   "file": "img09_mixed_petrol.png",
+   "how_made": "Rendered mixed Urdu + Latin 'petrol', black on white (1200×600, headless Edge)",
+   "bytes": 16048,
+   "sha256": "7aa2d9ede4e1adfb5526a3cc1a9fc0b8dc1eb0c40f578c05004080699af45a5e",
+   "text": "حکومت نے petrol کی قیمت میں کمی کا اعلان کیا ہے"
+  },
+  {
+   "case": "TC-IMG-10",
+   "file": "img10_urdu_paragraph.png",
+   "how_made": "Rendered 4-line Urdu paragraph, right-aligned, Noto Nastaliq 40 px (1200×600, headless Edge)",
+   "bytes": 43137,
+   "sha256": "a88036cda9bc3c03dad8d759be30eb7603de6caa6db930b7b74334d88be3be6f",
+   "text": "شہر میں آج صبح سے موسلادھار بارش جاری ہے۔\nکئی سڑکوں پر پانی جمع ہونے سے ٹریفک متاثر ہوا۔\nانتظامیہ نے شہریوں کو گھروں میں رہنے کی ہدایت کی ہے۔\nمحکمہ موسمیات کے مطابق بارش کل تک جاری رہے گی۔"
+  },
+  {
+   "case": "TC-IMG-11",
+   "file": "img11a_blurred.png",
+   "how_made": "img02_urdu_internet.png with Pillow GaussianBlur(radius=5)",
+   "bytes": 73274,
+   "sha256": "b3a10f5588272629fc1925d55b7429c59463eb97330887d706a1df83439c0fa6",
+   "text": "حکومت نے اعلان کیا ہے کہ ملک بھر میں سات دن کے لیے انٹرنیٹ سروس بند کر دی جائے گی۔"
+  },
+  {
+   "case": "TC-IMG-11",
+   "file": "img11b_light_grey.png",
+   "how_made": "Rendered TC-IMG-02 text in light grey #dcdcdc on white (1200×600, headless Edge)",
+   "bytes": 25832,
+   "sha256": "981c3df95090b731a84650bb473f5ff0cb9fe6313c8f1791a82b521c248c3ce1",
+   "text": "حکومت نے اعلان کیا ہے کہ ملک بھر میں سات دن کے لیے انٹرنیٹ سروس بند کر دی جائے گی۔"
+  },
+  {
+   "case": "TC-IMG-03",
+   "file": "photo_landscape.jpg",
+   "how_made": "SYNTHETIC photo-like landscape (numpy: sky gradient, sun glow, noisy hills), 1024×768, JPEG q90",
+   "bytes": 145463,
+   "sha256": "360be170e4ac5f191f5baca8fe8c7d070d7805be49ba37c3a9c26cdbdad26b00"
+  },
+  {
+   "case": "TC-IMG-12",
+   "file": "img12_photo_caption.jpg",
+   "how_made": "SYNTHETIC landscape with an Edge-rendered white Urdu caption on a dark-red strip at the bottom, 1024×908, JPEG q90",
+   "bytes": 166487,
+   "sha256": "449201a3d9b5309b94f23c438d5032553483258f75aca33a3b3370237f288578",
+   "text": "سیلاب سے متاثرہ علاقوں میں امدادی کارروائیاں جاری ہیں"
+  },
+  {
+   "case": "TC-IMG-13",
+   "file": "img13_news_card.png",
+   "how_made": "Screenshot-style news post: generic header bar ('Daily Update', no real brand), Urdu headline, synthetic photo, footer (1080×1080, headless Edge)",
+   "bytes": 568434,
+   "sha256": "6bdd82994abc1b1da99728fe90403bfd693f9184705b70e4158e8ea633af8c63",
+   "text": "وفاقی حکومت نے پیٹرول کی قیمت میں دس روپے فی لیٹر اضافہ کر دیا"
+  },
+  {
+   "case": "TC-IMG-14",
+   "file": "photo_ai_look.png",
+   "how_made": "SYNTHETIC smooth pastel gradient with blurred glowing circles (computer-made look, no text), 1024×1024 PNG",
+   "bytes": 154094,
+   "sha256": "65fc70a2a80a26d52cde5c3c0534b8c3beab418342b4d2225d5bffc70dfd11a6"
+  },
+  {
+   "case": "TC-IMG-15",
+   "file": "img15_meme_roman.jpg",
+   "how_made": "SYNTHETIC street scene with Edge-rendered Roman Urdu meme text (white, black outline) at top and bottom, 1024×768 JPEG",
+   "bytes": 178577,
+   "sha256": "552207554d9e4f5d6bd161c4ec33b72837ac91c17fed3a50bfeed407825194ba",
+   "text": "Jab teacher kahe kal test nahi hoga / aur phir agle din surprise test ho jaye"
+  },
+  {
+   "case": "probe",
+   "file": "photo_street.jpg",
+   "how_made": "SYNTHETIC street scene (rectangles with windows, noise), 1024×768, JPEG q90 (extra asset for the TC-IMG-32/33 detector search)",
+   "bytes": 143522,
+   "sha256": "79a23dc8b76189c855b454558ab8a531d76c8a628b90764bb460cf9045732a64"
+  },
+  {
+   "case": "probe",
+   "file": "photo_texture.jpg",
+   "how_made": "SYNTHETIC multi-scale noise texture (rock-like), 1024×768, JPEG q90 (extra asset for the TC-IMG-32/33 detector search)",
+   "bytes": 285942,
+   "sha256": "8a2bc791be1574b8241f29975afc70385542f1c2a71f88d25a8f371fb69aeef8"
+  },
+  {
+   "case": "probe",
+   "file": "photo_portrait.jpg",
+   "how_made": "SYNTHETIC portrait-like figure (ellipse face, shapes, blur, noise), 768×1024, JPEG q90 (extra asset for the TC-IMG-32/33 detector search)",
+   "bytes": 100591,
+   "sha256": "e82aae83fa78af691b03cae84a0ebd6eeb645f5bda56738205a916e4320e2b93"
+  },
+  {
+   "case": "TC-IMG-01",
+   "file": "f01_64x64.png",
+   "how_made": "SYNTHETIC landscape resized to 64×64 PNG",
+   "bytes": 6424,
+   "sha256": "3de92b0d4a53c50d148f9dd52e0221775776f6d3776df2de59cbf929bb673775"
+  },
+  {
+   "case": "TC-IMG-16",
+   "file": "f16_valid.jpg",
+   "how_made": "SYNTHETIC landscape, baseline JPEG q88",
+   "bytes": 127238,
+   "sha256": "f7da4b93df32cc31bacd476150e06b3e1327d5c45bee924b4ca101a5bbae917c"
+  },
+  {
+   "case": "TC-IMG-17",
+   "file": "f17_valid.webp",
+   "how_made": "SYNTHETIC street scene, WEBP q85",
+   "bytes": 60000,
+   "sha256": "ff6926fd19e5d2ba3307be88d24f8031c35ea79042fc870a6cb4ce9ed5153e96"
+  },
+  {
+   "case": "TC-IMG-18",
+   "file": "f18_alpha.png",
+   "how_made": "img07 (Roman Urdu text) as RGBA PNG with alpha 150/255",
+   "bytes": 26425,
+   "sha256": "1471d9542be48dad3f9b5d8ed464d7f47322fca92cdefb6c3f8e6f726c0401fb"
+  },
+  {
+   "case": "TC-IMG-19",
+   "file": "f19_greyscale.jpg",
+   "how_made": "SYNTHETIC landscape as 8-bit greyscale (mode L) JPEG",
+   "bytes": 135981,
+   "sha256": "b546393e08a4899db5188a82967e2e0dcf5172d39debc1367d69c85304f5c7fa"
+  },
+  {
+   "case": "TC-IMG-20",
+   "file": "f20_1x1.png",
+   "how_made": "1×1 PNG",
+   "bytes": 69,
+   "sha256": "cf27c87b1d7029c68b7fcbde4524373f62dbd9933c72fd8f1ec6d294b8ed92bb"
+  },
+  {
+   "case": "TC-IMG-21",
+   "file": "f21_8000x8000.png",
+   "how_made": "8000×8000 horizontal gradient PNG (64 Mpx, compresses well)",
+   "bytes": 201631,
+   "sha256": "b6adce80ee6d6395a36dad4791f4eb9024417a4710f286305dd3b1760ecd05a9"
+  },
+  {
+   "case": "TC-IMG-21",
+   "file": "f21b_6000x6000.png",
+   "how_made": "6000×6000 gradient PNG (36 Mpx, under the 40 Mpx cap) — extra, to measure processing time and RAM",
+   "bytes": 116325,
+   "sha256": "8ce4fe9ce40aec1bb4516a8e0d1b921f5e8c722096f07940b7effe5ba2257d56"
+  },
+  {
+   "case": "TC-IMG-22",
+   "file": "f22a_just_under_10mb.png",
+   "how_made": "random-noise PNG (no compression) padded with a tEXt chunk to -6000 bytes from 10 MiB (10485760 bytes)",
+   "bytes": 10484883,
+   "sha256": "39da16f83cbe06f4bf11b13d696e51cd7209ce111529fc0fe6fb063e34c5285d"
+  },
+  {
+   "case": "TC-IMG-22",
+   "file": "f22b_just_over_10mb.png",
+   "how_made": "random-noise PNG (no compression) padded with a tEXt chunk to +6000 bytes from 10 MiB (10485760 bytes)",
+   "bytes": 10496113,
+   "sha256": "08c185a1543c75a9156967e940e453afc858782ec64ab5b8fc387134539681ce"
+  },
+  {
+   "case": "TC-IMG-23",
+   "file": "f23.gif",
+   "how_made": "img08 (English text) saved as GIF",
+   "bytes": 16439,
+   "sha256": "a36613d9c1827f49f1bd00bfb0e251396eba9cc59f38245dfba930c840aeb850"
+  },
+  {
+   "case": "TC-IMG-24",
+   "file": "f24_truncated.jpg",
+   "how_made": "SYNTHETIC landscape JPEG cut to half its bytes",
+   "bytes": 72731,
+   "sha256": "0131baafa12248a086c318facf3ed118519c9a4eb35abec32b602a8086176955"
+  },
+  {
+   "case": "TC-IMG-25",
+   "file": "f25_png_named.jpg",
+   "how_made": "img07 PNG bytes in a file named .jpg (sent as image/jpeg)",
+   "bytes": 17372,
+   "sha256": "425cd67ab8b57df509b33aad1dc58df8cd3f0ce36b2dbd370180428b70809acf"
+  },
+  {
+   "case": "TC-IMG-26",
+   "file": "f26_exif6.jpg",
+   "how_made": "Urdu TC-IMG-02 text rendered upright 600×900, stored rotated 900×600 with EXIF Orientation 6",
+   "bytes": 41584,
+   "sha256": "3d2ab007c0b367733324ae49e8a75532cd08b48db49dd35557fc6cd23510e725",
+   "text": "حکومت نے اعلان کیا ہے کہ ملک بھر میں سات دن کے لیے انٹرنیٹ سروس بند کر دی جائے گی۔",
+   "upright_size": [
+    600,
+    900
+   ]
+  },
+  {
+   "case": "TC-IMG-04",
+   "file": "f04_text_renamed.png",
+   "how_made": "plain text file renamed to .png",
+   "bytes": 840,
+   "sha256": "afe3a47e4384166867d27705fac700b60c3dc99051e65bbd0980920aed302fae"
+  },
+  {
+   "case": "TC-IMG-04",
+   "file": "f04_document.pdf",
+   "how_made": "img08 saved as a one-page PDF by Pillow",
+   "bytes": 37047,
+   "sha256": "a1e1d5400b54d073d9ff38b5f563536d5c2e717ea54f9245e58e9b8eecb916dd"
+  },
+  {
+   "case": "TC-IMG-06",
+   "file": "../../fixtures/urdu_headline.png",
+   "how_made": "existing repo fixture (unchanged)",
+   "bytes": 9097,
+   "sha256": "4b7032b2936e85dc3ea68600fff58e4959203d19ec778259524f6dd6b4a4f035"
+  },
+  {
+   "case": "control",
+   "file": "ctl02_urdu_segoe.png",
+   "how_made": "CONTROL: TC-IMG-02 text rendered in Segoe UI (Naskh-style), black on white (1200×600, headless Edge)",
+   "bytes": 16944,
+   "sha256": "31b1d1235f81f4bc8124588656366fff95db8669ac4add9f533eb2c0b3cdfd6e",
+   "text": "حکومت نے اعلان کیا ہے کہ ملک بھر میں سات دن کے لیے انٹرنیٹ سروس بند کر دی جائے گی۔"
+  },
+  {
+   "case": "control",
+   "file": "ctl10_paragraph_segoe.png",
+   "how_made": "CONTROL: TC-IMG-10 paragraph rendered in Segoe UI (Naskh-style), right-aligned (1200×600, headless Edge)",
+   "bytes": 30115,
+   "sha256": "eeed64caf0e8be110f2af1dc8762377735be5591e2dc203168a67531dea5a1e0",
+   "text": "شہر میں آج صبح سے موسلادھار بارش جاری ہے۔\nکئی سڑکوں پر پانی جمع ہونے سے ٹریفک متاثر ہوا۔\nانتظامیہ نے شہریوں کو گھروں میں رہنے کی ہدایت کی ہے۔\nمحکمہ موسمیات کے مطابق بارش کل تک جاری رہے گی۔"
+  }
+ ]
+}

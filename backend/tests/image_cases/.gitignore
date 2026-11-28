@@ -1,0 +1,5 @@
+.accounts_*.json
+# ~10 MB size-limit images; regenerate with make_images.py
+images/f22a_just_under_10mb.png
+images/f22b_just_over_10mb.png
+heatmaps/f22a_just_under_10mb_id*.png

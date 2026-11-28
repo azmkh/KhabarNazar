@@ -1,0 +1,3253 @@
+{
+ "meta": {
+  "date": "2026-11-28",
+  "base_url": "http://127.0.0.1:8001",
+  "server_models": {
+   "ready": true,
+   "warmup": "done",
+   "models": {
+    "urdu_text": "loaded",
+    "roman_urdu_text": "loaded",
+    "image_detector": "loaded",
+    "ocr": "loaded"
+   }
+  },
+  "server_environment": "full-pass"
+ },
+ "cases": {
+  "TC-IMG-02": {
+   "result": "Fail",
+   "evidence": "201 · ai_or_real · ocr completed 0.28 “حکومت نے اعلان کیاے کەملک بجھریں …” · lang urdu · no text verdict · image completed AI 0.8312 (Likely AI-generated) · gradcam completed (class fake) · final Uncertain risk — · 6.2 s · id 31; branch ai_or_real (OCR completed 0.2815); text model None (expected xlmr-urdu) · control, same text in Segoe UI: OCR completed 0.52, image_pair, xlmr-urdu Real (id 32)",
+   "expected": "OCR reads it; Urdu; xlmr-urdu verdict; image_score; heatmap",
+   "notes": "EasyOCR read the Nastaliq-rendered text at 0.28, below the 0.3 cutoff, so no text verdict was produced. See the Segoe UI control in the evidence.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 31,
+     "file": "img02_urdu_internet.png",
+     "latency_s": 6.17,
+     "branch": "ai_or_real",
+     "ocr_status": "completed",
+     "ocr_text": "حکومت نے اعلان کیاے کەملک بجھریں سات دن ےلي انڑنیٹ\nسروس بندکردی جاسےگی -",
+     "ocr_confidence": 0.2815,
+     "language": "urdu",
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.8312,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/31_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks AI-generated (83% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "fake",
+     "p_real": 0.1688,
+     "members": {
+      "clip_vitl14": 0.3327,
+      "dinov2_l": 0.1736,
+      "resnet18_robust": 0.0001
+     },
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/img02_urdu_internet_id31.png",
+     "heatmap_sha256": "76a1ba570daef2f42f90b37454b5c38384671d117ebb31ba1dfa91d87de67ffc"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 6.17,
+     "body": {
+      "id": 31,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:14:47.581355Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 31,
+       "image_path": "73200b54ad9a40fca0fc42428015d231.png",
+       "original_filename": "img02_urdu_internet.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 24161,
+       "ocr_text": "حکومت نے اعلان کیاے کەملک بجھریں سات دن ےلي انڑنیٹ\nسروس بندکردی جاسےگی -",
+       "ocr_confidence": 0.2815,
+       "ocr_status": "completed",
+       "detected_language": "urdu",
+       "text_prediction": null,
+       "text_confidence": null,
+       "image_score": 0.8312,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:14:47.606593Z",
+       "analysis_branch": "ai_or_real",
+       "text_classification_status": "not_run",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 31,
+       "highlighted_words": null,
+       "heatmap_path": "explanations/31_heatmap.png",
+       "explanation_summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks AI-generated (83% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+       "model_version": "img-ens-clip-dino-r18",
+       "created_at": "2026-11-27T20:14:47.606252Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "img02_urdu_internet.png",
+     "sent_name": "img02_urdu_internet.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "bf37ac7bd128b7ac48c8a5be40bb9865907d7808778c551fcee27a8a441bcddd",
+     "sent_bytes": 24161,
+     "retry_after": null
+    },
+    "control": {
+     "status": 201,
+     "id": 32,
+     "file": "ctl02_urdu_segoe.png",
+     "latency_s": 7.76,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "سات دن ے ليے\nحکومت ے اعلان کيا ہے کہ ملک بهر\nانٹرنیٹ سروس بندکردی جاۓ\nميں\nگی .",
+     "ocr_confidence": 0.5248,
+     "language": "urdu",
+     "text_model": "xlmr-urdu",
+     "model_version": "img-pair:xlmr-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.9931,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.921,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/32_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.0069,
+     "summary": "OCR read text from the image (average confidence 0.52), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (99.3%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (92% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "ے",
+      "دن",
+      "کیا",
+      "سات",
+      "اعلان",
+      "لیے",
+      "ہے",
+      "حکومت"
+     ],
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/ctl02_urdu_segoe_id32.png",
+     "heatmap_sha256": "21d88639e93769ea10ffde161f263d5bf8b0a2853e59b413ca9284fcbcc8d28c"
+    }
+   },
+   "run_at": "2026-11-28 01:14:47",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-03": {
+   "result": "Pass",
+   "evidence": "201 · ai_or_real · ocr no_text_found — “—” · lang None · no text verdict · image completed AI 0.4998 (Likely real photo) · gradcam completed (class real) · final Uncertain risk — · 10.7 s · id 2",
+   "expected": "no_text_found; final Uncertain; risk None; image_score; Grad-CAM attempted",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 2,
+     "file": "photo_landscape.jpg",
+     "latency_s": 10.69,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.4998,
+     "authenticity": "Likely real photo",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/2_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks like a real photo (50% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "real",
+     "p_real": 0.5002,
+     "members": {
+      "clip_vitl14": 0.5233,
+      "dinov2_l": 0.0497,
+      "resnet18_robust": 0.9276
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      768
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/photo_landscape_id2.png",
+     "heatmap_sha256": "8570365302f2358ed9cabab9697aa6f2efe2a44a93ef04de63c478c44950fde9"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 10.69,
+     "body": {
+      "id": 2,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": null,
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:03:19.955951Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 2,
+       "image_path": "04b2551d26724074a01cf0196bd0f86a.jpg",
+       "original_filename": "photo_landscape.jpg",
+       "mime_type": "image/jpeg",
+       "file_size_bytes": 145463,
+       "ocr_text": null,
+       "ocr_confidence": null,
+       "ocr_status": "no_text_found",
+       "detected_language": null,
+       "text_prediction": null,
+       "text_confidence": null,
+       "image_score": 0.4998,
+       "manipulation_prediction": "Likely real photo",
+       "created_at": "2026-11-27T20:03:20.068725Z",
+       "analysis_branch": "ai_or_real",
+       "text_classification_status": "not_run",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 2,
+       "highlighted_words": null,
+       "heatmap_path": "explanations/2_heatmap.png",
+       "explanation_summary": "OCR found no readable text, so no news claim was checked. The picture looks like a real photo (50% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+       "model_version": "img-ens-clip-dino-r18",
+       "created_at": "2026-11-27T20:03:20.068002Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "photo_landscape.jpg",
+     "sent_name": "photo_landscape.jpg",
+     "sent_mime": "image/jpeg",
+     "sent_sha256": "360be170e4ac5f191f5baca8fe8c7d070d7805be49ba37c3a9c26cdbdad26b00",
+     "sent_bytes": 145463,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:03:20",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-04": {
+   "result": "Pass",
+   "evidence": ".txt renamed .png → 415 “File does not appear to be a valid image.” · PDF → 415 “File does not appear to be a valid image.” · history 2→2, upload files 2→2",
+   "expected": "rejected 400/415 with a clear message; nothing saved",
+   "notes": "",
+   "raw": {
+    ".txt renamed .png": {
+     "status": 415,
+     "detail": "File does not appear to be a valid image.",
+     "latency_s": 0.2,
+     "bytes": 840
+    },
+    "PDF": {
+     "status": 415,
+     "detail": "File does not appear to be a valid image.",
+     "latency_s": 0.01,
+     "bytes": 37047
+    },
+    "history": [
+     2,
+     2
+    ],
+    "upload_files": [
+     2,
+     2
+    ]
+   },
+   "run_at": "2026-11-28 01:03:20",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-05": {
+   "result": "Pass",
+   "evidence": "no token 401 “Authentication token is missing.” · tampered 401 “Could not validate authentication credentials.” · history/upload files (2, 2)→(2, 2)",
+   "expected": "401 for both; nothing saved",
+   "notes": "",
+   "raw": {
+    "no_token": 401,
+    "tampered": 401,
+    "before_after": [
+     [
+      2,
+      2
+     ],
+     [
+      2,
+      2
+     ]
+    ]
+   },
+   "run_at": "2026-11-28 01:03:20",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-06": {
+   "result": "Known limitation",
+   "evidence": "201 · image_pair · ocr completed 0.44 “حکومت نے پیٹرول کی قیمت ميں پانچ …” · urdu · xlmr-urdu Real 0.9999 · image completed AI 0.9434 (Likely AI-generated) · gradcam completed (class fake) · final Real risk 0.0001 · 10.4 s · id 3 · report: OCR 0.44, Real, AI 0.94 → now OCR 0.44, Real, AI 0.94",
+   "expected": "OCR text; text verdict; detector score; heatmap; compare OCR 0.44, Real, AI 0.94",
+   "notes": "High AI-generated score on rendered text (audit Finalization: screenshots/rendered text rated AI-generated); presentation checked separately.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 3,
+     "file": "../../fixtures/urdu_headline.png",
+     "latency_s": 10.44,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "حکومت نے پیٹرول کی قیمت ميں پانچ روپے کمی کا\nاعلان کر ديا",
+     "ocr_confidence": 0.4445,
+     "language": "urdu",
+     "text_model": "xlmr-urdu",
+     "model_version": "img-pair:xlmr-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.9999,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.9434,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/3_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.0001,
+     "summary": "OCR read text from the image (average confidence 0.44), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (94% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "نے",
+      "میں",
+      "روپے",
+      "کی",
+      "پیٹرول",
+      "قیمت",
+      "پانچ",
+      "حکومت"
+     ],
+     "explained_class": "fake",
+     "p_real": 0.0566,
+     "members": {
+      "clip_vitl14": 0.0746,
+      "dinov2_l": 0.0947,
+      "resnet18_robust": 0.0005
+     },
+     "user": "A",
+     "heatmap_size": [
+      1100,
+      220
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/urdu_headline_id3.png",
+     "heatmap_sha256": "843099a7f7d6b24f17d351fcd751f30d3cf72131c09114127c365835730608e9"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 10.44,
+     "body": {
+      "id": 3,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0001,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:03:30.842486Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 3,
+       "image_path": "37dc70e3a8e54d5e90816ec6c5493232.png",
+       "original_filename": "urdu_headline.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 9097,
+       "ocr_text": "حکومت نے پیٹرول کی قیمت ميں پانچ روپے کمی کا\nاعلان کر ديا",
+       "ocr_confidence": 0.4445,
+       "ocr_status": "completed",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9999,
+       "image_score": 0.9434,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:03:30.869103Z",
+       "analysis_branch": "image_pair",
+       "text_classification_status": "completed",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 3,
+       "highlighted_words": "[{\"word\": \"نے\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"میں\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"روپے\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"کی\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"پیٹرول\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"قیمت\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"پانچ\", \"contribution\": -0.0, \"direction\": \"opposes_prediction\"}, {\"word\": \"حکومت\", \"contribution\": -0.0, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": "explanations/3_heatmap.png",
+       "explanation_summary": "OCR read text from the image (average confidence 0.44), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (94% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+       "model_version": "img-pair:xlmr-urdu",
+       "created_at": "2026-11-27T20:03:30.868727Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "../../fixtures/urdu_headline.png",
+     "sent_name": "urdu_headline.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "4b7032b2936e85dc3ea68600fff58e4959203d19ec778259524f6dd6b4a4f035",
+     "sent_bytes": 9097,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:03:30",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-07": {
+   "result": "Pass",
+   "evidence": "201 · image_pair · ocr completed 0.56 “Hukoomat ne elan kiya hai ke mulk…” · roman_urdu · xlmr-roman-urdu Real 0.9280 · image completed AI 0.9467 (Likely AI-generated) · gradcam completed (class fake) · final Real risk 0.0720 · 32.4 s · id 4",
+   "expected": "Roman Urdu; xlmr-roman-urdu; image_score; heatmap",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 4,
+     "file": "img07_roman_internet.png",
+     "latency_s": 32.41,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "Hukoomat ne elan kiya hai ke mulk bhar mein saat\ndin ke liye internet service band kar di jayegi",
+     "ocr_confidence": 0.5582,
+     "language": "roman_urdu",
+     "text_model": "xlmr-roman-urdu",
+     "model_version": "img-pair:xlmr-roman-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.928,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.9467,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/4_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.072,
+     "summary": "OCR read text from the image (average confidence 0.56), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (92.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (95% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "Hukoomat",
+      "ke",
+      "bhar",
+      "kiya",
+      "mulk",
+      "hai",
+      "elan",
+      "ne"
+     ],
+     "explained_class": "fake",
+     "p_real": 0.0533,
+     "members": {
+      "clip_vitl14": 0.0282,
+      "dinov2_l": 0.1318,
+      "resnet18_robust": 0.0
+     },
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/img07_roman_internet_id4.png",
+     "heatmap_sha256": "8d9a695a9ea84a8589bdc6c6e628cf1a0537845f5af5cbff67c525a4533cfc61"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 32.41,
+     "body": {
+      "id": 4,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "roman_urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.072,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:04:03.261002Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 4,
+       "image_path": "f206e922f1c4442daa52a855f729a990.png",
+       "original_filename": "img07_roman_internet.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 17372,
+       "ocr_text": "Hukoomat ne elan kiya hai ke mulk bhar mein saat\ndin ke liye internet service band kar di jayegi",
+       "ocr_confidence": 0.5582,
+       "ocr_status": "completed",
+       "detected_language": "roman_urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.928,
+       "image_score": 0.9467,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:04:03.314728Z",
+       "analysis_branch": "image_pair",
+       "text_classification_status": "completed",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 4,
+       "highlighted_words": "[{\"word\": \"Hukoomat\", \"contribution\": 0.75564, \"direction\": \"supports_prediction\"}, {\"word\": \"ke\", \"contribution\": 0.60573, \"direction\": \"supports_prediction\"}, {\"word\": \"bhar\", \"contribution\": 0.16506, \"direction\": \"supports_prediction\"}, {\"word\": \"kiya\", \"contribution\": 0.07168, \"direction\": \"supports_prediction\"}, {\"word\": \"mulk\", \"contribution\": 0.04787, \"direction\": \"supports_prediction\"}, {\"word\": \"hai\", \"contribution\": -0.04405, \"direction\": \"opposes_prediction\"}, {\"word\": \"elan\", \"contribution\": -0.03748, \"direction\": \"opposes_prediction\"}, {\"word\": \"ne\", \"contribution\": 0.01229, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": "explanations/4_heatmap.png",
+       "explanation_summary": "OCR read text from the image (average confidence 0.56), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (92.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (95% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+       "model_version": "img-pair:xlmr-roman-urdu",
+       "created_at": "2026-11-27T20:04:03.313524Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "img07_roman_internet.png",
+     "sent_name": "img07_roman_internet.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "425cd67ab8b57df509b33aad1dc58df8cd3f0ce36b2dbd370180428b70809acf",
+     "sent_bytes": 17372,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:04:03",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-08": {
+   "result": "Finding",
+   "evidence": "201 · image_pair · ocr completed 0.66 “The government has announced free…” · mixed · xlmr-roman-urdu Real 0.9748 · image completed AI 0.9565 (Likely AI-generated) · gradcam completed (class fake) · final Real risk 0.0252 · 10.7 s · id 33; no lower-reliability note in the summary",
+   "expected": "xlmr-roman-urdu with the lower-reliability note; image_score; heatmap",
+   "notes": "Routed to xlmr-roman-urdu as expected, but OCR inserted an Arabic-script letter, so the text was detected as 'mixed' and the summary carries the mixed-script note instead of the English lower-reliability note.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 33,
+     "file": "img08_english_textbooks.png",
+     "latency_s": 10.72,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "The government has announced free textbooks for\nalا\npublic schools from\n1 November",
+     "ocr_confidence": 0.6627,
+     "language": "mixed",
+     "text_model": "xlmr-roman-urdu",
+     "model_version": "img-pair:xlmr-roman-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.9748,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.9565,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/33_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.0252,
+     "summary": "OCR read text from the image (average confidence 0.66), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (97.5%). The highlighted words below had the biggest effect on this result. The text mixes Urdu and English script, so it was checked as Roman Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (96% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "alا",
+      "for",
+      "government",
+      "The",
+      "announced",
+      "free",
+      "textbooks",
+      "has"
+     ],
+     "explained_class": "fake",
+     "p_real": 0.0435,
+     "members": {
+      "clip_vitl14": 0.033,
+      "dinov2_l": 0.0974,
+      "resnet18_robust": 0.0
+     },
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/img08_english_textbooks_id33.png",
+     "heatmap_sha256": "7d2c566e3f258022f72a5b393f48ccd49618d7aed53bc8d14c55dd933dcf2f23"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 10.72,
+     "body": {
+      "id": 33,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "mixed",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0252,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:15:06.156531Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 33,
+       "image_path": "7b73e17197e845738f42a66f38a0bfce.png",
+       "original_filename": "img08_english_textbooks.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 18012,
+       "ocr_text": "The government has announced free textbooks for\nalا\npublic schools from\n1 November",
+       "ocr_confidence": 0.6627,
+       "ocr_status": "completed",
+       "detected_language": "mixed",
+       "text_prediction": "Real",
+       "text_confidence": 0.9748,
+       "image_score": 0.9565,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:15:06.178397Z",
+       "analysis_branch": "image_pair",
+       "text_classification_status": "completed",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 33,
+       "highlighted_words": "[{\"word\": \"alا\", \"contribution\": 0.4416, \"direction\": \"supports_prediction\"}, {\"word\": \"for\", \"contribution\": 0.1457, \"direction\": \"supports_prediction\"}, {\"word\": \"government\", \"contribution\": 0.04597, \"direction\": \"supports_prediction\"}, {\"word\": \"The\", \"contribution\": 0.0369, \"direction\": \"supports_prediction\"}, {\"word\": \"announced\", \"contribution\": 0.00462, \"direction\": \"supports_prediction\"}, {\"word\": \"free\", \"contribution\": -0.00455, \"direction\": \"opposes_prediction\"}, {\"word\": \"textbooks\", \"contribution\": 0.00339, \"direction\": \"supports_prediction\"}, {\"word\": \"has\", \"contribution\": -0.00062, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": "explanations/33_heatmap.png",
+       "explanation_summary": "OCR read text from the image (average confidence 0.66), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (97.5%). The highlighted words below had the biggest effect on this result. The text mixes Urdu and English script, so it was checked as Roman Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (96% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+       "model_version": "img-pair:xlmr-roman-urdu",
+       "created_at": "2026-11-27T20:15:06.178111Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "img08_english_textbooks.png",
+     "sent_name": "img08_english_textbooks.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "e30b520ece5dd7f3eba8dcc819e8c57aaea2e2cf4fed4430a8f21cd7dd9fa49c",
+     "sent_bytes": 18012,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:15:06",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-09": {
+   "result": "Pass",
+   "evidence": "201 · image_pair · ocr completed 0.43 “ي ی کا اعلان نياء حکومت نے petrol…” · urdu · xlmr-urdu Real 0.9859 · image completed AI 0.8485 (Likely AI-generated) · gradcam completed (class fake) · final Real risk 0.0141 · 14.6 s · id 6 · OCR text “ي ی کا اعلان نياء حکومت نے petrol ئ قیمت”",
+   "expected": "record OCR text, language and route; no error",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 6,
+     "file": "img09_mixed_petrol.png",
+     "latency_s": 14.64,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "ي ی کا اعلان نياء\nحکومت نے petrol ئ\nقیمت",
+     "ocr_confidence": 0.4256,
+     "language": "urdu",
+     "text_model": "xlmr-urdu",
+     "model_version": "img-pair:xlmr-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.9859,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.8485,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/6_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.0141,
+     "summary": "OCR read text from the image (average confidence 0.43), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (98.6%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (85% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "اعلان",
+      "حکومت",
+      "نیاء",
+      "کا",
+      "ئ",
+      "نے",
+      "ی",
+      "petrol"
+     ],
+     "explained_class": "fake",
+     "p_real": 0.1515,
+     "members": {
+      "clip_vitl14": 0.2466,
+      "dinov2_l": 0.2076,
+      "resnet18_robust": 0.0002
+     },
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/img09_mixed_petrol_id6.png",
+     "heatmap_sha256": "28cee361a95f05fcc3ed53536cfdf216a2b7af6c62e86feeb6e71f304ffd2b89"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 14.64,
+     "body": {
+      "id": 6,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0141,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:04:45.133017Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 6,
+       "image_path": "aab7ac61998c45bca4fe185f37a490dd.png",
+       "original_filename": "img09_mixed_petrol.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 16048,
+       "ocr_text": "ي ی کا اعلان نياء\nحکومت نے petrol ئ\nقیمت",
+       "ocr_confidence": 0.4256,
+       "ocr_status": "completed",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9859,
+       "image_score": 0.8485,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:04:45.186433Z",
+       "analysis_branch": "image_pair",
+       "text_classification_status": "completed",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 6,
+       "highlighted_words": "[{\"word\": \"اعلان\", \"contribution\": 0.98441, \"direction\": \"supports_prediction\"}, {\"word\": \"حکومت\", \"contribution\": 0.9821, \"direction\": \"supports_prediction\"}, {\"word\": \"نیاء\", \"contribution\": 0.96359, \"direction\": \"supports_prediction\"}, {\"word\": \"کا\", \"contribution\": 0.95781, \"direction\": \"supports_prediction\"}, {\"word\": \"ئ\", \"contribution\": 0.03449, \"direction\": \"supports_prediction\"}, {\"word\": \"نے\", \"contribution\": -0.01369, \"direction\": \"opposes_prediction\"}, {\"word\": \"ی\", \"contribution\": 0.0128, \"direction\": \"supports_prediction\"}, {\"word\": \"petrol\", \"contribution\": -0.00797, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": "explanations/6_heatmap.png",
+       "explanation_summary": "OCR read text from the image (average confidence 0.43), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (98.6%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (85% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+       "model_version": "img-pair:xlmr-urdu",
+       "created_at": "2026-11-27T20:04:45.185288Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "img09_mixed_petrol.png",
+     "sent_name": "img09_mixed_petrol.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "7aa2d9ede4e1adfb5526a3cc1a9fc0b8dc1eb0c40f578c05004080699af45a5e",
+     "sent_bytes": 16048,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:04:45",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-10": {
+   "result": "Fail",
+   "evidence": "201 · ai_or_real · ocr completed 0.27 “شريں آج سبجے موسلادھار بارش جاریے…” · lang urdu · no text verdict · image completed AI 0.8834 (Likely AI-generated) · gradcam completed (class fake) · final Uncertain risk — · 8.0 s · id 34 · 9 OCR lines map to source lines [1, 2, 3, 1, 2, 4, 4, 3, 3] (reading order=False); no text verdict (ai_or_real) · control, same text in Segoe UI: OCR completed 0.63, image_pair, xlmr-urdu Real (id 35); control lines map to [1, 2, 1, 3, 3, 4, 1, 1, 2, 1] (in order=False)",
+   "expected": "OCR text in reading order; text verdict",
+   "notes": "OCR returned the paragraph lines out of reading order. OCR confidence 0.27 is below the 0.3 cutoff, so no verdict.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 34,
+     "file": "img10_urdu_paragraph.png",
+     "latency_s": 8.02,
+     "branch": "ai_or_real",
+     "ocr_status": "completed",
+     "ocr_text": "شريں آج سبجے موسلادھار بارش جاریے\nسڑوں پرپانی جمع ہوسنےے ٹریفک متاثر ہوا -\nرول ی رسےی ہدایت یِ\nتہریول\nمختِظِا.\nمطابق بارش کل تُک جاری\nموسمیات\nمیەن\nرت ی-",
+     "ocr_confidence": 0.2655,
+     "language": "urdu",
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.8834,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/34_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks AI-generated (88% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "fake",
+     "p_real": 0.1166,
+     "members": {
+      "clip_vitl14": 0.231,
+      "dinov2_l": 0.118,
+      "resnet18_robust": 0.001
+     },
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/img10_urdu_paragraph_id34.png",
+     "heatmap_sha256": "f51f599d06e7794e50e775f41639644bc42ada200e7435f01c87d2e1561aafb9"
+    },
+    "line_map": [
+     0,
+     1,
+     2,
+     0,
+     1,
+     3,
+     3,
+     2,
+     2
+    ],
+    "ocr_lines": [
+     "شريں آج سبجے موسلادھار بارش جاریے",
+     "سڑوں پرپانی جمع ہوسنےے ٹریفک متاثر ہوا -",
+     "رول ی رسےی ہدایت یِ",
+     "تہریول",
+     "مختِظِا.",
+     "مطابق بارش کل تُک جاری",
+     "موسمیات",
+     "میەن",
+     "رت ی-"
+    ],
+    "response": {
+     "status": 201,
+     "latency_s": 8.02,
+     "body": {
+      "id": 34,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:15:14.207997Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 34,
+       "image_path": "9a2cbb5f924d49e4b15e41ada923b373.png",
+       "original_filename": "img10_urdu_paragraph.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 43137,
+       "ocr_text": "شريں آج سبجے موسلادھار بارش جاریے\nسڑوں پرپانی جمع ہوسنےے ٹریفک متاثر ہوا -\nرول ی رسےی ہدایت یِ\nتہریول\nمختِظِا.\nمطابق بارش کل تُک جاری\nموسمیات\nمیەن\nرت ی-",
+       "ocr_confidence": 0.2655,
+       "ocr_status": "completed",
+       "detected_language": "urdu",
+       "text_prediction": null,
+       "text_confidence": null,
+       "image_score": 0.8834,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:15:14.228610Z",
+       "analysis_branch": "ai_or_real",
+       "text_classification_status": "not_run",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 34,
+       "highlighted_words": null,
+       "heatmap_path": "explanations/34_heatmap.png",
+       "explanation_summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks AI-generated (88% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+       "model_version": "img-ens-clip-dino-r18",
+       "created_at": "2026-11-27T20:15:14.228302Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "img10_urdu_paragraph.png",
+     "sent_name": "img10_urdu_paragraph.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "a88036cda9bc3c03dad8d759be30eb7603de6caa6db930b7b74334d88be3be6f",
+     "sent_bytes": 43137,
+     "retry_after": null
+    },
+    "control": {
+     "status": 201,
+     "id": 35,
+     "file": "ctl10_paragraph_segoe.png",
+     "latency_s": 18.94,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "ميں آج صبح ٹسے موسلادھار بارش جاری\nسڑکوں پرپانی جمع ہون سے ٹریفک متاثر ہوا.\n-\nرہنے کی ہدايت کی\nانتظامیہے شہريوں کو گھروں\nمحکمہ موسمیات کے مطابق بارش کل تک جاری رہے گی-\nشہل\n-\nکئی\nميں",
+     "ocr_confidence": 0.6252,
+     "language": "urdu",
+     "text_model": "xlmr-urdu",
+     "model_version": "img-pair:xlmr-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.9996,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.9371,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/35_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.0004,
+     "summary": "OCR read text from the image (average confidence 0.63), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (94% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "بارش",
+      "آج",
+      "صبح",
+      "میں",
+      "سڑکوں",
+      "ٹسے",
+      "جاری",
+      "موسلادھار"
+     ],
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/ctl10_paragraph_segoe_id35.png",
+     "heatmap_sha256": "aafe48484f3f99548e382375b30dac7005507ab924516a68b9bf95d2a1b38d2c"
+    }
+   },
+   "run_at": "2026-11-28 01:15:14",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-11": {
+   "result": "Finding",
+   "evidence": "blurred: ocr completed conf 0.00 → text check skipped (reason in summary=True), image completed AI 0.62, gradcam completed, id 8 | light grey: ocr completed conf 0.41 → text check run (xlmr-urdu Real), image completed AI 0.73, gradcam completed, id 9",
+   "expected": "below 0.3: text check skipped with a reason; image analysis + heatmap still run; record confidences",
+   "notes": "At least one degraded image was still read above the 0.3 cutoff, so its text was classified; the below-cutoff path was exercised only where noted.",
+   "raw": {
+    "blurred": {
+     "facts": {
+      "status": 201,
+      "id": 8,
+      "file": "img11a_blurred.png",
+      "latency_s": 17.1,
+      "branch": "ai_or_real",
+      "ocr_status": "completed",
+      "ocr_text": "آن ذم باے مەہ مہنں ا لوەن\nاںوروں تسد-",
+      "ocr_confidence": 0.0028,
+      "language": "urdu",
+      "text_model": null,
+      "model_version": "img-ens-clip-dino-r18",
+      "text_label": null,
+      "text_confidence": null,
+      "text_status": "not_run",
+      "image_status": "completed",
+      "image_score": 0.6175,
+      "authenticity": "Likely AI-generated",
+      "gradcam_status": "completed",
+      "heatmap_path": "explanations/8_heatmap.png",
+      "final_label": "Uncertain",
+      "risk": null,
+      "summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks AI-generated (62% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+      "detail": null,
+      "highlights": [],
+      "explained_class": "fake",
+      "p_real": 0.3825,
+      "members": {
+       "clip_vitl14": 0.7487,
+       "dinov2_l": 0.1074,
+       "resnet18_robust": 0.2916
+      },
+      "user": "A",
+      "heatmap_size": [
+       1200,
+       600
+      ],
+      "heatmap_file": "backend/tests/image_cases/heatmaps/img11a_blurred_id8.png",
+      "heatmap_sha256": "ce9e8e5927678f73485e9a1a0b8ff92d863d1f83d83a5abd23c1067be50b96fa"
+     },
+     "response": {
+      "status": 201,
+      "latency_s": 17.1,
+      "body": {
+       "id": 8,
+       "user_id": 1,
+       "submission_type": "image",
+       "detected_language": "urdu",
+       "is_news": null,
+       "news_confidence": null,
+       "combined_risk_score": null,
+       "final_label": "Uncertain",
+       "final_label_source": "AI",
+       "admin_comment": null,
+       "created_at": "2026-11-27T20:05:21.692907Z",
+       "text_submission": null,
+       "image_submission": {
+        "id": 8,
+        "image_path": "5caebd02e1144bb6b489c746c279df37.png",
+        "original_filename": "img11a_blurred.png",
+        "mime_type": "image/png",
+        "file_size_bytes": 73274,
+        "ocr_text": "آن ذم باے مەہ مہنں ا لوەن\nاںوروں تسد-",
+        "ocr_confidence": 0.0028,
+        "ocr_status": "completed",
+        "detected_language": "urdu",
+        "text_prediction": null,
+        "text_confidence": null,
+        "image_score": 0.6175,
+        "manipulation_prediction": "Likely AI-generated",
+        "created_at": "2026-11-27T20:05:21.756011Z",
+        "analysis_branch": "ai_or_real",
+        "text_classification_status": "not_run",
+        "image_analysis_status": "completed"
+       },
+       "explainability": {
+        "id": 8,
+        "highlighted_words": null,
+        "heatmap_path": "explanations/8_heatmap.png",
+        "explanation_summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks AI-generated (62% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+        "model_version": "img-ens-clip-dino-r18",
+        "created_at": "2026-11-27T20:05:21.755083Z"
+       },
+       "gradcam_status": "completed"
+      },
+      "file": "img11a_blurred.png",
+      "sent_name": "img11a_blurred.png",
+      "sent_mime": "image/png",
+      "sent_sha256": "b3a10f5588272629fc1925d55b7429c59463eb97330887d706a1df83439c0fa6",
+      "sent_bytes": 73274,
+      "retry_after": null
+     }
+    },
+    "light grey": {
+     "facts": {
+      "status": 201,
+      "id": 9,
+      "file": "img11b_light_grey.png",
+      "latency_s": 17.83,
+      "branch": "image_pair",
+      "ocr_status": "completed",
+      "ocr_text": "انڑییٹ\nسات دن\nحکومت ۓے اعلان کیا -\nسروس بند کردی جاسےی\nکلیے\nاۓ ك\nنلک بهری",
+      "ocr_confidence": 0.405,
+      "language": "urdu",
+      "text_model": "xlmr-urdu",
+      "model_version": "img-pair:xlmr-urdu",
+      "text_label": "Real",
+      "text_confidence": 0.9998,
+      "text_status": "completed",
+      "image_status": "completed",
+      "image_score": 0.7294,
+      "authenticity": "Likely AI-generated",
+      "gradcam_status": "completed",
+      "heatmap_path": "explanations/9_heatmap.png",
+      "final_label": "Real",
+      "risk": 0.0002,
+      "summary": "OCR read text from the image (average confidence 0.41), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (73% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+      "detail": null,
+      "highlights": [
+       "سروس",
+       "سات",
+       "کیا",
+       "دن",
+       "ۓے",
+       "اعلان",
+       "انڑییٹ",
+       "حکومت"
+      ],
+      "explained_class": "fake",
+      "p_real": 0.2706,
+      "members": {
+       "clip_vitl14": 0.2066,
+       "dinov2_l": 0.6045,
+       "resnet18_robust": 0.0005
+      },
+      "user": "A",
+      "heatmap_size": [
+       1200,
+       600
+      ],
+      "heatmap_file": "backend/tests/image_cases/heatmaps/img11b_light_grey_id9.png",
+      "heatmap_sha256": "4729c863b876c9b5e39973554dc43129d1b37ac1666dc64f0331261b64446ad8"
+     },
+     "response": {
+      "status": 201,
+      "latency_s": 17.83,
+      "body": {
+       "id": 9,
+       "user_id": 1,
+       "submission_type": "image",
+       "detected_language": "urdu",
+       "is_news": null,
+       "news_confidence": null,
+       "combined_risk_score": 0.0002,
+       "final_label": "Real",
+       "final_label_source": "AI",
+       "admin_comment": null,
+       "created_at": "2026-11-27T20:05:39.565119Z",
+       "text_submission": null,
+       "image_submission": {
+        "id": 9,
+        "image_path": "e0473cbde97b4a4cb4525cf3cd37a190.png",
+        "original_filename": "img11b_light_grey.png",
+        "mime_type": "image/png",
+        "file_size_bytes": 25832,
+        "ocr_text": "انڑییٹ\nسات دن\nحکومت ۓے اعلان کیا -\nسروس بند کردی جاسےی\nکلیے\nاۓ ك\nنلک بهری",
+        "ocr_confidence": 0.405,
+        "ocr_status": "completed",
+        "detected_language": "urdu",
+        "text_prediction": "Real",
+        "text_confidence": 0.9998,
+        "image_score": 0.7294,
+        "manipulation_prediction": "Likely AI-generated",
+        "created_at": "2026-11-27T20:05:39.628050Z",
+        "analysis_branch": "image_pair",
+        "text_classification_status": "completed",
+        "image_analysis_status": "completed"
+       },
+       "explainability": {
+        "id": 9,
+        "highlighted_words": "[{\"word\": \"سروس\", \"contribution\": 0.00029, \"direction\": \"supports_prediction\"}, {\"word\": \"سات\", \"contribution\": 7e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"کیا\", \"contribution\": -6e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"دن\", \"contribution\": 6e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"ۓے\", \"contribution\": -5e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"اعلان\", \"contribution\": 4e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"انڑییٹ\", \"contribution\": 3e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"حکومت\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}]",
+        "heatmap_path": "explanations/9_heatmap.png",
+        "explanation_summary": "OCR read text from the image (average confidence 0.41), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (73% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+        "model_version": "img-pair:xlmr-urdu",
+        "created_at": "2026-11-27T20:05:39.627125Z"
+       },
+       "gradcam_status": "completed"
+      },
+      "file": "img11b_light_grey.png",
+      "sent_name": "img11b_light_grey.png",
+      "sent_mime": "image/png",
+      "sent_sha256": "981c3df95090b731a84650bb473f5ff0cb9fe6313c8f1791a82b521c248c3ce1",
+      "sent_bytes": 25832,
+      "retry_after": null
+     }
+    }
+   },
+   "run_at": "2026-11-28 01:05:39",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-12": {
+   "result": "Pass",
+   "evidence": "201 · image_pair · ocr completed 0.40 “سیلابےے متاثرہ علاقوں عيں امدادی …” · urdu · xlmr-urdu Real 0.9999 · image completed AI 0.3851 (Likely real photo) · gradcam completed (class real) · final Real risk 0.0001 · 17.2 s · id 10",
+   "expected": "OCR reads the caption; text verdict; image_score; heatmap",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 10,
+     "file": "img12_photo_caption.jpg",
+     "latency_s": 17.19,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "سیلابےے متاثرہ علاقوں عيں امدادی کاررواتیاں جاری",
+     "ocr_confidence": 0.4005,
+     "language": "urdu",
+     "text_model": "xlmr-urdu",
+     "model_version": "img-pair:xlmr-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.9999,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.3851,
+     "authenticity": "Likely real photo",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/10_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.0001,
+     "summary": "OCR read text from the image (average confidence 0.40), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks like a real photo (39% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "جاری",
+      "متاثرہ",
+      "علاقوں",
+      "سیلابےے",
+      "عیں",
+      "امدادی",
+      "کاررواتیاں"
+     ],
+     "explained_class": "real",
+     "p_real": 0.6149,
+     "members": {
+      "clip_vitl14": 0.8376,
+      "dinov2_l": 0.0482,
+      "resnet18_robust": 0.959
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      908
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/img12_photo_caption_id10.png",
+     "heatmap_sha256": "fc7ee4c804237a8692a2d45ffd3bd1cf51937ecf6b710be1fef8fa7d8dd84fb4"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 17.19,
+     "body": {
+      "id": 10,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0001,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:05:56.714321Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 10,
+       "image_path": "99153cc2935b473d841eb4af88a42889.jpg",
+       "original_filename": "img12_photo_caption.jpg",
+       "mime_type": "image/jpeg",
+       "file_size_bytes": 166487,
+       "ocr_text": "سیلابےے متاثرہ علاقوں عيں امدادی کاررواتیاں جاری",
+       "ocr_confidence": 0.4005,
+       "ocr_status": "completed",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9999,
+       "image_score": 0.3851,
+       "manipulation_prediction": "Likely real photo",
+       "created_at": "2026-11-27T20:05:56.856102Z",
+       "analysis_branch": "image_pair",
+       "text_classification_status": "completed",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 10,
+       "highlighted_words": "[{\"word\": \"جاری\", \"contribution\": 2e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"متاثرہ\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"علاقوں\", \"contribution\": 1e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"سیلابےے\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"عیں\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"امدادی\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"کاررواتیاں\", \"contribution\": -0.0, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": "explanations/10_heatmap.png",
+       "explanation_summary": "OCR read text from the image (average confidence 0.40), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks like a real photo (39% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+       "model_version": "img-pair:xlmr-urdu",
+       "created_at": "2026-11-27T20:05:56.855280Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "img12_photo_caption.jpg",
+     "sent_name": "img12_photo_caption.jpg",
+     "sent_mime": "image/jpeg",
+     "sent_sha256": "449201a3d9b5309b94f23c438d5032553483258f75aca33a3b3370237f288578",
+     "sent_bytes": 166487,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:05:56",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-13": {
+   "result": "Pass",
+   "evidence": "201 · image_pair · ocr completed 0.61 “Daily Update تی وس روسپےفی لیٹڑر …” · mixed · xlmr-urdu Fake 0.5626 · image completed AI 0.3938 (Likely real photo) · gradcam completed (class real) · final Fake risk 0.5626 · 24.1 s · id 11 · screen: id 41: text verdict first=True (verdict at 11, authenticity at 97); authenticity card colour rgb(56, 189, 248) (neutral info blue=True); limitation note=True; text-image note=True; heatmap shown=True [1080, 1080]; OCR text shown=True · backend/tests/image_cases/screens/TC-IMG-13_42_result_top.png, backend/tests/image_cases/screens/TC-IMG-13_42_result_heatmap.png, backend/tests/image_cases/screens/TC-IMG-13_42_result_ocr.png",
+   "expected": "text verdict + separate authenticity result (API); screen check separate",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 11,
+     "file": "img13_news_card.png",
+     "latency_s": 24.06,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "Daily Update\nتی وس روسپےفی لیٹڑر\nوفاقی حکومت ذے پیڑرول کی\nاضافه ردیا\n2 hours ago\n12K shares\nخبریں\nقیمت",
+     "ocr_confidence": 0.613,
+     "language": "mixed",
+     "text_model": "xlmr-urdu",
+     "model_version": "img-pair:xlmr-urdu",
+     "text_label": "Fake",
+     "text_confidence": 0.5626,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.3938,
+     "authenticity": "Likely real photo",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/11_heatmap.png",
+     "final_label": "Fake",
+     "risk": 0.5626,
+     "summary": "OCR read text from the image (average confidence 0.61), so the text was checked as the news claim. This looks like fake or misleading news. The AI is unsure (56.3%), so treat this result with caution. The highlighted words below had the biggest effect on this result. The text mixes Urdu and English script, so it was checked as Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks like a real photo (39% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "حکومت",
+      "روسپےفی",
+      "Update",
+      "Daily",
+      "وفاقی",
+      "لیٹڑر",
+      "تی",
+      "وس"
+     ],
+     "explained_class": "real",
+     "p_real": 0.6062,
+     "members": {
+      "clip_vitl14": 0.7955,
+      "dinov2_l": 0.0382,
+      "resnet18_robust": 0.9848
+     },
+     "user": "A",
+     "heatmap_size": [
+      1080,
+      1080
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/img13_news_card_id11.png",
+     "heatmap_sha256": "bcc501c0ba5e0ac08032ea899d2c1c2d87686cb7b343f50c1aa3010c90b97468"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 24.06,
+     "body": {
+      "id": 11,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "mixed",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.5626,
+      "final_label": "Fake",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:06:20.853238Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 11,
+       "image_path": "cea12056159b47849249183344963d65.png",
+       "original_filename": "img13_news_card.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 568434,
+       "ocr_text": "Daily Update\nتی وس روسپےفی لیٹڑر\nوفاقی حکومت ذے پیڑرول کی\nاضافه ردیا\n2 hours ago\n12K shares\nخبریں\nقیمت",
+       "ocr_confidence": 0.613,
+       "ocr_status": "completed",
+       "detected_language": "mixed",
+       "text_prediction": "Fake",
+       "text_confidence": 0.5626,
+       "image_score": 0.3938,
+       "manipulation_prediction": "Likely real photo",
+       "created_at": "2026-11-27T20:06:21.012010Z",
+       "analysis_branch": "image_pair",
+       "text_classification_status": "completed",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 11,
+       "highlighted_words": "[{\"word\": \"حکومت\", \"contribution\": -0.43422, \"direction\": \"opposes_prediction\"}, {\"word\": \"روسپےفی\", \"contribution\": -0.42503, \"direction\": \"opposes_prediction\"}, {\"word\": \"Update\", \"contribution\": -0.40976, \"direction\": \"opposes_prediction\"}, {\"word\": \"Daily\", \"contribution\": -0.40737, \"direction\": \"opposes_prediction\"}, {\"word\": \"وفاقی\", \"contribution\": -0.40714, \"direction\": \"opposes_prediction\"}, {\"word\": \"لیٹڑر\", \"contribution\": -0.38524, \"direction\": \"opposes_prediction\"}, {\"word\": \"تی\", \"contribution\": -0.37774, \"direction\": \"opposes_prediction\"}, {\"word\": \"وس\", \"contribution\": -0.07916, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": "explanations/11_heatmap.png",
+       "explanation_summary": "OCR read text from the image (average confidence 0.61), so the text was checked as the news claim. This looks like fake or misleading news. The AI is unsure (56.3%), so treat this result with caution. The highlighted words below had the biggest effect on this result. The text mixes Urdu and English script, so it was checked as Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks like a real photo (39% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+       "model_version": "img-pair:xlmr-urdu",
+       "created_at": "2026-11-27T20:06:21.010775Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "img13_news_card.png",
+     "sent_name": "img13_news_card.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "6bdd82994abc1b1da99728fe90403bfd693f9184705b70e4158e8ea633af8c63",
+     "sent_bytes": 568434,
+     "retry_after": null
+    },
+    "web": {
+     "ok": true,
+     "evidence": "id 41: text verdict first=True (verdict at 11, authenticity at 97); authenticity card colour rgb(56, 189, 248) (neutral info blue=True); limitation note=True; text-image note=True; heatmap shown=True [1080, 1080]; OCR text shown=True · backend/tests/image_cases/screens/TC-IMG-13_42_result_top.png, backend/tests/image_cases/screens/TC-IMG-13_42_result_heatmap.png, backend/tests/image_cases/screens/TC-IMG-13_42_result_ocr.png",
+     "page": {
+      "verdictAt": 11,
+      "authAt": 97,
+      "authColor": "rgb(56, 189, 248)",
+      "authText": "IMAGE AUTHENTICITY (SEPARATE FROM THE VERDICT ABOVE)",
+      "limitationNote": true,
+      "textImageNote": true,
+      "heatmapShown": true,
+      "heatmapNatural": [
+       1080,
+       1080
+      ],
+      "resnetCaption": true,
+      "ocrShown": true,
+      "noClaim": false,
+      "uncertainShown": false,
+      "heatmapMissingNote": false
+     },
+     "api_branch": "image_pair"
+    },
+    "api_result": "Pass"
+   },
+   "run_at": "2026-11-28 01:06:21",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-14": {
+   "result": "Pass",
+   "evidence": "201 · ai_or_real · ocr no_text_found — “—” · lang None · no text verdict · image completed AI 0.7594 (Likely AI-generated) · gradcam completed (class fake) · final Uncertain risk — · 15.1 s · id 12",
+   "expected": "image_score and label; final Uncertain; heatmap",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 12,
+     "file": "photo_ai_look.png",
+     "latency_s": 15.07,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.7594,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/12_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (76% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "fake",
+     "p_real": 0.2406,
+     "members": {
+      "clip_vitl14": 0.1991,
+      "dinov2_l": 0.086,
+      "resnet18_robust": 0.4366
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      1024
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/photo_ai_look_id12.png",
+     "heatmap_sha256": "cb99863acde55a9a78ffde19c018ba7f5adbdf17cd4b4d1b75f99c4ca3f160a7"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 15.07,
+     "body": {
+      "id": 12,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": null,
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:06:36.051268Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 12,
+       "image_path": "fbd484953f4a4adbb36eb4b3b2aa4712.png",
+       "original_filename": "photo_ai_look.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 154094,
+       "ocr_text": null,
+       "ocr_confidence": null,
+       "ocr_status": "no_text_found",
+       "detected_language": null,
+       "text_prediction": null,
+       "text_confidence": null,
+       "image_score": 0.7594,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:06:36.153556Z",
+       "analysis_branch": "ai_or_real",
+       "text_classification_status": "not_run",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 12,
+       "highlighted_words": null,
+       "heatmap_path": "explanations/12_heatmap.png",
+       "explanation_summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (76% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+       "model_version": "img-ens-clip-dino-r18",
+       "created_at": "2026-11-27T20:06:36.152459Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "photo_ai_look.png",
+     "sent_name": "photo_ai_look.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "65fc70a2a80a26d52cde5c3c0534b8c3beab418342b4d2225d5bffc70dfd11a6",
+     "sent_bytes": 154094,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:06:36",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-15": {
+   "result": "Fail",
+   "evidence": "201 · ai_or_real · ocr completed 0.06 “IBIB آST٥٥ IUPIBUfIEISUPBISSSTIOJI” · lang mixed · no text verdict · image completed AI 0.4494 (Likely real photo) · gradcam completed (class real) · final Uncertain risk — · 21.2 s · id 13; branch ai_or_real (OCR completed 0.0564)",
+   "expected": "OCR text verdict and image_score; heatmap",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 13,
+     "file": "img15_meme_roman.jpg",
+     "latency_s": 21.22,
+     "branch": "ai_or_real",
+     "ocr_status": "completed",
+     "ocr_text": "IBIB آST٥٥\nIUPIBUfIEISUPBISSSTIOJI",
+     "ocr_confidence": 0.0564,
+     "language": "mixed",
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.4494,
+     "authenticity": "Likely real photo",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/13_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks like a real photo (45% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "real",
+     "p_real": 0.5506,
+     "members": {
+      "clip_vitl14": 0.8558,
+      "dinov2_l": 0.631,
+      "resnet18_robust": 0.165
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      768
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/img15_meme_roman_id13.png",
+     "heatmap_sha256": "f448bc8d6bd67533fea9cf5c01de98446b989b59563022329c1bea045d6739ff"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 21.22,
+     "body": {
+      "id": 13,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "mixed",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:06:57.279078Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 13,
+       "image_path": "c9848d9f8e2d45c995d37012af05984f.jpg",
+       "original_filename": "img15_meme_roman.jpg",
+       "mime_type": "image/jpeg",
+       "file_size_bytes": 178577,
+       "ocr_text": "IBIB آST٥٥\nIUPIBUfIEISUPBISSSTIOJI",
+       "ocr_confidence": 0.0564,
+       "ocr_status": "completed",
+       "detected_language": "mixed",
+       "text_prediction": null,
+       "text_confidence": null,
+       "image_score": 0.4494,
+       "manipulation_prediction": "Likely real photo",
+       "created_at": "2026-11-27T20:06:57.427996Z",
+       "analysis_branch": "ai_or_real",
+       "text_classification_status": "not_run",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 13,
+       "highlighted_words": null,
+       "heatmap_path": "explanations/13_heatmap.png",
+       "explanation_summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks like a real photo (45% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+       "model_version": "img-ens-clip-dino-r18",
+       "created_at": "2026-11-27T20:06:57.427213Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "img15_meme_roman.jpg",
+     "sent_name": "img15_meme_roman.jpg",
+     "sent_mime": "image/jpeg",
+     "sent_sha256": "552207554d9e4f5d6bd161c4ec33b72837ac91c17fed3a50bfeed407825194ba",
+     "sent_bytes": 178577,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:06:57",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-16": {
+   "result": "Pass",
+   "evidence": "201 · ai_or_real · ocr no_text_found — “—” · lang None · no text verdict · image completed AI 0.5471 (Likely AI-generated) · gradcam completed (class fake) · final Uncertain risk — · 12.6 s · id 14",
+   "expected": "201; processed",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 14,
+     "file": "f16_valid.jpg",
+     "latency_s": 12.61,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.5471,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/14_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (55% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "fake",
+     "p_real": 0.4529,
+     "members": {
+      "clip_vitl14": 0.3943,
+      "dinov2_l": 0.0412,
+      "resnet18_robust": 0.9232
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      768
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f16_valid_id14.png",
+     "heatmap_sha256": "d341fd4bc2f9a7a2ba02eb826655bcd900fe0361beae468db7fb7bd7943b0283"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 12.61,
+     "body": {
+      "id": 14,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": null,
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:07:09.997922Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 14,
+       "image_path": "750d54c95eb947d0947341bff0003268.jpg",
+       "original_filename": "f16_valid.jpg",
+       "mime_type": "image/jpeg",
+       "file_size_bytes": 127238,
+       "ocr_text": null,
+       "ocr_confidence": null,
+       "ocr_status": "no_text_found",
+       "detected_language": null,
+       "text_prediction": null,
+       "text_confidence": null,
+       "image_score": 0.5471,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:07:10.111419Z",
+       "analysis_branch": "ai_or_real",
+       "text_classification_status": "not_run",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 14,
+       "highlighted_words": null,
+       "heatmap_path": "explanations/14_heatmap.png",
+       "explanation_summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (55% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+       "model_version": "img-ens-clip-dino-r18",
+       "created_at": "2026-11-27T20:07:10.110800Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "f16_valid.jpg",
+     "sent_name": "f16_valid.jpg",
+     "sent_mime": "image/jpeg",
+     "sent_sha256": "f7da4b93df32cc31bacd476150e06b3e1327d5c45bee924b4ca101a5bbae917c",
+     "sent_bytes": 127238,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:07:10",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-17": {
+   "result": "Pass",
+   "evidence": "201 · ai_or_real · ocr no_text_found — “—” · lang None · no text verdict · image completed AI 0.8541 (Likely AI-generated) · gradcam completed (class fake) · final Uncertain risk — · 12.8 s · id 15",
+   "expected": "201; processed",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 15,
+     "file": "f17_valid.webp",
+     "latency_s": 12.77,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.8541,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/15_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (85% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "fake",
+     "p_real": 0.1459,
+     "members": {
+      "clip_vitl14": 0.0169,
+      "dinov2_l": 0.4145,
+      "resnet18_robust": 0.0063
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      768
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f17_valid_id15.png",
+     "heatmap_sha256": "4b6a8eb17f0b3b454d47f033dfa610d8fd68206e1ae2eb362dcbf8bab3b2b22b"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 12.77,
+     "body": {
+      "id": 15,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": null,
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:07:22.784536Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 15,
+       "image_path": "cfc4bb34eaca4008bc335beae965e8f2.webp",
+       "original_filename": "f17_valid.webp",
+       "mime_type": "image/webp",
+       "file_size_bytes": 60000,
+       "ocr_text": null,
+       "ocr_confidence": null,
+       "ocr_status": "no_text_found",
+       "detected_language": null,
+       "text_prediction": null,
+       "text_confidence": null,
+       "image_score": 0.8541,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:07:22.929069Z",
+       "analysis_branch": "ai_or_real",
+       "text_classification_status": "not_run",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 15,
+       "highlighted_words": null,
+       "heatmap_path": "explanations/15_heatmap.png",
+       "explanation_summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (85% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+       "model_version": "img-ens-clip-dino-r18",
+       "created_at": "2026-11-27T20:07:22.928227Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "f17_valid.webp",
+     "sent_name": "f17_valid.webp",
+     "sent_mime": "image/webp",
+     "sent_sha256": "ff6926fd19e5d2ba3307be88d24f8031c35ea79042fc870a6cb4ce9ed5153e96",
+     "sent_bytes": 60000,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:07:23",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-18": {
+   "result": "Pass",
+   "evidence": "201 · image_pair · ocr completed 0.56 “Hukoomat ne elan kiya hai ke mulk…” · roman_urdu · xlmr-roman-urdu Real 0.9280 · image completed AI 0.9467 (Likely AI-generated) · gradcam completed (class fake) · final Real risk 0.0720 · 33.5 s · id 16",
+   "expected": "201; no crash; heatmap",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 16,
+     "file": "f18_alpha.png",
+     "latency_s": 33.52,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "Hukoomat ne elan kiya hai ke mulk bhar mein saat\ndin ke liye internet service band kar di jayegi",
+     "ocr_confidence": 0.5582,
+     "language": "roman_urdu",
+     "text_model": "xlmr-roman-urdu",
+     "model_version": "img-pair:xlmr-roman-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.928,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.9467,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/16_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.072,
+     "summary": "OCR read text from the image (average confidence 0.56), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (92.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (95% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "Hukoomat",
+      "ke",
+      "bhar",
+      "kiya",
+      "mulk",
+      "hai",
+      "elan",
+      "ne"
+     ],
+     "explained_class": "fake",
+     "p_real": 0.0533,
+     "members": {
+      "clip_vitl14": 0.0282,
+      "dinov2_l": 0.1318,
+      "resnet18_robust": 0.0
+     },
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f18_alpha_id16.png",
+     "heatmap_sha256": "8d9a695a9ea84a8589bdc6c6e628cf1a0537845f5af5cbff67c525a4533cfc61"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 33.52,
+     "body": {
+      "id": 16,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "roman_urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.072,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:07:56.453385Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 16,
+       "image_path": "8e61f6020af74dd5b022fa27c577302b.png",
+       "original_filename": "f18_alpha.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 26425,
+       "ocr_text": "Hukoomat ne elan kiya hai ke mulk bhar mein saat\ndin ke liye internet service band kar di jayegi",
+       "ocr_confidence": 0.5582,
+       "ocr_status": "completed",
+       "detected_language": "roman_urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.928,
+       "image_score": 0.9467,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:07:56.517128Z",
+       "analysis_branch": "image_pair",
+       "text_classification_status": "completed",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 16,
+       "highlighted_words": "[{\"word\": \"Hukoomat\", \"contribution\": 0.75564, \"direction\": \"supports_prediction\"}, {\"word\": \"ke\", \"contribution\": 0.60573, \"direction\": \"supports_prediction\"}, {\"word\": \"bhar\", \"contribution\": 0.16506, \"direction\": \"supports_prediction\"}, {\"word\": \"kiya\", \"contribution\": 0.07168, \"direction\": \"supports_prediction\"}, {\"word\": \"mulk\", \"contribution\": 0.04787, \"direction\": \"supports_prediction\"}, {\"word\": \"hai\", \"contribution\": -0.04405, \"direction\": \"opposes_prediction\"}, {\"word\": \"elan\", \"contribution\": -0.03748, \"direction\": \"opposes_prediction\"}, {\"word\": \"ne\", \"contribution\": 0.01229, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": "explanations/16_heatmap.png",
+       "explanation_summary": "OCR read text from the image (average confidence 0.56), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (92.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (95% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+       "model_version": "img-pair:xlmr-roman-urdu",
+       "created_at": "2026-11-27T20:07:56.516005Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "f18_alpha.png",
+     "sent_name": "f18_alpha.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "1471d9542be48dad3f9b5d8ed464d7f47322fca92cdefb6c3f8e6f726c0401fb",
+     "sent_bytes": 26425,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:07:56",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-19": {
+   "result": "Pass",
+   "evidence": "201 · ai_or_real · ocr no_text_found — “—” · lang None · no text verdict · image completed AI 0.2946 (Likely real photo) · gradcam completed (class real) · final Uncertain risk — · 12.5 s · id 17",
+   "expected": "201; no crash; heatmap",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 17,
+     "file": "f19_greyscale.jpg",
+     "latency_s": 12.51,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.2946,
+     "authenticity": "Likely real photo",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/17_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks like a real photo (29% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "real",
+     "p_real": 0.7054,
+     "members": {
+      "clip_vitl14": 0.946,
+      "dinov2_l": 0.1771,
+      "resnet18_robust": 0.9931
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      768
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f19_greyscale_id17.png",
+     "heatmap_sha256": "7e700be06d304c0907cbe1a1d762c785b910b00b2ff634bdf6a587eae602e84d"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 12.51,
+     "body": {
+      "id": 17,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": null,
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:08:08.970388Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 17,
+       "image_path": "71b900ddab304237b7793e041c6cde1f.jpg",
+       "original_filename": "f19_greyscale.jpg",
+       "mime_type": "image/jpeg",
+       "file_size_bytes": 135981,
+       "ocr_text": null,
+       "ocr_confidence": null,
+       "ocr_status": "no_text_found",
+       "detected_language": null,
+       "text_prediction": null,
+       "text_confidence": null,
+       "image_score": 0.2946,
+       "manipulation_prediction": "Likely real photo",
+       "created_at": "2026-11-27T20:08:09.087326Z",
+       "analysis_branch": "ai_or_real",
+       "text_classification_status": "not_run",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 17,
+       "highlighted_words": null,
+       "heatmap_path": "explanations/17_heatmap.png",
+       "explanation_summary": "OCR found no readable text, so no news claim was checked. The picture looks like a real photo (29% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+       "model_version": "img-ens-clip-dino-r18",
+       "created_at": "2026-11-27T20:08:09.085899Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "f19_greyscale.jpg",
+     "sent_name": "f19_greyscale.jpg",
+     "sent_mime": "image/jpeg",
+     "sent_sha256": "b546393e08a4899db5188a82967e2e0dcf5172d39debc1367d69c85304f5c7fa",
+     "sent_bytes": 135981,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:08:09",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-20": {
+   "result": "Finding",
+   "evidence": "201 · ai_or_real · ocr no_text_found — “—” · lang None · no text verdict · image completed AI 0.5036 (Likely AI-generated) · gradcam completed · final Uncertain risk — · 4.8 s · id 36 · the 1×1 picture is upscaled to 224×224 and still gets an AI-generated score, label and heatmap",
+   "expected": "processed or clear error; no crash; nothing invented",
+   "notes": "No news verdict is invented (final Uncertain), but the detector returns a label and a heatmap for a single pixel; a minimum-size check would be clearer.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 36,
+     "file": "f20_1x1.png",
+     "latency_s": 4.76,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.5036,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/36_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (50% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "user": "A",
+     "heatmap_size": [
+      1,
+      1
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f20_1x1_id36.png",
+     "heatmap_sha256": "67306fc2bcba5bef133b3188e3fa2ce8dc912e572932dd3b9729a930949eb8ab"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 4.76,
+     "body": {
+      "id": 36,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": null,
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:15:38.012692Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 36,
+       "image_path": "5fd179408cee465b9257d2074a7fd416.png",
+       "original_filename": "f20_1x1.png",
+       "mime_type": "image/png",
+       "file_size_bytes": 69,
+       "ocr_text": null,
+       "ocr_confidence": null,
+       "ocr_status": "no_text_found",
+       "detected_language": null,
+       "text_prediction": null,
+       "text_confidence": null,
+       "image_score": 0.5036,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:15:38.022751Z",
+       "analysis_branch": "ai_or_real",
+       "text_classification_status": "not_run",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 36,
+       "highlighted_words": null,
+       "heatmap_path": "explanations/36_heatmap.png",
+       "explanation_summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (50% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+       "model_version": "img-ens-clip-dino-r18",
+       "created_at": "2026-11-27T20:15:38.022347Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "f20_1x1.png",
+     "sent_name": "f20_1x1.png",
+     "sent_mime": "image/png",
+     "sent_sha256": "cf27c87b1d7029c68b7fcbde4524373f62dbd9933c72fd8f1ec6d294b8ed92bb",
+     "sent_bytes": 69,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:15:38",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-21": {
+   "result": "Pass",
+   "evidence": "8000×8000 (196 KB): 413 “Image dimensions are too large to analyze.” in 0.0 s · extra 6000×6000: 201 · ai_or_real · ocr no_text_found — “—” · lang None · no text verdict · image completed AI 0.6259 (Likely AI-generated) · gradcam completed · final Uncertain risk — · 51.9 s · id 37 · server RAM 3741→2559 MB, peak 7495 MB",
+   "expected": "processed or clear error; no crash; record time and peak RAM",
+   "notes": "",
+   "raw": {
+    "facts_8000": {
+     "status": 413,
+     "id": null,
+     "file": "f21_8000x8000.png",
+     "latency_s": 0.01,
+     "branch": null,
+     "ocr_status": null,
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": null,
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": null,
+     "image_status": null,
+     "image_score": null,
+     "authenticity": null,
+     "gradcam_status": null,
+     "heatmap_path": null,
+     "final_label": null,
+     "risk": null,
+     "summary": null,
+     "detail": "Image dimensions are too large to analyze.",
+     "highlights": [],
+     "user": "A"
+    },
+    "facts_6000": {
+     "status": 201,
+     "id": 37,
+     "file": "f21b_6000x6000.png",
+     "latency_s": 51.87,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.6259,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/37_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (63% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "user": "A",
+     "heatmap_size": [
+      6000,
+      6000
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f21b_6000x6000_id37.png",
+     "heatmap_sha256": "f2d8f3d5662d60b9725f70641dd05e7f2d76f84f08e06b7f6c33d913087fe804"
+    },
+    "memory": [
+     {
+      "working_set_mb": 3741,
+      "peak_working_set_mb": 7495
+     },
+     {
+      "working_set_mb": 3742,
+      "peak_working_set_mb": 7495
+     },
+     {
+      "working_set_mb": 2559,
+      "peak_working_set_mb": 7495
+     }
+    ]
+   },
+   "run_at": "2026-11-28 01:16:33",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-22": {
+   "result": "Pass",
+   "evidence": "under (10484883 B): 201 · ai_or_real · ocr no_text_found — “—” · lang None · no text verdict · image completed AI 0.2661 (Likely real photo) · gradcam completed · final Uncertain risk — · 18.0 s · id 20 · over (10496113 B): 413 “File is larger than the maximum allowed size of 10 MB.” · nothing saved=True",
+   "expected": "under: 201; over: 413 clear message, nothing saved",
+   "notes": "",
+   "raw": {
+    "under": {
+     "status": 201,
+     "id": 20,
+     "file": "f22a_just_under_10mb.png",
+     "latency_s": 17.99,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.2661,
+     "authenticity": "Likely real photo",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/20_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks like a real photo (27% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "user": "A",
+     "heatmap_size": [
+      1869,
+      1869
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f22a_just_under_10mb_id20.png",
+     "heatmap_sha256": "cd505a39367558116bb9d352424548b897ac335f5fbcc410433710e7b9d320f5"
+    },
+    "over": {
+     "just over 10 MB": {
+      "status": 413,
+      "detail": "File is larger than the maximum allowed size of 10 MB.",
+      "latency_s": 0.05,
+      "bytes": 10496113
+     },
+     "history": [
+      20,
+      20
+     ],
+     "upload_files": [
+      20,
+      20
+     ]
+    }
+   },
+   "run_at": "2026-11-28 01:09:26",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-23": {
+   "result": "Pass",
+   "evidence": "GIF → 415 “Unsupported image format 'gif'. Accepted: JPEG, PNG, WEBP.” · history 20→20, upload files 20→20",
+   "expected": "rejected with a clear message; nothing saved",
+   "notes": "",
+   "raw": {
+    "GIF": {
+     "status": 415,
+     "detail": "Unsupported image format 'gif'. Accepted: JPEG, PNG, WEBP.",
+     "latency_s": 0.01,
+     "bytes": 16439
+    },
+    "history": [
+     20,
+     20
+    ],
+    "upload_files": [
+     20,
+     20
+    ]
+   },
+   "run_at": "2026-11-28 01:09:26",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-24": {
+   "result": "Pass",
+   "evidence": "truncated JPEG → 415 “File does not appear to be a valid image.” · history 20→20, upload files 20→20 · next request: 201 id 21",
+   "expected": "rejected; nothing saved; next request served",
+   "notes": "",
+   "raw": {
+    "truncated JPEG": {
+     "status": 415,
+     "detail": "File does not appear to be a valid image.",
+     "latency_s": 0.01,
+     "bytes": 72731
+    },
+    "history": [
+     20,
+     20
+    ],
+    "upload_files": [
+     20,
+     20
+    ],
+    "next": {
+     "status": 201,
+     "id": 21,
+     "file": "f16_valid.jpg",
+     "latency_s": 5.66,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.5471,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/21_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (55% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "fake",
+     "p_real": 0.4529,
+     "members": {
+      "clip_vitl14": 0.3943,
+      "dinov2_l": 0.0412,
+      "resnet18_robust": 0.9232
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      768
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f16_valid_id21.png",
+     "heatmap_sha256": "d341fd4bc2f9a7a2ba02eb826655bcd900fe0361beae468db7fb7bd7943b0283"
+    }
+   },
+   "run_at": "2026-11-28 01:09:26",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-25": {
+   "result": "Pass",
+   "evidence": "201 · image_pair · ocr completed 0.56 “Hukoomat ne elan kiya hai ke mulk…” · roman_urdu · xlmr-roman-urdu Real 0.9280 · image completed AI 0.9467 (Likely AI-generated) · gradcam completed (class fake) · final Real risk 0.0720 · 14.6 s · id 22 · sent as image/jpeg named .jpg → stored mime image/png, path 99b295ed1340484894466b2d8092d18e.png",
+   "expected": "handled by its real content; 201",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 22,
+     "file": "f25_png_named.jpg",
+     "latency_s": 14.6,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "Hukoomat ne elan kiya hai ke mulk bhar mein saat\ndin ke liye internet service band kar di jayegi",
+     "ocr_confidence": 0.5582,
+     "language": "roman_urdu",
+     "text_model": "xlmr-roman-urdu",
+     "model_version": "img-pair:xlmr-roman-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.928,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.9467,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/22_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.072,
+     "summary": "OCR read text from the image (average confidence 0.56), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (92.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (95% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "Hukoomat",
+      "ke",
+      "bhar",
+      "kiya",
+      "mulk",
+      "hai",
+      "elan",
+      "ne"
+     ],
+     "explained_class": "fake",
+     "p_real": 0.0533,
+     "members": {
+      "clip_vitl14": 0.0282,
+      "dinov2_l": 0.1318,
+      "resnet18_robust": 0.0
+     },
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f25_png_named_id22.png",
+     "heatmap_sha256": "8d9a695a9ea84a8589bdc6c6e628cf1a0537845f5af5cbff67c525a4533cfc61"
+    },
+    "stored": {
+     "mime_type": "image/png",
+     "image_path": "99b295ed1340484894466b2d8092d18e.png",
+     "original_filename": "f25_png_named.jpg"
+    }
+   },
+   "run_at": "2026-11-28 01:09:46",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-26": {
+   "result": "Pass",
+   "evidence": "201 · image_pair · ocr completed 0.38 “اعلان ليا اسات دن انڑرنیٹ سروس بن…” · urdu · xlmr-urdu Real 0.9999 · image completed AI 0.8279 (Likely AI-generated) · gradcam completed (class fake) · final Real risk 0.0001 · 6.9 s · id 23 · stored 900×600 + EXIF 6 → heatmap [600, 900] (upright 600×900) · OCR read the upright text=True · backend/tests/image_cases/heatmaps/f26_exif6_id23.png",
+   "expected": "analysed upright; heatmap 600×900 lines up",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 23,
+     "file": "f26_exif6.jpg",
+     "latency_s": 6.9,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "اعلان ليا\nاسات دن\nانڑرنیٹ سروس بندکردی جالے\nحکومت نے\nلک ببھریں",
+     "ocr_confidence": 0.381,
+     "language": "urdu",
+     "text_model": "xlmr-urdu",
+     "model_version": "img-pair:xlmr-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.9999,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.8279,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/23_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.0001,
+     "summary": "OCR read text from the image (average confidence 0.38), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (83% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "اعلان",
+      "لیا",
+      "سروس",
+      "دن",
+      "انڑرنیٹ",
+      "اسات",
+      "بندکردی",
+      "جالے"
+     ],
+     "explained_class": "fake",
+     "p_real": 0.1721,
+     "members": {
+      "clip_vitl14": 0.4132,
+      "dinov2_l": 0.1032,
+      "resnet18_robust": 0.0
+     },
+     "user": "A",
+     "heatmap_size": [
+      600,
+      900
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f26_exif6_id23.png",
+     "heatmap_sha256": "ad8a5ac19aff9103e739ea465e8fcdb2ebc708b2ad8bb9d6295d3f6a4cb1e195"
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 6.9,
+     "body": {
+      "id": 23,
+      "user_id": 1,
+      "submission_type": "image",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0001,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T20:09:53.352089Z",
+      "text_submission": null,
+      "image_submission": {
+       "id": 23,
+       "image_path": "149ffe49922644a3a8d87ab948fdeec7.jpg",
+       "original_filename": "f26_exif6.jpg",
+       "mime_type": "image/jpeg",
+       "file_size_bytes": 41584,
+       "ocr_text": "اعلان ليا\nاسات دن\nانڑرنیٹ سروس بندکردی جالے\nحکومت نے\nلک ببھریں",
+       "ocr_confidence": 0.381,
+       "ocr_status": "completed",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9999,
+       "image_score": 0.8279,
+       "manipulation_prediction": "Likely AI-generated",
+       "created_at": "2026-11-27T20:09:53.373552Z",
+       "analysis_branch": "image_pair",
+       "text_classification_status": "completed",
+       "image_analysis_status": "completed"
+      },
+      "explainability": {
+       "id": 23,
+       "highlighted_words": "[{\"word\": \"اعلان\", \"contribution\": 0.00063, \"direction\": \"supports_prediction\"}, {\"word\": \"لیا\", \"contribution\": 0.0001, \"direction\": \"supports_prediction\"}, {\"word\": \"سروس\", \"contribution\": 1e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"دن\", \"contribution\": 1e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"انڑرنیٹ\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"اسات\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"بندکردی\", \"contribution\": 0.0, \"direction\": \"supports_prediction\"}, {\"word\": \"جالے\", \"contribution\": 0.0, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": "explanations/23_heatmap.png",
+       "explanation_summary": "OCR read text from the image (average confidence 0.38), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (83% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+       "model_version": "img-pair:xlmr-urdu",
+       "created_at": "2026-11-27T20:09:53.373188Z"
+      },
+      "gradcam_status": "completed"
+     },
+     "file": "f26_exif6.jpg",
+     "sent_name": "f26_exif6.jpg",
+     "sent_mime": "image/jpeg",
+     "sent_sha256": "3d2ab007c0b367733324ae49e8a75532cd08b48db49dd35557fc6cd23510e725",
+     "sent_bytes": 41584,
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 01:09:53",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-27": {
+   "result": "Pass",
+   "evidence": "upload SHA-256 bf37ac7bd128b7ac… · download 200 SHA-256 bf37ac7bd128b7ac… · equal=True · id 38",
+   "expected": "download SHA-256 equals upload",
+   "notes": "",
+   "raw": {
+    "upload": "bf37ac7bd128b7ac48c8a5be40bb9865907d7808778c551fcee27a8a441bcddd",
+    "download": "bf37ac7bd128b7ac48c8a5be40bb9865907d7808778c551fcee27a8a441bcddd",
+    "status": 200,
+    "id": 38,
+    "facts": {
+     "status": 201,
+     "id": 38,
+     "file": "img02_urdu_internet.png",
+     "latency_s": 8.29,
+     "branch": "ai_or_real",
+     "ocr_status": "completed",
+     "ocr_text": "حکومت نے اعلان کیاے کەملک بجھریں سات دن ےلي انڑنیٹ\nسروس بندکردی جاسےگی -",
+     "ocr_confidence": 0.2815,
+     "language": "urdu",
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.8312,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/38_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks AI-generated (83% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "fake",
+     "p_real": 0.1688,
+     "members": {
+      "clip_vitl14": 0.3327,
+      "dinov2_l": 0.1736,
+      "resnet18_robust": 0.0001
+     },
+     "user": "A",
+     "heatmap_size": [
+      1200,
+      600
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/img02_urdu_internet_id38.png",
+     "heatmap_sha256": "76a1ba570daef2f42f90b37454b5c38384671d117ebb31ba1dfa91d87de67ffc"
+    }
+   },
+   "run_at": "2026-11-28 01:16:41",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-01": {
+   "result": "Pass",
+   "evidence": "201 · ai_or_real · ocr unavailable — “—” · lang None · no text verdict · image unavailable AI — (Not Analyzed: model unavailable) · gradcam not_run · final Uncertain risk — · 0.1 s · id 25 · stored file served, SHA-256 matches=True · heatmap GET 404",
+   "expected": "201; stored; final Uncertain; image check unavailable; nothing invented",
+   "notes": "Injected: ocr.load_ocr_reader raises; ai_detector.load_detector returns (None, reason). Summary: OCR could not process this image. Check the backend log for details. Any text in the image could not be read, so no news claim was checked. Image authenticity was not analyzed: the AI-image detector is unavailable (fault-injected, TC-IMG-01) No news claim was checked, so there is no fake-news verdict for this image.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 25,
+     "file": "f01_64x64.png",
+     "latency_s": 0.14,
+     "branch": "ai_or_real",
+     "ocr_status": "unavailable",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "image-model-unavailable",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "unavailable",
+     "image_score": null,
+     "authenticity": "Not Analyzed: model unavailable",
+     "gradcam_status": "not_run",
+     "heatmap_path": null,
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR could not process this image. Check the backend log for details. Any text in the image could not be read, so no news claim was checked. Image authenticity was not analyzed: the AI-image detector is unavailable (fault-injected, TC-IMG-01) No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": []
+    },
+    "fault": {
+     "case": "TC-IMG-01",
+     "injection": "ocr.load_ocr_reader raises; ai_detector.load_detector returns (None, reason)",
+     "stored_image": 200,
+     "stored_sha_matches": true,
+     "heatmap_status": 404,
+     "logs": [
+      "ERROR app.ai.image.ocr: EasyOCR could not initialize or process the image [RuntimeError: injected: OCR engine unavailable (TC-IMG-01)]"
+     ]
+    }
+   },
+   "run_at": "2026-11-28 01:10:04",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-28": {
+   "result": "Pass",
+   "evidence": "201 · ai_or_real · ocr unavailable — “—” · lang None · no text verdict · image completed AI 0.8312 (Likely AI-generated) · gradcam completed · final Uncertain risk — · 21.7 s · id 26 · ocr_status “unavailable” (the code's value for a failed OCR; there is no “failed” value) · log: ERROR app.ai.image.ocr: EasyOCR could not initialize or process the image [RuntimeError: …",
+   "expected": "ocr_status failed (not no_text_found); image analysis and heatmap run",
+   "notes": "Injected: EasyOCR readtext raises. Summary: OCR could not process this image. Check the backend log for details. Any text in the image could not be read, so no news claim was checked. The picture looks AI-generated (83% chance it is AI-generat…",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 26,
+     "file": "img02_urdu_internet.png",
+     "latency_s": 21.68,
+     "branch": "ai_or_real",
+     "ocr_status": "unavailable",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.8312,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/26_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR could not process this image. Check the backend log for details. Any text in the image could not be read, so no news claim was checked. The picture looks AI-generated (83% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": []
+    },
+    "fault": {
+     "case": "TC-IMG-28",
+     "injection": "EasyOCR readtext raises",
+     "stored_image": 200,
+     "stored_sha_matches": true,
+     "heatmap_status": 200,
+     "logs": [
+      "ERROR app.ai.image.ocr: EasyOCR could not initialize or process the image [RuntimeError: injected OCR failure (TC-IMG-28)]"
+     ]
+    }
+   },
+   "run_at": "2026-11-28 01:10:30",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-29": {
+   "result": "Pass",
+   "evidence": "image ../../fixtures/urdu_headline.png (substitute: TC-IMG-02 gave no text verdict) · 201 · image_pair · ocr completed 0.44 “حکومت نے پیٹرول کی قیمت ميں پانچ …” · urdu · xlmr-urdu Real 0.9999 · image unavailable AI — (Not Analyzed: model unavailable) · gradcam not_run · final Real risk 0.0001 · 28.3 s · id 39 · log: ERROR app.ai.image.predict: AI-generated image detection failed [RuntimeError: injected d…",
+   "expected": "image analysis failed; no score invented; OCR text verdict kept",
+   "notes": "Injected: real detector loaded; AIImageDetector.analyse raises. Summary: OCR read text from the image (average confidence 0.44), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on…",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 39,
+     "file": "../../fixtures/urdu_headline.png",
+     "latency_s": 28.32,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "حکومت نے پیٹرول کی قیمت ميں پانچ روپے کمی کا\nاعلان کر ديا",
+     "ocr_confidence": 0.4445,
+     "language": "urdu",
+     "text_model": "xlmr-urdu",
+     "model_version": "img-pair:xlmr-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.9999,
+     "text_status": "completed",
+     "image_status": "unavailable",
+     "image_score": null,
+     "authenticity": "Not Analyzed: model unavailable",
+     "gradcam_status": "not_run",
+     "heatmap_path": null,
+     "final_label": "Real",
+     "risk": 0.0001,
+     "summary": "OCR read text from the image (average confidence 0.44), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. Image authenticity was not analyzed: the detector failed on this image. Check the backend log.",
+     "detail": null,
+     "highlights": [
+      "نے",
+      "میں",
+      "روپے",
+      "کی",
+      "پیٹرول",
+      "قیمت",
+      "پانچ",
+      "حکومت"
+     ]
+    },
+    "fault": {
+     "case": "TC-IMG-29",
+     "injection": "real detector loaded; AIImageDetector.analyse raises",
+     "stored_image": 200,
+     "stored_sha_matches": true,
+     "heatmap_status": 404,
+     "logs": [
+      "ERROR app.ai.image.predict: AI-generated image detection failed [RuntimeError: injected detector failure (TC-IMG-29)]"
+     ]
+    }
+   },
+   "run_at": "2026-11-28 01:17:14",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-30": {
+   "result": "Pass",
+   "evidence": "201 · ai_or_real · ocr no_text_found — “—” · lang None · no text verdict · image completed AI 0.4998 (Likely real photo) · gradcam unavailable · final Uncertain risk — · 22.8 s · id 28 · summary: “: Grad-CAM could not be computed for this image. No news claim was ch…” · heatmap GET 404",
+   "expected": "explanation unavailable; no heatmap invented; prediction kept",
+   "notes": "Injected: torch.Tensor.backward raises (only the Grad-CAM backward pass uses it).",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 28,
+     "file": "photo_landscape.jpg",
+     "latency_s": 22.83,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.4998,
+     "authenticity": "Likely real photo",
+     "gradcam_status": "unavailable",
+     "heatmap_path": null,
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks like a real photo (50% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. Grad-CAM heatmap unavailable: Grad-CAM could not be computed for this image. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": []
+    },
+    "fault": {
+     "case": "TC-IMG-30",
+     "injection": "torch.Tensor.backward raises (only the Grad-CAM backward pass uses it)",
+     "stored_image": 200,
+     "stored_sha_matches": true,
+     "heatmap_status": 404,
+     "logs": [
+      "ERROR app.ai.image.ai_detector: Grad-CAM failed; the ResNet18 prediction is kept without a heatmap [RuntimeError: injected Grad-CAM backward failure (TC-IMG-30)]"
+     ]
+    }
+   },
+   "run_at": "2026-11-28 01:11:36",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-31": {
+   "result": "Pass",
+   "evidence": "02 (ai_or_real, OCR completed 0.28): gradcam completed · 03 (ai_or_real, OCR no_text_found): gradcam completed — OCR and Grad-CAM both ran on each",
+   "expected": "gradcam completed for both",
+   "notes": "",
+   "raw": {
+    "02": "completed",
+    "03": "completed"
+   },
+   "run_at": "2026-11-28 01:17:14",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-32": {
+   "result": "Pass",
+   "evidence": "f16_valid.jpg: ensemble P(real) 0.4529 → Likely AI-generated · ResNet18 P(real) 0.9232 (disagrees) · explained class “fake” = label class “fake” · API gradcam completed, id 14",
+   "expected": "explained class equals the ensemble label; report both probabilities",
+   "notes": "",
+   "raw": {
+    "probe": {
+     "p_real": 0.4529,
+     "label": "Likely AI-generated",
+     "members": {
+      "clip_vitl14": 0.3943,
+      "dinov2_l": 0.0412,
+      "resnet18_robust": 0.9232
+     },
+     "gradcam_class": "fake",
+     "heatmap": true,
+     "gradcam_error": null,
+     "resnet_agrees": false,
+     "sha256": "f7da4b93df32cc31bacd476150e06b3e1327d5c45bee924b4ca101a5bbae917c"
+    },
+    "facts": {
+     "status": 201,
+     "id": 14,
+     "file": "f16_valid.jpg",
+     "latency_s": 12.61,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.5471,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/14_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks AI-generated (55% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "fake",
+     "p_real": 0.4529,
+     "members": {
+      "clip_vitl14": 0.3943,
+      "dinov2_l": 0.0412,
+      "resnet18_robust": 0.9232
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      768
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/f16_valid_id14.png",
+     "heatmap_sha256": "d341fd4bc2f9a7a2ba02eb826655bcd900fe0361beae468db7fb7bd7943b0283"
+    }
+   },
+   "run_at": "2026-11-28 01:11:36",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-33": {
+   "result": "Not run",
+   "evidence": "no asset where ResNet18 is near-certain of the other class (no disagreeing asset lost its heatmap; strongest disagreement f16_valid.jpg ResNet18 P(real) 0.9232)",
+   "expected": "no heatmap with reason → Known limitation",
+   "notes": "",
+   "raw": {},
+   "run_at": "2026-11-28 01:11:36",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-34": {
+   "result": "Pass",
+   "evidence": "API summary (id 1): “The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector…” · screen: caption “Grad-CAM from the detector's ResNet18 model (one of its three models)…” shown=True · backend/tests/image_cases/screens/TC-IMG-13_42_result_heatmap.png",
+   "expected": "caption says ResNet18-based, not CLIP/DINOv2",
+   "notes": "",
+   "raw": {
+    "summary_excerpt": "The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checke",
+    "web": {
+     "ok": true,
+     "evidence": "caption “Grad-CAM from the detector's ResNet18 model (one of its three models)…” shown=True · backend/tests/image_cases/screens/TC-IMG-13_42_result_heatmap.png",
+     "page": {
+      "verdictAt": 11,
+      "authAt": 97,
+      "authColor": "rgb(56, 189, 248)",
+      "authText": "IMAGE AUTHENTICITY (SEPARATE FROM THE VERDICT ABOVE)",
+      "limitationNote": true,
+      "textImageNote": true,
+      "heatmapShown": false,
+      "heatmapNatural": null,
+      "resnetCaption": true,
+      "ocrShown": true,
+      "noClaim": false,
+      "uncertainShown": false,
+      "heatmapMissingNote": false
+     }
+    }
+   },
+   "run_at": "2026-11-28 01:11:36",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-35": {
+   "result": "Pass",
+   "evidence": "06 (substitute: TC-IMG-02 gave no text verdict): text Real 0.9999 → text risk 0.0001; final risk 0.0001; image_score 0.9434 (average would be 0.4718) · 03: no text, risk None, image_score 0.4998",
+   "expected": "final risk = text risk; image_score never averaged in; no text → None",
+   "notes": "",
+   "raw": {
+    "02": {
+     "status": 201,
+     "id": 3,
+     "file": "../../fixtures/urdu_headline.png",
+     "latency_s": 10.44,
+     "branch": "image_pair",
+     "ocr_status": "completed",
+     "ocr_text": "حکومت نے پیٹرول کی قیمت ميں پانچ روپے کمی کا\nاعلان کر ديا",
+     "ocr_confidence": 0.4445,
+     "language": "urdu",
+     "text_model": "xlmr-urdu",
+     "model_version": "img-pair:xlmr-urdu",
+     "text_label": "Real",
+     "text_confidence": 0.9999,
+     "text_status": "completed",
+     "image_status": "completed",
+     "image_score": 0.9434,
+     "authenticity": "Likely AI-generated",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/3_heatmap.png",
+     "final_label": "Real",
+     "risk": 0.0001,
+     "summary": "OCR read text from the image (average confidence 0.44), so the text was checked as the news claim. This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources. The picture looks AI-generated (94% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true.",
+     "detail": null,
+     "highlights": [
+      "نے",
+      "میں",
+      "روپے",
+      "کی",
+      "پیٹرول",
+      "قیمت",
+      "پانچ",
+      "حکومت"
+     ],
+     "explained_class": "fake",
+     "p_real": 0.0566,
+     "members": {
+      "clip_vitl14": 0.0746,
+      "dinov2_l": 0.0947,
+      "resnet18_robust": 0.0005
+     },
+     "user": "A",
+     "heatmap_size": [
+      1100,
+      220
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/urdu_headline_id3.png",
+     "heatmap_sha256": "843099a7f7d6b24f17d351fcd751f30d3cf72131c09114127c365835730608e9"
+    },
+    "03": {
+     "status": 201,
+     "id": 2,
+     "file": "photo_landscape.jpg",
+     "latency_s": 10.69,
+     "branch": "ai_or_real",
+     "ocr_status": "no_text_found",
+     "ocr_text": null,
+     "ocr_confidence": null,
+     "language": null,
+     "text_model": null,
+     "model_version": "img-ens-clip-dino-r18",
+     "text_label": null,
+     "text_confidence": null,
+     "text_status": "not_run",
+     "image_status": "completed",
+     "image_score": 0.4998,
+     "authenticity": "Likely real photo",
+     "gradcam_status": "completed",
+     "heatmap_path": "explanations/2_heatmap.png",
+     "final_label": "Uncertain",
+     "risk": null,
+     "summary": "OCR found no readable text, so no news claim was checked. The picture looks like a real photo (50% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+     "detail": null,
+     "highlights": [],
+     "explained_class": "real",
+     "p_real": 0.5002,
+     "members": {
+      "clip_vitl14": 0.5233,
+      "dinov2_l": 0.0497,
+      "resnet18_robust": 0.9276
+     },
+     "user": "A",
+     "heatmap_size": [
+      1024,
+      768
+     ],
+     "heatmap_file": "backend/tests/image_cases/heatmaps/photo_landscape_id2.png",
+     "heatmap_sha256": "8570365302f2358ed9cabab9697aa6f2efe2a44a93ef04de63c478c44950fde9"
+    }
+   },
+   "run_at": "2026-11-28 01:17:15",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-36": {
+   "result": "Pass",
+   "evidence": "A's id 31: user B image 404, heatmap 404 · admin image 200, heatmap 200",
+   "expected": "404 for B; 200 for admin",
+   "notes": "",
+   "raw": {
+    "B": {
+     "image": 404,
+     "heatmap": 404
+    },
+    "ADMIN": {
+     "image": 200,
+     "heatmap": 200
+    }
+   },
+   "run_at": "2026-11-28 01:17:15",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-38": {
+   "result": "Pass",
+   "evidence": "ids 29, 30: OCR text identical=True, verdict None None / None None, image_score 0.8312 / 0.8312, heatmap bytes identical=True, explained class fake",
+   "expected": "identical OCR, verdict, image_score, explained class",
+   "notes": "",
+   "raw": {
+    "runs": [
+     {
+      "status": 201,
+      "id": 29,
+      "file": "img02_urdu_internet.png",
+      "latency_s": 6.57,
+      "branch": "ai_or_real",
+      "ocr_status": "completed",
+      "ocr_text": "حکومت نے اعلان کیاے کەملک بجھریں سات دن ےلي انڑنیٹ\nسروس بندکردی جاسےگی -",
+      "ocr_confidence": 0.2815,
+      "language": "urdu",
+      "text_model": null,
+      "model_version": "img-ens-clip-dino-r18",
+      "text_label": null,
+      "text_confidence": null,
+      "text_status": "not_run",
+      "image_status": "completed",
+      "image_score": 0.8312,
+      "authenticity": "Likely AI-generated",
+      "gradcam_status": "completed",
+      "heatmap_path": "explanations/29_heatmap.png",
+      "final_label": "Uncertain",
+      "risk": null,
+      "summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks AI-generated (83% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+      "detail": null,
+      "highlights": [],
+      "explained_class": "fake",
+      "p_real": 0.1688,
+      "members": {
+       "clip_vitl14": 0.3327,
+       "dinov2_l": 0.1736,
+       "resnet18_robust": 0.0001
+      },
+      "user": "A",
+      "heatmap_size": [
+       1200,
+       600
+      ],
+      "heatmap_file": "backend/tests/image_cases/heatmaps/img02_urdu_internet_id29.png",
+      "heatmap_sha256": "76a1ba570daef2f42f90b37454b5c38384671d117ebb31ba1dfa91d87de67ffc"
+     },
+     {
+      "status": 201,
+      "id": 30,
+      "file": "img02_urdu_internet.png",
+      "latency_s": 6.4,
+      "branch": "ai_or_real",
+      "ocr_status": "completed",
+      "ocr_text": "حکومت نے اعلان کیاے کەملک بجھریں سات دن ےلي انڑنیٹ\nسروس بندکردی جاسےگی -",
+      "ocr_confidence": 0.2815,
+      "language": "urdu",
+      "text_model": null,
+      "model_version": "img-ens-clip-dino-r18",
+      "text_label": null,
+      "text_confidence": null,
+      "text_status": "not_run",
+      "image_status": "completed",
+      "image_score": 0.8312,
+      "authenticity": "Likely AI-generated",
+      "gradcam_status": "completed",
+      "heatmap_path": "explanations/30_heatmap.png",
+      "final_label": "Uncertain",
+      "risk": null,
+      "summary": "OCR found only a little or unclear text, too little to check as a news claim. The picture looks AI-generated (83% chance it is AI-generated, judged from its centre). This is about the picture only, not whether any news claim is true. The detector was trained on camera photos, so screenshots, posters and edited web images are often rated AI-generated. The Grad-CAM heatmap shows what the detector's ResNet18 model saw as evidence for the image-authenticity answer above (it does not cover the detector's other two models); it does not show edits and does not say whether a claim is true. No news claim was checked, so there is no fake-news verdict for this image.",
+      "detail": null,
+      "highlights": [],
+      "explained_class": "fake",
+      "p_real": 0.1688,
+      "members": {
+       "clip_vitl14": 0.3327,
+       "dinov2_l": 0.1736,
+       "resnet18_robust": 0.0001
+      },
+      "user": "A",
+      "heatmap_size": [
+       1200,
+       600
+      ],
+      "heatmap_file": "backend/tests/image_cases/heatmaps/img02_urdu_internet_id30.png",
+      "heatmap_sha256": "76a1ba570daef2f42f90b37454b5c38384671d117ebb31ba1dfa91d87de67ffc"
+     }
+    ]
+   },
+   "run_at": "2026-11-28 01:11:49",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-37": {
+   "result": "Finding",
+   "evidence": "39 image checks, newest first=True · list item fields: combined_risk_score, created_at, dispute_count, final_label, final_label_source, has_image, id, submission_type, text_preview · OCR text in list=False, image_score in list=False, verdict=True · full records carry them=True · rejected files listed: 0 (every listed image's SHA-256 compared with the 6 rejected files)",
+   "expected": "newest first with OCR text, verdict, image_score; rejected not listed",
+   "notes": "The history list (SubmissionListItem) has no OCR text and no image_score for image checks; they are only in the full record (text_preview is set for text checks only).",
+   "raw": {
+    "keys": [
+     "combined_risk_score",
+     "created_at",
+     "dispute_count",
+     "final_label",
+     "final_label_source",
+     "has_image",
+     "id",
+     "submission_type",
+     "text_preview"
+    ],
+    "count": 39,
+    "listed_rejected": []
+   },
+   "run_at": "2026-11-28 01:17:39",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-42": {
+   "result": "Pass",
+   "evidence": "id 41: text verdict first=True (verdict at 11, authenticity at 97); authenticity card colour rgb(56, 189, 248) (neutral info blue=True); limitation note=True; text-image note=True; heatmap shown=True [1080, 1080]; OCR text shown=True · backend/tests/image_cases/screens/TC-IMG-13_42_result_top.png, backend/tests/image_cases/screens/TC-IMG-13_42_result_heatmap.png, backend/tests/image_cases/screens/TC-IMG-13_42_result_ocr.png",
+   "expected": "text verdict first; neutral authenticity card with note; heatmap over original; OCR text shown",
+   "notes": "",
+   "raw": {
+    "page": {
+     "verdictAt": 11,
+     "authAt": 97,
+     "authColor": "rgb(56, 189, 248)",
+     "authText": "IMAGE AUTHENTICITY (SEPARATE FROM THE VERDICT ABOVE)",
+     "limitationNote": true,
+     "textImageNote": true,
+     "heatmapShown": true,
+     "heatmapNatural": [
+      1080,
+      1080
+     ],
+     "resnetCaption": true,
+     "ocrShown": true,
+     "noClaim": false,
+     "uncertainShown": false,
+     "heatmapMissingNote": false
+    },
+    "api_branch": "image_pair"
+   },
+   "run_at": "2026-11-28 01:20:18",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-40": {
+   "result": "Pass",
+   "evidence": "picked img02, removed it (×), picked photo_landscape → POSTs 1, saved 1; stored image = second pick=True, = first pick=False · id 42 · backend/tests/image_cases/screens/TC-IMG-40_first_pick.png, backend/tests/image_cases/screens/TC-IMG-40_second_pick.png",
+   "expected": "only the second image is submitted",
+   "notes": "",
+   "raw": {
+    "sent": 1,
+    "saved": 1,
+    "stored_sha": "360be170e4ac5f191f5baca8fe8c7d070d7805be49ba37c3a9c26cdbdad26b00"
+   },
+   "run_at": "2026-11-28 01:20:42",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-43": {
+   "result": "Finding",
+   "evidence": "id 43 (API final Uncertain, risk None): “No readable news text was found in this image, so no news claim was checked.” shown=True; word “Uncertain” on screen=False; authenticity card=True (IMAGE AUTHENTICITY); heatmap shown=True · backend/tests/image_cases/screens/TC-IMG-43_no_text_result.png, backend/tests/image_cases/screens/TC-IMG-43_no_text_heatmap.png",
+   "expected": "says no text-based verdict; shows Uncertain; authenticity card and heatmap",
+   "notes": "The screen says no news claim was checked and shows no verdict card at all; the word “Uncertain” (the stored final label) is not shown.",
+   "raw": {
+    "page": {
+     "verdictAt": -1,
+     "authAt": 11,
+     "authColor": "rgb(56, 189, 248)",
+     "authText": "IMAGE AUTHENTICITY",
+     "limitationNote": true,
+     "textImageNote": false,
+     "heatmapShown": true,
+     "heatmapNatural": [
+      1024,
+      768
+     ],
+     "resnetCaption": true,
+     "ocrShown": false,
+     "noClaim": true,
+     "uncertainShown": false,
+     "heatmapMissingNote": false
+    }
+   },
+   "run_at": "2026-11-28 01:21:03",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-45": {
+   "result": "Finding",
+   "evidence": "text file (.txt): “Image  Unsupported file type: text/plain. Only images and videos are supported.” (request sent: 0) · text renamed .png: “Could not analyze  File does not appear to be a valid image.” (request sent: 1) · PNG over 10 MB: “Could not analyze  This image is larger than 10 MB. Choose a smaller one or a screenshot.” (request sent: 0) · backend/tests/image_cases/screens/TC-IMG-45_last_message.png",
+   "expected": "record the exact message (use case: “Invalid file type. Please upload a valid image”)",
+   "notes": "Each file is refused with a clear message, but the wording differs from the use case's “Invalid file type. Please upload a valid image”.",
+   "raw": {
+    "text file (.txt)": {
+     "message": "Image\n\nUnsupported file type: text/plain. Only images and videos are supported.",
+     "request_sent": 0
+    },
+    "text renamed .png": {
+     "message": "Could not analyze\n\nFile does not appear to be a valid image.",
+     "request_sent": 1
+    },
+    "PNG over 10 MB": {
+     "message": "Could not analyze\n\nThis image is larger than 10 MB. Choose a smaller one or a screenshot.",
+     "request_sent": 0
+    }
+   },
+   "run_at": "2026-11-28 01:21:33",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-41": {
+   "result": "Not run",
+   "evidence": "HEIC from the iPhone camera roll cannot be produced in a browser; to be tested on the phone. Code: the picker (app/(tabs)/index.tsx) asks expo-image-picker for images with quality 0.85 and no conversion of its own; the upload is refused in the app unless its type is JPEG, PNG or WEBP (“Choose a JPG, PNG, or WEBP image.”) and the backend accepts only those three (checked from the bytes)",
+   "expected": "HEIC photo accepted as JPEG",
+   "notes": "",
+   "raw": {},
+   "run_at": "2026-11-28 01:21:33",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-44": {
+   "result": "Pass",
+   "evidence": "while waiting: spinner=True, aria-disabled=true; backend killed mid-request → message “Could not analyze  Cannot reach the backend at http://127.0.0.1:8001. Check the API URL and that FastAPI is running.”; no crash, still on Check screen=True · backend/tests/image_cases/screens/TC-IMG-44_busy.png, backend/tests/image_cases/screens/TC-IMG-44_backend_stopped.png",
+   "expected": "spinner + disabled while waiting; clear error and no crash when the backend stops",
+   "notes": "",
+   "raw": {
+    "busy": {
+     "ariaDisabled": "true",
+     "spinner": true
+    },
+    "message": "Could not analyze\n\nCannot reach the backend at http://127.0.0.1:8001. Check the API URL and that FastAPI is running.",
+    "still": true
+   },
+   "run_at": "2026-11-28 01:22:19",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-IMG-39": {
+   "result": "Pass",
+   "evidence": "A: 11 uploads started within 4.1 s → statuses [201, 201, 201, 201, 201, 201, 201, 201, 201, 201, 429] · 11th: 429 “Too many checks in a short time. Please try again in 56 seconds.” Retry-After 56 (answered in 0.05 s) · B: 201",
+   "expected": "first 10 succeed; 11th 429 with clear message; B unaffected",
+   "notes": "",
+   "raw": {
+    "statuses": [
+     201,
+     201,
+     201,
+     201,
+     201,
+     201,
+     201,
+     201,
+     201,
+     201,
+     429
+    ],
+    "starts": [
+     1.0999938240274787e-06,
+     0.40046040000015637,
+     0.8012601999944309,
+     1.2028193999940413,
+     1.6112079999948037,
+     2.0181937999950605,
+     2.43473449999874,
+     2.852045299994643,
+     3.2581317000003764,
+     3.678637400000298,
+     4.141480999998748
+    ],
+    "eleventh": {
+     "status": 429,
+     "detail": "Too many checks in a short time. Please try again in 56 seconds."
+    },
+    "b": 201
+   },
+   "run_at": "2026-11-28 01:23:42",
+   "base_url": "http://127.0.0.1:8001"
+  }
+ }
+}

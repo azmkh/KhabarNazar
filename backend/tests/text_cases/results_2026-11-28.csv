@@ -1,0 +1,40 @@
+﻿ID,Result,Actual result / evidence
+TC-TXT-01,Pass,201 · urdu · text-model-unavailable · Uncertain — · risk — · 0 highlights · 0.1 s · id 32 · status unavailable · model dir empty (fault-injected) · saved (GET 200)
+TC-TXT-02,Pass,201 · urdu · xlmr-urdu · Real 0.9984 · risk 0.0016 · 8 highlights · 1.1 s · id 1
+TC-TXT-03,Pass,201 · urdu · tfidf-urdu-long-articles · Real 0.6856 · risk 0.3144 · 8 highlights · 1.3 s · id 2
+TC-TXT-04,Pass,201 · roman_urdu · xlmr-roman-urdu · Real 0.9794 · risk 0.0206 · 8 highlights · 10.2 s · id 3
+TC-TXT-05,Pass,"empty 422 “String should have at least 3 characters” · spaces 422 “Value error, Text must contain at least 3 non-space characters” · two_chars 422 “String should have at least 3 characters” · chars_10001 422 “String should have at most 10000 characters” · history 3→3"
+TC-TXT-06,Pass,no token 401 “Authentication token is missing.” · tampered signature 401 “Could not validate authentication credentials.” · history 3→3
+TC-TXT-07,Pass,201 · urdu · xlmr-urdu · Fake 0.9994 · risk 0.9994 · 8 highlights · 0.8 s · id 4
+TC-TXT-08,Pass,201 · roman_urdu · xlmr-roman-urdu · Real 0.995 · risk 0.005 · 8 highlights · 8.9 s · id 5
+TC-TXT-09,Pass,cutoff LONG_TEXT_WORDS=150 (words > cutoff → TF-IDF) · 150 words: 201 · urdu · xlmr-urdu · Fake 0.9976 · risk 0.9976 · 8 highlights · 2.2 s · id 6 · 151 words: 201 · urdu · tfidf-urdu-long-articles · Real 0.5867 · risk 0.4133 · 8 highlights · 0.3 s · id 7
+TC-TXT-10,Pass,"135 words, 292 tokens (Urdu tokenizer, limit 256) · 201 · urdu · xlmr-urdu · Fake 0.9816 · risk 0.9816 · 0 highlights · 0.3 s · id 35 · summary says “only its first part was checked”=True; no highlights for truncated text (by design, explain.py)"
+TC-TXT-11,Finding,"v1 roman_urdu xlmr-roman-urdu Fake 0.9966 (4.6 s, id 9) | v2 roman_urdu xlmr-roman-urdu Real 0.7919 (4.0 s, id 10) | v3 roman_urdu xlmr-roman-urdu Fake 0.9985 (4.9 s, id 11) — Spelling variants of the same claim get different labels."
+TC-TXT-12,Finding,TC-TXT-02 xlmr-urdu Real 0.9984 vs TC-TXT-04 xlmr-roman-urdu Real 0.9794 · TC-TXT-07 xlmr-urdu Fake 0.9994 vs TC-TXT-08 xlmr-roman-urdu Real 0.995 — The same claim in Urdu script and in Roman Urdu gets different labels from the two models.
+TC-TXT-13,Known limitation,201 · english · xlmr-roman-urdu · Real 0.5662 · risk 0.4338 · 8 highlights · 5.1 s · id 12 · summary says “less reliable”=True
+TC-TXT-14,Pass,201 · urdu · xlmr-urdu · Real 0.9996 · risk 0.0004 · 8 highlights · 0.6 s · id 13
+TC-TXT-15,Pass,201 · roman_urdu · xlmr-roman-urdu · Fake 0.999 · risk 0.999 · 8 highlights · 5.5 s · id 14 · detected roman_urdu
+TC-TXT-16,Pass,201 · mixed · xlmr-roman-urdu · Fake 0.981 · risk 0.981 · 8 highlights · 4.5 s · id 15 · route xlmr-roman-urdu
+TC-TXT-17,Pass,201 · urdu · xlmr-urdu · Real 0.9999 · risk 0.0001 · 8 highlights · 0.5 s · id 16
+TC-TXT-18,Finding,201 · urdu · xlmr-urdu · Real 0.9998 · risk 0.0002 · 8 highlights · 0.7 s · id 17 — Arabic text is classified by the xlmr-urdu model and gets a Real label.
+TC-TXT-19,Finding,201 · urdu · xlmr-urdu · Real 0.9998 · risk 0.0002 · 8 highlights · 0.5 s · id 18 — Persian text is classified by the xlmr-urdu model and gets a Real label.
+TC-TXT-20,Finding,201 · unknown · xlmr-roman-urdu · Fake 0.9878 · risk 0.9878 · 8 highlights · 4.7 s · id 19 — Hindi (Devanagari) text is classified by the xlmr-roman-urdu model and gets a Fake label.
+TC-TXT-21,Finding,201 · urdu · xlmr-urdu · Real 0.9997 · risk 0.0003 · 8 highlights · 0.5 s · id 20 · is_news=None — A cooking instruction gets a news verdict: no news/not-news filter is connected (is_news is null).
+TC-TXT-22,Pass,abc (3 chars): 201 · unknown · xlmr-roman-urdu · Real 0.9257 · risk 0.0743 · 1 highlights · 0.3 s · id 21 · GET 200 | chars_10000 (10000 chars): 201 · urdu · tfidf-urdu-long-articles · Real 0.8389 · risk 0.1611 · 8 highlights · 2.6 s · id 22 · GET 200
+TC-TXT-23,Pass,201 · unknown · text-model-unavailable · Uncertain — · risk — · 0 highlights · 0.0 s · id 23
+TC-TXT-24,Pass,201 · unknown · text-model-unavailable · Uncertain — · risk — · 0 highlights · 0.0 s · id 24
+TC-TXT-25,Pass,"201 · unknown · text-model-unavailable · Uncertain — · risk — · 0 highlights · 0.0 s · id 25 · summary “The text has no words to classify (only links, numbers or symbols).”"
+TC-TXT-26,Pass,"201 · mixed · xlmr-urdu · Fake 0.9997 · risk 0.9997 · 7 highlights · 0.3 s · id 26 · stored exactly as sent=True · web: result shows the text literally=True, history=True, alert fired=False, <script> element injected=False · backend/tests/text_cases/screens/TC-TXT-26_result.png, backend/tests/text_cases/screens/TC-TXT-26_history.png"
+TC-TXT-27,Pass,201 · roman_urdu · xlmr-roman-urdu · Real 0.9794 · risk 0.0206 · 8 highlights · 9.6 s · id 27 · TC-TXT-04: Real 0.9794 · Δconf 0.0000
+TC-TXT-28,Pass,"TC-TXT-02×3: Real 0.9984 · highlights identical=True (ids 28, 29) | TC-TXT-04×3: Real 0.9794 · highlights identical=True (ids 30, 31)"
+TC-TXT-29,Pass,"15 confident Real (risk ≤ 0.0743): TC-TXT-17 Real 0.9999→risk 0.0001, TC-TXT-18 Real 0.9998→risk 0.0002, TC-TXT-19 Real 0.9998→risk 0.0002 · 9 confident Fake (risk ≥ 0.9810): TC-TXT-26 Fake 0.9997→risk 0.9997, TC-TXT-07 Fake 0.9994→risk 0.9994, TC-TXT-15 Fake 0.9990→risk 0.9990 · risk = P(fake) for all 29: True"
+TC-TXT-30,Pass,"TC-TXT-02: 8 highlights, all in input=True, max |weight| 0.9745, summary ✓ · TC-TXT-03: 8 highlights, all in input=True, max |weight| 0.2028, summary ✓ · TC-TXT-04: 8 highlights, all in input=True, max |weight| 0.1089, summary ✓"
+TC-TXT-31,Pass,201 · urdu · text-model-unavailable · Uncertain — · risk — · 0 highlights · 14.8 s · id 33 · status unavailable · log: ERROR app.ai.text.predict: urdu XLM-R inference failed [RuntimeError: injected inference failure (TC-TXT-31)] · next request in same process: 201 · urdu · xlmr-urdu · Real 0.9984 · risk 0.0016 · 8 highlights · 0.7 s · id 34
+TC-TXT-32,Finding,"34 items, newest first=True (ids 34…1) · label on every item=True · language in list response=False (in full record 34/34) · TC-TXT-05 inputs present: 0 — The history list response (SubmissionListItem) has no language field; the language is only in the full record."
+TC-TXT-33,Pass,user B GET /submissions/34 → 404 “Submission 34 not found.” · A's text in body=False · id in B's history=False
+TC-TXT-34,Pass,A: 10×201 then 429 at 4.2 s “Too many checks in a short time. Please try again in 56 seconds.” Retry-After 56 · B: 201 · all within 5 s
+TC-TXT-35,Pass,"two taps 0 ms apart → POSTs 1, saved 1; while busy: spinner=True, aria-disabled=true · backend/tests/text_cases/screens/TC-TXT-35_busy.png"
+TC-TXT-36,Finding,"Analyze aria-disabled=true; tap → requests sent 0, history 0→0; message shown: null · backend/tests/text_cases/screens/TC-TXT-36_empty_box.png — No request is sent (Analyze is disabled below 3 characters), but no message is shown; the use case text “Please enter news content before submitting” does not appear."
+TC-TXT-37,Pass,"direction rtl, text-align right, font NotoNastaliqUrdu_400Regular, width 322/390 px, 6 lines, overflow=False · note: the User claim card shows only the first 280 characters, cut mid-word with no ellipsis (lib/SubmissionsContext.tsx textPreview) · backend/tests/text_cases/screens/TC-TXT-37_long_urdu_result.png, backend/tests/text_cases/screens/TC-TXT-37_long_urdu_result_scrolled.png"
+TC-TXT-38,Pass,"result opened after 9.8 s (click to result screen); app analysis timeout ANALYSIS_TIMEOUT_MS = 180000 ms (180 s, lib/api.ts) · backend/tests/text_cases/screens/TC-TXT-38_roman_urdu_result.png"
+TC-TXT-39,Pass,"message: ""Could not analyze\n\nCannot reach the backend at http://127.0.0.1:8001. Check the API URL and that FastAPI is running.""; no crash, still on the Check screen=True, typed text kept (94 chars) · backend/tests/text_cases/screens/TC-TXT-39_backend_stopped.png"

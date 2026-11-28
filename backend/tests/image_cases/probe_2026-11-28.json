@@ -1,0 +1,324 @@
+{
+ "img02_urdu_internet.png": {
+  "p_real": 0.1688,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.3327,
+   "dinov2_l": 0.1736,
+   "resnet18_robust": 0.0001
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "bf37ac7bd128b7ac48c8a5be40bb9865907d7808778c551fcee27a8a441bcddd"
+ },
+ "img07_roman_internet.png": {
+  "p_real": 0.0533,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.0282,
+   "dinov2_l": 0.1318,
+   "resnet18_robust": 0.0
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "425cd67ab8b57df509b33aad1dc58df8cd3f0ce36b2dbd370180428b70809acf"
+ },
+ "img08_english_textbooks.png": {
+  "p_real": 0.0435,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.033,
+   "dinov2_l": 0.0974,
+   "resnet18_robust": 0.0
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "e30b520ece5dd7f3eba8dcc819e8c57aaea2e2cf4fed4430a8f21cd7dd9fa49c"
+ },
+ "img09_mixed_petrol.png": {
+  "p_real": 0.1515,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.2466,
+   "dinov2_l": 0.2076,
+   "resnet18_robust": 0.0002
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "7aa2d9ede4e1adfb5526a3cc1a9fc0b8dc1eb0c40f578c05004080699af45a5e"
+ },
+ "img10_urdu_paragraph.png": {
+  "p_real": 0.1166,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.231,
+   "dinov2_l": 0.118,
+   "resnet18_robust": 0.001
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "a88036cda9bc3c03dad8d759be30eb7603de6caa6db930b7b74334d88be3be6f"
+ },
+ "img11a_blurred.png": {
+  "p_real": 0.3825,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.7487,
+   "dinov2_l": 0.1074,
+   "resnet18_robust": 0.2916
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "b3a10f5588272629fc1925d55b7429c59463eb97330887d706a1df83439c0fa6"
+ },
+ "img11b_light_grey.png": {
+  "p_real": 0.2706,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.2066,
+   "dinov2_l": 0.6045,
+   "resnet18_robust": 0.0005
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "981c3df95090b731a84650bb473f5ff0cb9fe6313c8f1791a82b521c248c3ce1"
+ },
+ "photo_landscape.jpg": {
+  "p_real": 0.5002,
+  "label": "Likely real photo",
+  "members": {
+   "clip_vitl14": 0.5233,
+   "dinov2_l": 0.0497,
+   "resnet18_robust": 0.9276
+  },
+  "gradcam_class": "real",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "360be170e4ac5f191f5baca8fe8c7d070d7805be49ba37c3a9c26cdbdad26b00"
+ },
+ "img12_photo_caption.jpg": {
+  "p_real": 0.6149,
+  "label": "Likely real photo",
+  "members": {
+   "clip_vitl14": 0.8376,
+   "dinov2_l": 0.0482,
+   "resnet18_robust": 0.959
+  },
+  "gradcam_class": "real",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "449201a3d9b5309b94f23c438d5032553483258f75aca33a3b3370237f288578"
+ },
+ "img13_news_card.png": {
+  "p_real": 0.6062,
+  "label": "Likely real photo",
+  "members": {
+   "clip_vitl14": 0.7955,
+   "dinov2_l": 0.0382,
+   "resnet18_robust": 0.9848
+  },
+  "gradcam_class": "real",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "6bdd82994abc1b1da99728fe90403bfd693f9184705b70e4158e8ea633af8c63"
+ },
+ "photo_ai_look.png": {
+  "p_real": 0.2406,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.1991,
+   "dinov2_l": 0.086,
+   "resnet18_robust": 0.4366
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "65fc70a2a80a26d52cde5c3c0534b8c3beab418342b4d2225d5bffc70dfd11a6"
+ },
+ "img15_meme_roman.jpg": {
+  "p_real": 0.5506,
+  "label": "Likely real photo",
+  "members": {
+   "clip_vitl14": 0.8558,
+   "dinov2_l": 0.631,
+   "resnet18_robust": 0.165
+  },
+  "gradcam_class": "real",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": false,
+  "sha256": "552207554d9e4f5d6bd161c4ec33b72837ac91c17fed3a50bfeed407825194ba"
+ },
+ "photo_street.jpg": {
+  "p_real": 0.4981,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.7383,
+   "dinov2_l": 0.6261,
+   "resnet18_robust": 0.1299
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "79a23dc8b76189c855b454558ab8a531d76c8a628b90764bb460cf9045732a64"
+ },
+ "photo_texture.jpg": {
+  "p_real": 0.8599,
+  "label": "Likely real photo",
+  "members": {
+   "clip_vitl14": 0.9358,
+   "dinov2_l": 0.7271,
+   "resnet18_robust": 0.9169
+  },
+  "gradcam_class": "real",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "8a2bc791be1574b8241f29975afc70385542f1c2a71f88d25a8f371fb69aeef8"
+ },
+ "photo_portrait.jpg": {
+  "p_real": 0.0673,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.0053,
+   "dinov2_l": 0.04,
+   "resnet18_robust": 0.1568
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "e82aae83fa78af691b03cae84a0ebd6eeb645f5bda56738205a916e4320e2b93"
+ },
+ "f01_64x64.png": {
+  "p_real": 0.1641,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.4346,
+   "dinov2_l": 0.0573,
+   "resnet18_robust": 0.0005
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "3de92b0d4a53c50d148f9dd52e0221775776f6d3776df2de59cbf929bb673775"
+ },
+ "f16_valid.jpg": {
+  "p_real": 0.4529,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.3943,
+   "dinov2_l": 0.0412,
+   "resnet18_robust": 0.9232
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": false,
+  "sha256": "f7da4b93df32cc31bacd476150e06b3e1327d5c45bee924b4ca101a5bbae917c"
+ },
+ "f17_valid.webp": {
+  "p_real": 0.1459,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.0169,
+   "dinov2_l": 0.4145,
+   "resnet18_robust": 0.0063
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "ff6926fd19e5d2ba3307be88d24f8031c35ea79042fc870a6cb4ce9ed5153e96"
+ },
+ "f18_alpha.png": {
+  "p_real": 0.0533,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.0282,
+   "dinov2_l": 0.1318,
+   "resnet18_robust": 0.0
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "1471d9542be48dad3f9b5d8ed464d7f47322fca92cdefb6c3f8e6f726c0401fb"
+ },
+ "f19_greyscale.jpg": {
+  "p_real": 0.7054,
+  "label": "Likely real photo",
+  "members": {
+   "clip_vitl14": 0.946,
+   "dinov2_l": 0.1771,
+   "resnet18_robust": 0.9931
+  },
+  "gradcam_class": "real",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "b546393e08a4899db5188a82967e2e0dcf5172d39debc1367d69c85304f5c7fa"
+ },
+ "f25_png_named.jpg": {
+  "p_real": 0.0533,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.0282,
+   "dinov2_l": 0.1318,
+   "resnet18_robust": 0.0
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "425cd67ab8b57df509b33aad1dc58df8cd3f0ce36b2dbd370180428b70809acf"
+ },
+ "f26_exif6.jpg": {
+  "p_real": 0.1721,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.4132,
+   "dinov2_l": 0.1032,
+   "resnet18_robust": 0.0
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "3d2ab007c0b367733324ae49e8a75532cd08b48db49dd35557fc6cd23510e725"
+ },
+ "../../fixtures/urdu_headline.png": {
+  "p_real": 0.0566,
+  "label": "Likely AI-generated",
+  "members": {
+   "clip_vitl14": 0.0746,
+   "dinov2_l": 0.0947,
+   "resnet18_robust": 0.0005
+  },
+  "gradcam_class": "fake",
+  "heatmap": true,
+  "gradcam_error": null,
+  "resnet_agrees": true,
+  "sha256": "4b7032b2936e85dc3ea68600fff58e4959203d19ec778259524f6dd6b4a4f035"
+ }
+}

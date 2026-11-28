@@ -1,0 +1,3070 @@
+{
+ "meta": {
+  "date": "2026-11-28",
+  "base_url": "http://127.0.0.1:8001",
+  "server_environment": "full-pass",
+  "server_database": "sqlite",
+  "server_models": {
+   "ready": true,
+   "warmup": "done",
+   "models": {
+    "urdu_text": "loaded",
+    "roman_urdu_text": "loaded",
+    "image_detector": "loaded",
+    "ocr": "loaded"
+   }
+  }
+ },
+ "cases": {
+  "TC-TXT-02": {
+   "result": "Pass",
+   "evidence": "201 · urdu · xlmr-urdu · Real 0.9984 · risk 0.0016 · 8 highlights · 1.1 s · id 1",
+   "expected": "201; urdu; xlmr-urdu; Real/Fake; conf 0–1; risk; 1–8 highlights from input; summary",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 1,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.9984,
+     "risk": 0.0016,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "کیا",
+      "حکومت",
+      "یکم",
+      "اعلان",
+      "کہ",
+      "نے",
+      "آج",
+      "ہے"
+     ],
+     "contributions": [
+      0.97453,
+      0.00433,
+      0.00381,
+      0.00184,
+      0.0017,
+      0.00142,
+      0.00134,
+      0.00034
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (99.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 1.14,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 1.14,
+     "body": {
+      "id": 1,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0016,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:17:32.283378Z",
+      "text_submission": {
+       "id": 1,
+       "input_text": "حکومت نے آج اعلان کیا ہے کہ یکم نومبر سے تمام سرکاری اسکولوں میں مفت کتابیں فراہم کی جائیں گی۔",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9984,
+       "created_at": "2026-11-27T19:17:32.290636Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 1,
+       "highlighted_words": "[{\"word\": \"کیا\", \"contribution\": 0.97453, \"direction\": \"supports_prediction\"}, {\"word\": \"حکومت\", \"contribution\": 0.00433, \"direction\": \"supports_prediction\"}, {\"word\": \"یکم\", \"contribution\": 0.00381, \"direction\": \"supports_prediction\"}, {\"word\": \"اعلان\", \"contribution\": 0.00184, \"direction\": \"supports_prediction\"}, {\"word\": \"کہ\", \"contribution\": 0.0017, \"direction\": \"supports_prediction\"}, {\"word\": \"نے\", \"contribution\": 0.00142, \"direction\": \"supports_prediction\"}, {\"word\": \"آج\", \"contribution\": 0.00134, \"direction\": \"supports_prediction\"}, {\"word\": \"ہے\", \"contribution\": 0.00034, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is highly confident (99.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:17:32.288564Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:17:32",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-03": {
+   "result": "Pass",
+   "evidence": "201 · urdu · tfidf-urdu-long-articles · Real 0.6856 · risk 0.3144 · 8 highlights · 1.3 s · id 2",
+   "expected": "tfidf-urdu-long-articles; label; conf 0–1; 1–8 highlights from the article",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 2,
+     "language": "urdu",
+     "model": "tfidf-urdu-long-articles",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.6856,
+     "risk": 0.3144,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "دیا",
+      "دوران",
+      "علاقوں",
+      "تاکہ",
+      "شدید",
+      "کہنا",
+      "لینڈ",
+      "حکام"
+     ],
+     "contributions": [
+      -0.20278,
+      0.1547,
+      0.1474,
+      -0.13177,
+      -0.10702,
+      -0.10465,
+      0.09938,
+      -0.09121
+     ],
+     "summary": "This looks like genuine news. The AI is unsure (68.6%), so treat this result with caution. The highlighted words below had the biggest effect on this result. Long articles are checked as a whole. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 1.29,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 1.29,
+     "body": {
+      "id": 2,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.3144,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:17:34.141974Z",
+      "text_submission": {
+       "id": 2,
+       "input_text": "محکمہ موسمیات نے آئندہ تین دنوں کے دوران ملک کے بالائی علاقوں میں شدید بارش اور برفباری کی پیش گوئی کی ہے۔ ترجمان کے مطابق اسلام آباد، راولپنڈی، پشاور اور ایبٹ آباد میں جمعرات کی شام سے بارش کا آغاز متوقع ہے۔ شمالی علاقوں میں لینڈ سلائیڈنگ کے خدشے کے پیش نظر سیاحوں کو غیر ضروری سفر سے گریز کرنے کی ہدایت کی گئی ہے۔ قومی ادارہ برائے آفات نے تمام صوبائی اداروں کو الرٹ رہنے اور ہنگامی سامان تیار رکھنے کا حکم دیا ہے۔ ضلعی انتظامیہ نے نشیبی علاقوں سے پانی کی نکاسی کے لیے اضافی مشینری اور عملہ تعینات کر دیا ہے۔ محکمہ صحت کے حکام کا کہنا ہے کہ بارش کے بعد ڈینگی اور دیگر بیماریوں سے بچاؤ کے لیے خصوصی مہم چلائی جائے گی۔ کسانوں کو مشورہ دیا گیا ہے کہ وہ گندم کی بوائی موسم صاف ہونے تک مؤخر کر دیں تاکہ بیج ضائع نہ ہو۔ شاہراہ قراقرم کے بعض حصوں پر ٹریفک عارضی طور پر معطل رہنے کا امکان ہے اور مسافروں کو متبادل راستے اختیار کرنے کا کہا گیا ہے۔ بجلی کی تقسیم کار کمپنیوں نے صارفین سے اپیل کی ہے کہ وہ بارش کے دوران کھمبوں اور ننگی تاروں سے دور رہیں۔",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.6856,
+       "created_at": "2026-11-27T19:17:34.144277Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 2,
+       "highlighted_words": "[{\"word\": \"دیا\", \"contribution\": -0.20278, \"direction\": \"opposes_prediction\"}, {\"word\": \"دوران\", \"contribution\": 0.1547, \"direction\": \"supports_prediction\"}, {\"word\": \"علاقوں\", \"contribution\": 0.1474, \"direction\": \"supports_prediction\"}, {\"word\": \"تاکہ\", \"contribution\": -0.13177, \"direction\": \"opposes_prediction\"}, {\"word\": \"شدید\", \"contribution\": -0.10702, \"direction\": \"opposes_prediction\"}, {\"word\": \"کہنا\", \"contribution\": -0.10465, \"direction\": \"opposes_prediction\"}, {\"word\": \"لینڈ\", \"contribution\": 0.09938, \"direction\": \"supports_prediction\"}, {\"word\": \"حکام\", \"contribution\": -0.09121, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is unsure (68.6%), so treat this result with caution. The highlighted words below had the biggest effect on this result. Long articles are checked as a whole. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "tfidf-urdu-long-articles",
+       "created_at": "2026-11-27T19:17:34.143844Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:17:34",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-04": {
+   "result": "Pass",
+   "evidence": "201 · roman_urdu · xlmr-roman-urdu · Real 0.9794 · risk 0.0206 · 8 highlights · 10.2 s · id 3",
+   "expected": "roman_urdu; xlmr-roman-urdu; label; conf; highlights; latency",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 3,
+     "language": "roman_urdu",
+     "model": "xlmr-roman-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.9794,
+     "risk": 0.0206,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "Hukoomat",
+      "ke",
+      "ne",
+      "elan",
+      "hai",
+      "kiya",
+      "1",
+      "aaj"
+     ],
+     "contributions": [
+      0.10892,
+      0.043,
+      0.0235,
+      -0.00989,
+      -0.00842,
+      0.0042,
+      -0.00179,
+      0.00062
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (97.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 10.16,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 10.16,
+     "body": {
+      "id": 3,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "roman_urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0206,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:17:44.310011Z",
+      "text_submission": {
+       "id": 3,
+       "input_text": "Hukoomat ne aaj elan kiya hai ke 1 November se tamam sarkari schools mein muft kitaabein faraham ki jayengi.",
+       "detected_language": "roman_urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9794,
+       "created_at": "2026-11-27T19:17:44.312860Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 3,
+       "highlighted_words": "[{\"word\": \"Hukoomat\", \"contribution\": 0.10892, \"direction\": \"supports_prediction\"}, {\"word\": \"ke\", \"contribution\": 0.043, \"direction\": \"supports_prediction\"}, {\"word\": \"ne\", \"contribution\": 0.0235, \"direction\": \"supports_prediction\"}, {\"word\": \"elan\", \"contribution\": -0.00989, \"direction\": \"opposes_prediction\"}, {\"word\": \"hai\", \"contribution\": -0.00842, \"direction\": \"opposes_prediction\"}, {\"word\": \"kiya\", \"contribution\": 0.0042, \"direction\": \"supports_prediction\"}, {\"word\": \"1\", \"contribution\": -0.00179, \"direction\": \"opposes_prediction\"}, {\"word\": \"aaj\", \"contribution\": 0.00062, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is highly confident (97.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-roman-urdu",
+       "created_at": "2026-11-27T19:17:44.312393Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:17:44",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-05": {
+   "result": "Pass",
+   "evidence": "empty 422 “String should have at least 3 characters” · spaces 422 “Value error, Text must contain at least 3 non-space characters” · two_chars 422 “String should have at least 3 characters” · chars_10001 422 “String should have at most 10000 characters” · history 3→3",
+   "expected": "422 each with a clear message; none in history",
+   "notes": "",
+   "raw": {
+    "empty": {
+     "status": 422,
+     "message": "String should have at least 3 characters",
+     "chars": 0
+    },
+    "spaces": {
+     "status": 422,
+     "message": "Value error, Text must contain at least 3 non-space characters",
+     "chars": 3
+    },
+    "two_chars": {
+     "status": 422,
+     "message": "String should have at least 3 characters",
+     "chars": 2
+    },
+    "chars_10001": {
+     "status": 422,
+     "message": "String should have at most 10000 characters",
+     "chars": 10001
+    },
+    "history_before_after": [
+     3,
+     3
+    ]
+   },
+   "run_at": "2026-11-28 00:17:44",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-06": {
+   "result": "Pass",
+   "evidence": "no token 401 “Authentication token is missing.” · tampered signature 401 “Could not validate authentication credentials.” · history 3→3",
+   "expected": "401 for both; nothing saved",
+   "notes": "",
+   "raw": {
+    "no_token": {
+     "status": 401,
+     "detail": "Authentication token is missing."
+    },
+    "tampered": {
+     "status": 401,
+     "detail": "Could not validate authentication credentials."
+    },
+    "history_before_after": [
+     3,
+     3
+    ]
+   },
+   "run_at": "2026-11-28 00:17:44",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-07": {
+   "result": "Pass",
+   "evidence": "201 · urdu · xlmr-urdu · Fake 0.9994 · risk 0.9994 · 8 highlights · 0.8 s · id 4",
+   "expected": "as TC-TXT-02",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 4,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Fake",
+     "text_prediction": "Fake",
+     "confidence": 0.9994,
+     "risk": 0.9994,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "ملک",
+      "کیا",
+      "حکومت",
+      "اعلان",
+      "بھر",
+      "ہے",
+      "کہ",
+      "نے"
+     ],
+     "contributions": [
+      -0.00044,
+      -0.00044,
+      -0.00043,
+      -0.00043,
+      -0.00043,
+      -0.00042,
+      -0.00041,
+      -0.00037
+     ],
+     "summary": "This looks like fake or misleading news. The AI is highly confident (99.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.75,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.75,
+     "body": {
+      "id": 4,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.9994,
+      "final_label": "Fake",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:17:45.154238Z",
+      "text_submission": {
+       "id": 4,
+       "input_text": "حکومت نے اعلان کیا ہے کہ ملک بھر میں سات دن کے لیے انٹرنیٹ سروس بند کر دی جائے گی۔",
+       "detected_language": "urdu",
+       "text_prediction": "Fake",
+       "text_confidence": 0.9994,
+       "created_at": "2026-11-27T19:17:45.156637Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 4,
+       "highlighted_words": "[{\"word\": \"ملک\", \"contribution\": -0.00044, \"direction\": \"opposes_prediction\"}, {\"word\": \"کیا\", \"contribution\": -0.00044, \"direction\": \"opposes_prediction\"}, {\"word\": \"حکومت\", \"contribution\": -0.00043, \"direction\": \"opposes_prediction\"}, {\"word\": \"اعلان\", \"contribution\": -0.00043, \"direction\": \"opposes_prediction\"}, {\"word\": \"بھر\", \"contribution\": -0.00043, \"direction\": \"opposes_prediction\"}, {\"word\": \"ہے\", \"contribution\": -0.00042, \"direction\": \"opposes_prediction\"}, {\"word\": \"کہ\", \"contribution\": -0.00041, \"direction\": \"opposes_prediction\"}, {\"word\": \"نے\", \"contribution\": -0.00037, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like fake or misleading news. The AI is highly confident (99.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:17:45.156257Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:17:45",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-08": {
+   "result": "Pass",
+   "evidence": "201 · roman_urdu · xlmr-roman-urdu · Real 0.995 · risk 0.005 · 8 highlights · 8.9 s · id 5",
+   "expected": "as TC-TXT-04",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 5,
+     "language": "roman_urdu",
+     "model": "xlmr-roman-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.995,
+     "risk": 0.005,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "Hukoomat",
+      "bhar",
+      "ke",
+      "mulk",
+      "elan",
+      "kiya",
+      "hai",
+      "ne"
+     ],
+     "contributions": [
+      0.04053,
+      0.01026,
+      0.00172,
+      0.00155,
+      -0.00095,
+      -0.00054,
+      -0.00043,
+      0.00014
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (99.5%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 8.95,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 8.95,
+     "body": {
+      "id": 5,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "roman_urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.005,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:17:54.096687Z",
+      "text_submission": {
+       "id": 5,
+       "input_text": "Hukoomat ne elan kiya hai ke mulk bhar mein saat din ke liye internet service band kar di jayegi.",
+       "detected_language": "roman_urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.995,
+       "created_at": "2026-11-27T19:17:54.107178Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 5,
+       "highlighted_words": "[{\"word\": \"Hukoomat\", \"contribution\": 0.04053, \"direction\": \"supports_prediction\"}, {\"word\": \"bhar\", \"contribution\": 0.01026, \"direction\": \"supports_prediction\"}, {\"word\": \"ke\", \"contribution\": 0.00172, \"direction\": \"supports_prediction\"}, {\"word\": \"mulk\", \"contribution\": 0.00155, \"direction\": \"supports_prediction\"}, {\"word\": \"elan\", \"contribution\": -0.00095, \"direction\": \"opposes_prediction\"}, {\"word\": \"kiya\", \"contribution\": -0.00054, \"direction\": \"opposes_prediction\"}, {\"word\": \"hai\", \"contribution\": -0.00043, \"direction\": \"opposes_prediction\"}, {\"word\": \"ne\", \"contribution\": 0.00014, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is highly confident (99.5%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-roman-urdu",
+       "created_at": "2026-11-27T19:17:54.106332Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:17:54",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-09": {
+   "result": "Pass",
+   "evidence": "cutoff LONG_TEXT_WORDS=150 (words > cutoff → TF-IDF) · 150 words: 201 · urdu · xlmr-urdu · Fake 0.9976 · risk 0.9976 · 8 highlights · 2.2 s · id 6 · 151 words: 201 · urdu · tfidf-urdu-long-articles · Real 0.5867 · risk 0.4133 · 8 highlights · 0.3 s · id 7",
+   "expected": "150 → xlmr-urdu; 151 → TF-IDF",
+   "notes": "",
+   "raw": {
+    "facts_150": {
+     "status": 201,
+     "id": 6,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Fake",
+     "text_prediction": "Fake",
+     "confidence": 0.9976,
+     "risk": 0.9976,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "کے",
+      "محکمہ",
+      "تین",
+      "آئندہ",
+      "نے",
+      "موسمیات",
+      "دوران",
+      "دنوں"
+     ],
+     "contributions": [
+      0.01388,
+      0.00204,
+      -0.00079,
+      -0.00072,
+      0.00032,
+      -0.00025,
+      8e-05,
+      1e-05
+     ],
+     "summary": "This looks like fake or misleading news. The AI is highly confident (99.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 2.23,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "facts_151": {
+     "status": 201,
+     "id": 7,
+     "language": "urdu",
+     "model": "tfidf-urdu-long-articles",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.5867,
+     "risk": 0.4133,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "دیا",
+      "علاقوں",
+      "تاکہ",
+      "کہنا",
+      "شدید",
+      "لینڈ",
+      "حکام",
+      "ہنگامی"
+     ],
+     "contributions": [
+      -0.23455,
+      0.16783,
+      -0.15269,
+      -0.1222,
+      -0.12207,
+      0.1132,
+      -0.10559,
+      0.10245
+     ],
+     "summary": "This looks like genuine news. The AI is unsure (58.7%), so treat this result with caution. The highlighted words below had the biggest effect on this result. Long articles are checked as a whole. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.26,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response_150": {
+     "status": 201,
+     "latency_s": 2.23,
+     "body": {
+      "id": 6,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.9976,
+      "final_label": "Fake",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:17:56.316914Z",
+      "text_submission": {
+       "id": 6,
+       "input_text": "محکمہ موسمیات نے آئندہ تین دنوں کے دوران ملک کے بالائی علاقوں میں شدید بارش اور برفباری کی پیش گوئی کی ہے۔ ترجمان کے مطابق اسلام آباد، راولپنڈی، پشاور اور ایبٹ آباد میں جمعرات کی شام سے بارش کا آغاز متوقع ہے۔ شمالی علاقوں میں لینڈ سلائیڈنگ کے خدشے کے پیش نظر سیاحوں کو غیر ضروری سفر سے گریز کرنے کی ہدایت کی گئی ہے۔ قومی ادارہ برائے آفات نے تمام صوبائی اداروں کو الرٹ رہنے اور ہنگامی سامان تیار رکھنے کا حکم دیا ہے۔ ضلعی انتظامیہ نے نشیبی علاقوں سے پانی کی نکاسی کے لیے اضافی مشینری اور عملہ تعینات کر دیا ہے۔ محکمہ صحت کے حکام کا کہنا ہے کہ بارش کے بعد ڈینگی اور دیگر بیماریوں سے بچاؤ کے لیے خصوصی مہم چلائی جائے گی۔ کسانوں کو مشورہ دیا گیا ہے کہ وہ گندم کی بوائی موسم صاف ہونے تک مؤخر کر دیں تاکہ بیج ضائع نہ",
+       "detected_language": "urdu",
+       "text_prediction": "Fake",
+       "text_confidence": 0.9976,
+       "created_at": "2026-11-27T19:17:56.319503Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 6,
+       "highlighted_words": "[{\"word\": \"کے\", \"contribution\": 0.01388, \"direction\": \"supports_prediction\"}, {\"word\": \"محکمہ\", \"contribution\": 0.00204, \"direction\": \"supports_prediction\"}, {\"word\": \"تین\", \"contribution\": -0.00079, \"direction\": \"opposes_prediction\"}, {\"word\": \"آئندہ\", \"contribution\": -0.00072, \"direction\": \"opposes_prediction\"}, {\"word\": \"نے\", \"contribution\": 0.00032, \"direction\": \"supports_prediction\"}, {\"word\": \"موسمیات\", \"contribution\": -0.00025, \"direction\": \"opposes_prediction\"}, {\"word\": \"دوران\", \"contribution\": 8e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"دنوں\", \"contribution\": 1e-05, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like fake or misleading news. The AI is highly confident (99.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:17:56.319208Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    },
+    "response_151": {
+     "status": 201,
+     "latency_s": 0.26,
+     "body": {
+      "id": 7,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.4133,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:17:56.600800Z",
+      "text_submission": {
+       "id": 7,
+       "input_text": "محکمہ موسمیات نے آئندہ تین دنوں کے دوران ملک کے بالائی علاقوں میں شدید بارش اور برفباری کی پیش گوئی کی ہے۔ ترجمان کے مطابق اسلام آباد، راولپنڈی، پشاور اور ایبٹ آباد میں جمعرات کی شام سے بارش کا آغاز متوقع ہے۔ شمالی علاقوں میں لینڈ سلائیڈنگ کے خدشے کے پیش نظر سیاحوں کو غیر ضروری سفر سے گریز کرنے کی ہدایت کی گئی ہے۔ قومی ادارہ برائے آفات نے تمام صوبائی اداروں کو الرٹ رہنے اور ہنگامی سامان تیار رکھنے کا حکم دیا ہے۔ ضلعی انتظامیہ نے نشیبی علاقوں سے پانی کی نکاسی کے لیے اضافی مشینری اور عملہ تعینات کر دیا ہے۔ محکمہ صحت کے حکام کا کہنا ہے کہ بارش کے بعد ڈینگی اور دیگر بیماریوں سے بچاؤ کے لیے خصوصی مہم چلائی جائے گی۔ کسانوں کو مشورہ دیا گیا ہے کہ وہ گندم کی بوائی موسم صاف ہونے تک مؤخر کر دیں تاکہ بیج ضائع نہ ہو۔",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.5867,
+       "created_at": "2026-11-27T19:17:56.602784Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 7,
+       "highlighted_words": "[{\"word\": \"دیا\", \"contribution\": -0.23455, \"direction\": \"opposes_prediction\"}, {\"word\": \"علاقوں\", \"contribution\": 0.16783, \"direction\": \"supports_prediction\"}, {\"word\": \"تاکہ\", \"contribution\": -0.15269, \"direction\": \"opposes_prediction\"}, {\"word\": \"کہنا\", \"contribution\": -0.1222, \"direction\": \"opposes_prediction\"}, {\"word\": \"شدید\", \"contribution\": -0.12207, \"direction\": \"opposes_prediction\"}, {\"word\": \"لینڈ\", \"contribution\": 0.1132, \"direction\": \"supports_prediction\"}, {\"word\": \"حکام\", \"contribution\": -0.10559, \"direction\": \"opposes_prediction\"}, {\"word\": \"ہنگامی\", \"contribution\": 0.10245, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is unsure (58.7%), so treat this result with caution. The highlighted words below had the biggest effect on this result. Long articles are checked as a whole. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "tfidf-urdu-long-articles",
+       "created_at": "2026-11-27T19:17:56.602534Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:17:56",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-10": {
+   "result": "Pass",
+   "evidence": "135 words, 292 tokens (Urdu tokenizer, limit 256) · 201 · urdu · xlmr-urdu · Fake 0.9816 · risk 0.9816 · 0 highlights · 0.3 s · id 35 · summary says “only its first part was checked”=True; no highlights for truncated text (by design, explain.py)",
+   "expected": "xlmr-urdu; no error; truncated to 256 tokens; result returned",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 35,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Fake",
+     "text_prediction": "Fake",
+     "confidence": 0.9816,
+     "risk": 0.9816,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [],
+     "contributions": [],
+     "summary": "This looks like fake or misleading news. The AI is highly confident (98.2%). The text is long, so only its first part was checked. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.32
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.32,
+     "body": {
+      "id": 35,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.9816,
+      "final_label": "Fake",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:19:38.305575Z",
+      "text_submission": {
+       "id": 35,
+       "input_text": "وزارت خزانہ کے نوٹیفکیشن نمبر ایف-۱۲(۴)/۲۰۲۶-بجٹ، ایس-آر-او-۱۵۶۷(I)/۲۰۲۶ اور ٹی-۰۹۸۷/۲۰۲۶-اے کے تحت ۲۸-۱۱-۲۰۲۶ سے نئے نرخ نافذ ہوں گے۔ ان نوٹیفکیشنز (ایف-۱۳(۲)/۲۰۲۶-ٹیکس، ایس-آر-او-۱۶۰۲(I)/۲۰۲۶) کے مطابق ۱۵٫۷۵٪، ۱۸٫۲۵٪ اور ۲۲٫۵۰٪ کی شرحیں ۰۱-۱۲-۲۰۲۶ تک برقرار رہیں گی۔ وفاقی ادارہ شماریات (پی بی ایس) کی رپورٹ کے مطابق اکتوبر ۲۰۲۶ء میں مہنگائی کی شرح ۷٫۴۵٪ رہی جو ستمبر میں ۸٫۱۲٪ تھی۔ شہری علاقوں میں اشیائے خوردونوش کی قیمتوں میں ۳٫۲۷٪، دیہی علاقوں میں ۴٫۰۹٪ اور ٹرانسپورٹ کے کرایوں میں ۱۱٫۶۳٪ اضافہ ریکارڈ کیا گیا۔ رپورٹ میں بتایا گیا کہ آٹے کا ۲۰ کلوگرام تھیلا ۲۳۵۰ روپے، چینی ۱۴۸ روپے فی کلو، گھی ۵۲۵ روپے فی کلو اور ایل پی جی ۲۶۳٫۸۵ روپے فی کلو فروخت ہوئی۔ اسٹیٹ بینک آف پاکستان (ایس بی پی) نے پالیسی ریٹ ۱۲٪ پر برقرار رکھا جبکہ زرمبادلہ کے ذخائر ۱۴٫۸۷ ارب ڈالر رہے۔",
+       "detected_language": "urdu",
+       "text_prediction": "Fake",
+       "text_confidence": 0.9816,
+       "created_at": "2026-11-27T19:19:38.307637Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 35,
+       "highlighted_words": null,
+       "heatmap_path": null,
+       "explanation_summary": "This looks like fake or misleading news. The AI is highly confident (98.2%). The text is long, so only its first part was checked. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:19:38.307354Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:19:38",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-11": {
+   "result": "Finding",
+   "evidence": "v1 roman_urdu xlmr-roman-urdu Fake 0.9966 (4.6 s, id 9) | v2 roman_urdu xlmr-roman-urdu Real 0.7919 (4.0 s, id 10) | v3 roman_urdu xlmr-roman-urdu Fake 0.9985 (4.9 s, id 11)",
+   "expected": "all three xlmr-roman-urdu; labels recorded; disagreement → Finding",
+   "notes": "Spelling variants of the same claim get different labels.",
+   "raw": {
+    "variant_1": {
+     "facts": {
+      "status": 201,
+      "id": 9,
+      "language": "roman_urdu",
+      "model": "xlmr-roman-urdu",
+      "label": "Fake",
+      "text_prediction": "Fake",
+      "confidence": 0.9966,
+      "risk": 0.9966,
+      "processing_status": "completed",
+      "is_news": null,
+      "highlights": [
+       "petrol",
+       "Hukoomat",
+       "kar",
+       "rupay",
+       "diya",
+       "5",
+       "ne",
+       "sasta"
+      ],
+      "contributions": [
+       0.00246,
+       -0.00242,
+       0.00197,
+       -0.00194,
+       0.00148,
+       -0.00145,
+       0.00099,
+       0.00099
+      ],
+      "summary": "This looks like fake or misleading news. The AI is highly confident (99.7%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+      "latency_s": 4.57,
+      "highlights_not_in_input": [],
+      "highlights_only_after_cleaning": []
+     },
+     "response": {
+      "status": 201,
+      "latency_s": 4.57,
+      "body": {
+       "id": 9,
+       "user_id": 1,
+       "submission_type": "text",
+       "detected_language": "roman_urdu",
+       "is_news": null,
+       "news_confidence": null,
+       "combined_risk_score": 0.9966,
+       "final_label": "Fake",
+       "final_label_source": "AI",
+       "admin_comment": null,
+       "created_at": "2026-11-27T19:18:01.492221Z",
+       "text_submission": {
+        "id": 9,
+        "input_text": "Hukoomat ne petrol 5 rupay sasta kar diya hai",
+        "detected_language": "roman_urdu",
+        "text_prediction": "Fake",
+        "text_confidence": 0.9966,
+        "created_at": "2026-11-27T19:18:01.506177Z",
+        "processing_status": "completed"
+       },
+       "image_submission": null,
+       "explainability": {
+        "id": 9,
+        "highlighted_words": "[{\"word\": \"petrol\", \"contribution\": 0.00246, \"direction\": \"supports_prediction\"}, {\"word\": \"Hukoomat\", \"contribution\": -0.00242, \"direction\": \"opposes_prediction\"}, {\"word\": \"kar\", \"contribution\": 0.00197, \"direction\": \"supports_prediction\"}, {\"word\": \"rupay\", \"contribution\": -0.00194, \"direction\": \"opposes_prediction\"}, {\"word\": \"diya\", \"contribution\": 0.00148, \"direction\": \"supports_prediction\"}, {\"word\": \"5\", \"contribution\": -0.00145, \"direction\": \"opposes_prediction\"}, {\"word\": \"ne\", \"contribution\": 0.00099, \"direction\": \"supports_prediction\"}, {\"word\": \"sasta\", \"contribution\": 0.00099, \"direction\": \"supports_prediction\"}]",
+        "heatmap_path": null,
+        "explanation_summary": "This looks like fake or misleading news. The AI is highly confident (99.7%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+        "model_version": "xlmr-roman-urdu",
+        "created_at": "2026-11-27T19:18:01.505903Z"
+       },
+       "gradcam_status": null
+      },
+      "retry_after": null
+     }
+    },
+    "variant_2": {
+     "facts": {
+      "status": 201,
+      "id": 10,
+      "language": "roman_urdu",
+      "model": "xlmr-roman-urdu",
+      "label": "Real",
+      "text_prediction": "Real",
+      "confidence": 0.7919,
+      "risk": 0.2081,
+      "processing_status": "completed",
+      "is_news": null,
+      "highlights": [
+       "Hakumat",
+       "sasta",
+       "ne",
+       "kr",
+       "dia",
+       "rupe",
+       "petrol",
+       "5"
+      ],
+      "contributions": [
+       0.78995,
+       0.78897,
+       -0.19421,
+       -0.18008,
+       -0.17792,
+       -0.17008,
+       0.06363,
+       -0.0571
+      ],
+      "summary": "This looks like genuine news. The AI is fairly confident (79.2%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+      "latency_s": 3.95,
+      "highlights_not_in_input": [],
+      "highlights_only_after_cleaning": []
+     },
+     "response": {
+      "status": 201,
+      "latency_s": 3.95,
+      "body": {
+       "id": 10,
+       "user_id": 1,
+       "submission_type": "text",
+       "detected_language": "roman_urdu",
+       "is_news": null,
+       "news_confidence": null,
+       "combined_risk_score": 0.2081,
+       "final_label": "Real",
+       "final_label_source": "AI",
+       "admin_comment": null,
+       "created_at": "2026-11-27T19:18:05.427133Z",
+       "text_submission": {
+        "id": 10,
+        "input_text": "Hakumat ne petrol 5 rupe sasta kr dia he",
+        "detected_language": "roman_urdu",
+        "text_prediction": "Real",
+        "text_confidence": 0.7919,
+        "created_at": "2026-11-27T19:18:05.452259Z",
+        "processing_status": "completed"
+       },
+       "image_submission": null,
+       "explainability": {
+        "id": 10,
+        "highlighted_words": "[{\"word\": \"Hakumat\", \"contribution\": 0.78995, \"direction\": \"supports_prediction\"}, {\"word\": \"sasta\", \"contribution\": 0.78897, \"direction\": \"supports_prediction\"}, {\"word\": \"ne\", \"contribution\": -0.19421, \"direction\": \"opposes_prediction\"}, {\"word\": \"kr\", \"contribution\": -0.18008, \"direction\": \"opposes_prediction\"}, {\"word\": \"dia\", \"contribution\": -0.17792, \"direction\": \"opposes_prediction\"}, {\"word\": \"rupe\", \"contribution\": -0.17008, \"direction\": \"opposes_prediction\"}, {\"word\": \"petrol\", \"contribution\": 0.06363, \"direction\": \"supports_prediction\"}, {\"word\": \"5\", \"contribution\": -0.0571, \"direction\": \"opposes_prediction\"}]",
+        "heatmap_path": null,
+        "explanation_summary": "This looks like genuine news. The AI is fairly confident (79.2%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+        "model_version": "xlmr-roman-urdu",
+        "created_at": "2026-11-27T19:18:05.451903Z"
+       },
+       "gradcam_status": null
+      },
+      "retry_after": null
+     }
+    },
+    "variant_3": {
+     "facts": {
+      "status": 201,
+      "id": 11,
+      "language": "roman_urdu",
+      "model": "xlmr-roman-urdu",
+      "label": "Fake",
+      "text_prediction": "Fake",
+      "confidence": 0.9985,
+      "risk": 0.9985,
+      "processing_status": "completed",
+      "is_news": null,
+      "highlights": [
+       "ne",
+       "kar",
+       "Hkumat",
+       "petrol",
+       "5",
+       "rs",
+       "sasta",
+       "dya"
+      ],
+      "contributions": [
+       0.00094,
+       0.00094,
+       -0.00052,
+       0.00045,
+       0.00045,
+       -4e-05,
+       -4e-05,
+       -4e-05
+      ],
+      "summary": "This looks like fake or misleading news. The AI is highly confident (99.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+      "latency_s": 4.91,
+      "highlights_not_in_input": [],
+      "highlights_only_after_cleaning": []
+     },
+     "response": {
+      "status": 201,
+      "latency_s": 4.91,
+      "body": {
+       "id": 11,
+       "user_id": 1,
+       "submission_type": "text",
+       "detected_language": "roman_urdu",
+       "is_news": null,
+       "news_confidence": null,
+       "combined_risk_score": 0.9985,
+       "final_label": "Fake",
+       "final_label_source": "AI",
+       "admin_comment": null,
+       "created_at": "2026-11-27T19:18:10.364818Z",
+       "text_submission": {
+        "id": 11,
+        "input_text": "Hkumat ne petrol 5 rs sasta kar dya hai",
+        "detected_language": "roman_urdu",
+        "text_prediction": "Fake",
+        "text_confidence": 0.9985,
+        "created_at": "2026-11-27T19:18:10.367164Z",
+        "processing_status": "completed"
+       },
+       "image_submission": null,
+       "explainability": {
+        "id": 11,
+        "highlighted_words": "[{\"word\": \"ne\", \"contribution\": 0.00094, \"direction\": \"supports_prediction\"}, {\"word\": \"kar\", \"contribution\": 0.00094, \"direction\": \"supports_prediction\"}, {\"word\": \"Hkumat\", \"contribution\": -0.00052, \"direction\": \"opposes_prediction\"}, {\"word\": \"petrol\", \"contribution\": 0.00045, \"direction\": \"supports_prediction\"}, {\"word\": \"5\", \"contribution\": 0.00045, \"direction\": \"supports_prediction\"}, {\"word\": \"rs\", \"contribution\": -4e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"sasta\", \"contribution\": -4e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"dya\", \"contribution\": -4e-05, \"direction\": \"opposes_prediction\"}]",
+        "heatmap_path": null,
+        "explanation_summary": "This looks like fake or misleading news. The AI is highly confident (99.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+        "model_version": "xlmr-roman-urdu",
+        "created_at": "2026-11-27T19:18:10.366893Z"
+       },
+       "gradcam_status": null
+      },
+      "retry_after": null
+     }
+    }
+   },
+   "run_at": "2026-11-28 00:18:10",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-12": {
+   "result": "Finding",
+   "evidence": "TC-TXT-02 xlmr-urdu Real 0.9984 vs TC-TXT-04 xlmr-roman-urdu Real 0.9794 · TC-TXT-07 xlmr-urdu Fake 0.9994 vs TC-TXT-08 xlmr-roman-urdu Real 0.995",
+   "expected": "each goes to its own model; labels disagree → Finding",
+   "notes": "The same claim in Urdu script and in Roman Urdu gets different labels from the two models.",
+   "raw": {
+    "pairs": [
+     [
+      "TC-TXT-02",
+      "TC-TXT-04"
+     ],
+     [
+      "TC-TXT-07",
+      "TC-TXT-08"
+     ]
+    ]
+   },
+   "run_at": "2026-11-28 00:18:10",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-13": {
+   "result": "Known limitation",
+   "evidence": "201 · english · xlmr-roman-urdu · Real 0.5662 · risk 0.4338 · 8 highlights · 5.1 s · id 12 · summary says “less reliable”=True",
+   "expected": "xlmr-roman-urdu; summary says no English model / less reliable",
+   "notes": "English has no model of its own (audit §15 #7).",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 12,
+     "language": "english",
+     "model": "xlmr-roman-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.5662,
+     "risk": 0.4338,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "The",
+      "announced",
+      "free",
+      "government",
+      "for",
+      "all",
+      "has",
+      "textbooks"
+     ],
+     "contributions": [
+      0.47001,
+      0.41874,
+      -0.34866,
+      0.3079,
+      0.18729,
+      -0.10299,
+      -0.0732,
+      0.04545
+     ],
+     "summary": "This looks like genuine news. The AI is unsure (56.6%), so treat this result with caution. The highlighted words below had the biggest effect on this result. KhabarNazar is built for Urdu and Roman Urdu, so results for English text are less reliable. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 5.13,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 5.13,
+     "body": {
+      "id": 12,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "english",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.4338,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:15.423026Z",
+      "text_submission": {
+       "id": 12,
+       "input_text": "The government has announced free textbooks for all public schools from 1 November.",
+       "detected_language": "english",
+       "text_prediction": "Real",
+       "text_confidence": 0.5662,
+       "created_at": "2026-11-27T19:18:15.496594Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 12,
+       "highlighted_words": "[{\"word\": \"The\", \"contribution\": 0.47001, \"direction\": \"supports_prediction\"}, {\"word\": \"announced\", \"contribution\": 0.41874, \"direction\": \"supports_prediction\"}, {\"word\": \"free\", \"contribution\": -0.34866, \"direction\": \"opposes_prediction\"}, {\"word\": \"government\", \"contribution\": 0.3079, \"direction\": \"supports_prediction\"}, {\"word\": \"for\", \"contribution\": 0.18729, \"direction\": \"supports_prediction\"}, {\"word\": \"all\", \"contribution\": -0.10299, \"direction\": \"opposes_prediction\"}, {\"word\": \"has\", \"contribution\": -0.0732, \"direction\": \"opposes_prediction\"}, {\"word\": \"textbooks\", \"contribution\": 0.04545, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is unsure (56.6%), so treat this result with caution. The highlighted words below had the biggest effect on this result. KhabarNazar is built for Urdu and Roman Urdu, so results for English text are less reliable. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-roman-urdu",
+       "created_at": "2026-11-27T19:18:15.496230Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:15",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-14": {
+   "result": "Pass",
+   "evidence": "201 · urdu · xlmr-urdu · Real 0.9996 · risk 0.0004 · 8 highlights · 0.6 s · id 13",
+   "expected": "detected Urdu; xlmr-urdu",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 13,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.9996,
+     "risk": 0.0004,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "حکومت",
+      "پانچ",
+      "میں",
+      "نے",
+      "قیمت",
+      "کی",
+      "روپے",
+      "petrol"
+     ],
+     "contributions": [
+      0.00289,
+      0.00081,
+      -0.0002,
+      -0.00016,
+      0.00014,
+      -0.00012,
+      7e-05,
+      -3e-05
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.56,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.56,
+     "body": {
+      "id": 13,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0004,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:16.024020Z",
+      "text_submission": {
+       "id": 13,
+       "input_text": "حکومت نے petrol کی قیمت میں پانچ روپے کمی کا اعلان کیا ہے",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9996,
+       "created_at": "2026-11-27T19:18:16.055319Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 13,
+       "highlighted_words": "[{\"word\": \"حکومت\", \"contribution\": 0.00289, \"direction\": \"supports_prediction\"}, {\"word\": \"پانچ\", \"contribution\": 0.00081, \"direction\": \"supports_prediction\"}, {\"word\": \"میں\", \"contribution\": -0.0002, \"direction\": \"opposes_prediction\"}, {\"word\": \"نے\", \"contribution\": -0.00016, \"direction\": \"opposes_prediction\"}, {\"word\": \"قیمت\", \"contribution\": 0.00014, \"direction\": \"supports_prediction\"}, {\"word\": \"کی\", \"contribution\": -0.00012, \"direction\": \"opposes_prediction\"}, {\"word\": \"روپے\", \"contribution\": 7e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"petrol\", \"contribution\": -3e-05, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:18:16.054933Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:16",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-15": {
+   "result": "Pass",
+   "evidence": "201 · roman_urdu · xlmr-roman-urdu · Fake 0.999 · risk 0.999 · 8 highlights · 5.5 s · id 14 · detected roman_urdu",
+   "expected": "xlmr-roman-urdu; record detected language",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 14,
+     "language": "roman_urdu",
+     "model": "xlmr-roman-urdu",
+     "label": "Fake",
+     "text_prediction": "Fake",
+     "confidence": 0.999,
+     "risk": 0.999,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "schools",
+      "band",
+      "se",
+      "Breaking",
+      "news",
+      "government",
+      "ne",
+      "kal"
+     ],
+     "contributions": [
+      0.21921,
+      0.00144,
+      0.00046,
+      -2e-05,
+      -2e-05,
+      -2e-05,
+      -2e-05,
+      -2e-05
+     ],
+     "summary": "This looks like fake or misleading news. The AI is highly confident (99.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 5.51,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 5.51,
+     "body": {
+      "id": 14,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "roman_urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.999,
+      "final_label": "Fake",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:21.560597Z",
+      "text_submission": {
+       "id": 14,
+       "input_text": "Breaking news: government ne kal se schools band karne ka announcement kar diya",
+       "detected_language": "roman_urdu",
+       "text_prediction": "Fake",
+       "text_confidence": 0.999,
+       "created_at": "2026-11-27T19:18:21.563441Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 14,
+       "highlighted_words": "[{\"word\": \"schools\", \"contribution\": 0.21921, \"direction\": \"supports_prediction\"}, {\"word\": \"band\", \"contribution\": 0.00144, \"direction\": \"supports_prediction\"}, {\"word\": \"se\", \"contribution\": 0.00046, \"direction\": \"supports_prediction\"}, {\"word\": \"Breaking\", \"contribution\": -2e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"news\", \"contribution\": -2e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"government\", \"contribution\": -2e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"ne\", \"contribution\": -2e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"kal\", \"contribution\": -2e-05, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like fake or misleading news. The AI is highly confident (99.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-roman-urdu",
+       "created_at": "2026-11-27T19:18:21.563065Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:21",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-16": {
+   "result": "Pass",
+   "evidence": "201 · mixed · xlmr-roman-urdu · Fake 0.981 · risk 0.981 · 8 highlights · 4.5 s · id 15 · route xlmr-roman-urdu",
+   "expected": "record language and route; no error",
+   "notes": "Summary: This looks like fake or misleading news. The AI is highly confident (98.1%). The highlighted words below had the biggest effect on this result. The text mixes Urdu and English script, so it was checked as Roman Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 15,
+     "language": "mixed",
+     "model": "xlmr-roman-urdu",
+     "label": "Fake",
+     "text_prediction": "Fake",
+     "confidence": 0.981,
+     "risk": 0.981,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "schools",
+      "se",
+      "کیا",
+      "نے",
+      "حکومت",
+      "kal",
+      "اعلان",
+      "ke"
+     ],
+     "contributions": [
+      0.60136,
+      0.03715,
+      -0.01754,
+      0.01713,
+      -0.01265,
+      -0.01265,
+      0.0059,
+      -0.00338
+     ],
+     "summary": "This looks like fake or misleading news. The AI is highly confident (98.1%). The highlighted words below had the biggest effect on this result. The text mixes Urdu and English script, so it was checked as Roman Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 4.48,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 4.48,
+     "body": {
+      "id": 15,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "mixed",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.981,
+      "final_label": "Fake",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:26.027895Z",
+      "text_submission": {
+       "id": 15,
+       "input_text": "حکومت نے اعلان کیا ke kal se schools band rahenge",
+       "detected_language": "mixed",
+       "text_prediction": "Fake",
+       "text_confidence": 0.981,
+       "created_at": "2026-11-27T19:18:26.044961Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 15,
+       "highlighted_words": "[{\"word\": \"schools\", \"contribution\": 0.60136, \"direction\": \"supports_prediction\"}, {\"word\": \"se\", \"contribution\": 0.03715, \"direction\": \"supports_prediction\"}, {\"word\": \"کیا\", \"contribution\": -0.01754, \"direction\": \"opposes_prediction\"}, {\"word\": \"نے\", \"contribution\": 0.01713, \"direction\": \"supports_prediction\"}, {\"word\": \"حکومت\", \"contribution\": -0.01265, \"direction\": \"opposes_prediction\"}, {\"word\": \"kal\", \"contribution\": -0.01265, \"direction\": \"opposes_prediction\"}, {\"word\": \"اعلان\", \"contribution\": 0.0059, \"direction\": \"supports_prediction\"}, {\"word\": \"ke\", \"contribution\": -0.00338, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like fake or misleading news. The AI is highly confident (98.1%). The highlighted words below had the biggest effect on this result. The text mixes Urdu and English script, so it was checked as Roman Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-roman-urdu",
+       "created_at": "2026-11-27T19:18:26.044590Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:26",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-17": {
+   "result": "Pass",
+   "evidence": "201 · urdu · xlmr-urdu · Real 0.9999 · risk 0.0001 · 8 highlights · 0.5 s · id 16",
+   "expected": "xlmr-urdu; no error",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 16,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.9999,
+     "risk": 0.0001,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "کتابیں",
+      "مفت",
+      "حکومت",
+      "سے",
+      "۱",
+      "نومبر",
+      "نے",
+      "دینے"
+     ],
+     "contributions": [
+      3e-05,
+      3e-05,
+      3e-05,
+      2e-05,
+      1e-05,
+      1e-05,
+      -1e-05,
+      0.0
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.51,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": [
+      "مفت"
+     ]
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.51,
+     "body": {
+      "id": 16,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0001,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:26.558851Z",
+      "text_submission": {
+       "id": 16,
+       "input_text": "حکومت نے ۱ نومبر سے کتابیں مُفت دینے کا اعلان کِیا ہے",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9999,
+       "created_at": "2026-11-27T19:18:26.560671Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 16,
+       "highlighted_words": "[{\"word\": \"کتابیں\", \"contribution\": 3e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"مفت\", \"contribution\": 3e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"حکومت\", \"contribution\": 3e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"سے\", \"contribution\": 2e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"۱\", \"contribution\": 1e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"نومبر\", \"contribution\": 1e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"نے\", \"contribution\": -1e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"دینے\", \"contribution\": 0.0, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:18:26.560404Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:26",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-18": {
+   "result": "Finding",
+   "evidence": "201 · urdu · xlmr-urdu · Real 0.9998 · risk 0.0002 · 8 highlights · 0.7 s · id 17",
+   "expected": "record route; Urdu model → Finding; no crash",
+   "notes": "Arabic text is classified by the xlmr-urdu model and gets a Real label.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 17,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.9998,
+     "risk": 0.0002,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "الحکومۃ",
+      "توزیع",
+      "أعلنت",
+      "فی",
+      "الکتب",
+      "عن",
+      "مجانا",
+      "الیوم"
+     ],
+     "contributions": [
+      0.00034,
+      7e-05,
+      6e-05,
+      -5e-05,
+      4e-05,
+      -3e-05,
+      3e-05,
+      2e-05
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.71,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": [
+      "الحکومۃ",
+      "توزیع",
+      "فی",
+      "الکتب",
+      "الیوم"
+     ]
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.71,
+     "body": {
+      "id": 17,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0002,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:27.265159Z",
+      "text_submission": {
+       "id": 17,
+       "input_text": "أعلنت الحكومة اليوم عن توزيع الكتب مجانا في جميع المدارس",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9998,
+       "created_at": "2026-11-27T19:18:27.267888Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 17,
+       "highlighted_words": "[{\"word\": \"الحکومۃ\", \"contribution\": 0.00034, \"direction\": \"supports_prediction\"}, {\"word\": \"توزیع\", \"contribution\": 7e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"أعلنت\", \"contribution\": 6e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"فی\", \"contribution\": -5e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"الکتب\", \"contribution\": 4e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"عن\", \"contribution\": -3e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"مجانا\", \"contribution\": 3e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"الیوم\", \"contribution\": 2e-05, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:18:27.267461Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:27",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-19": {
+   "result": "Finding",
+   "evidence": "201 · urdu · xlmr-urdu · Real 0.9998 · risk 0.0002 · 8 highlights · 0.5 s · id 18",
+   "expected": "record route; Urdu model → Finding; no crash",
+   "notes": "Persian text is classified by the xlmr-urdu model and gets a Real label.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 18,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.9998,
+     "risk": 0.0002,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "امروز",
+      "دولت",
+      "کہ",
+      "کتاب",
+      "ہا",
+      "رایگان",
+      "کرد",
+      "اعلام"
+     ],
+     "contributions": [
+      0.0003,
+      0.00018,
+      -0.0001,
+      8e-05,
+      -7e-05,
+      4e-05,
+      -3e-05,
+      1e-05
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.52,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": [
+      "کہ",
+      "ہا"
+     ]
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.52,
+     "body": {
+      "id": 18,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0002,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:27.776822Z",
+      "text_submission": {
+       "id": 18,
+       "input_text": "دولت امروز اعلام کرد که کتاب‌ها رایگان توزیع می‌شود",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9998,
+       "created_at": "2026-11-27T19:18:27.791899Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 18,
+       "highlighted_words": "[{\"word\": \"امروز\", \"contribution\": 0.0003, \"direction\": \"supports_prediction\"}, {\"word\": \"دولت\", \"contribution\": 0.00018, \"direction\": \"supports_prediction\"}, {\"word\": \"کہ\", \"contribution\": -0.0001, \"direction\": \"opposes_prediction\"}, {\"word\": \"کتاب\", \"contribution\": 8e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"ہا\", \"contribution\": -7e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"رایگان\", \"contribution\": 4e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"کرد\", \"contribution\": -3e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"اعلام\", \"contribution\": 1e-05, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:18:27.791550Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:27",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-20": {
+   "result": "Finding",
+   "evidence": "201 · unknown · xlmr-roman-urdu · Fake 0.9878 · risk 0.9878 · 8 highlights · 4.7 s · id 19",
+   "expected": "record route; Urdu model → Finding; no crash",
+   "notes": "Hindi (Devanagari) text is classified by the xlmr-roman-urdu model and gets a Fake label.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 19,
+     "language": "unknown",
+     "model": "xlmr-roman-urdu",
+     "label": "Fake",
+     "text_prediction": "Fake",
+     "confidence": 0.9878,
+     "risk": 0.9878,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "सरक",
+      "म",
+      "क",
+      "त",
+      "फ",
+      "न",
+      "र",
+      "आज"
+     ],
+     "contributions": [
+      0.93323,
+      0.91962,
+      0.9195,
+      0.88215,
+      0.76246,
+      0.72291,
+      0.42969,
+      -0.00781
+     ],
+     "summary": "This looks like fake or misleading news. The AI is highly confident (98.8%). The highlighted words below had the biggest effect on this result. The language was not clear, so the text was checked as Roman Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 4.68,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 4.68,
+     "body": {
+      "id": 19,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "unknown",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.9878,
+      "final_label": "Fake",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:32.462036Z",
+      "text_submission": {
+       "id": 19,
+       "input_text": "सरकार ने आज मुफ्त किताबें देने की घोषणा की",
+       "detected_language": "unknown",
+       "text_prediction": "Fake",
+       "text_confidence": 0.9878,
+       "created_at": "2026-11-27T19:18:32.471300Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 19,
+       "highlighted_words": "[{\"word\": \"सरक\", \"contribution\": 0.93323, \"direction\": \"supports_prediction\"}, {\"word\": \"म\", \"contribution\": 0.91962, \"direction\": \"supports_prediction\"}, {\"word\": \"क\", \"contribution\": 0.9195, \"direction\": \"supports_prediction\"}, {\"word\": \"त\", \"contribution\": 0.88215, \"direction\": \"supports_prediction\"}, {\"word\": \"फ\", \"contribution\": 0.76246, \"direction\": \"supports_prediction\"}, {\"word\": \"न\", \"contribution\": 0.72291, \"direction\": \"supports_prediction\"}, {\"word\": \"र\", \"contribution\": 0.42969, \"direction\": \"supports_prediction\"}, {\"word\": \"आज\", \"contribution\": -0.00781, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like fake or misleading news. The AI is highly confident (98.8%). The highlighted words below had the biggest effect on this result. The language was not clear, so the text was checked as Roman Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-roman-urdu",
+       "created_at": "2026-11-27T19:18:32.470984Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:32",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-21": {
+   "result": "Finding",
+   "evidence": "201 · urdu · xlmr-urdu · Real 0.9997 · risk 0.0003 · 8 highlights · 0.5 s · id 20 · is_news=None",
+   "expected": "use case: “does not appear to be news”; no news filter connected → Finding",
+   "notes": "A cooking instruction gets a news verdict: no news/not-news filter is connected (is_news is null).",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 20,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.9997,
+     "risk": 0.0003,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "آدھے",
+      "گھنٹے",
+      "کر",
+      "کے",
+      "دو",
+      "کپ",
+      "چاول",
+      "دھو"
+     ],
+     "contributions": [
+      0.00046,
+      0.00031,
+      0.00015,
+      -0.0001,
+      8e-05,
+      -7e-05,
+      -7e-05,
+      -5e-05
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.54,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.54,
+     "body": {
+      "id": 20,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0003,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:32.969809Z",
+      "text_submission": {
+       "id": 20,
+       "input_text": "دو کپ چاول دھو کر آدھے گھنٹے کے لیے بھگو دیں",
+       "detected_language": "urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9997,
+       "created_at": "2026-11-27T19:18:33.019205Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 20,
+       "highlighted_words": "[{\"word\": \"آدھے\", \"contribution\": 0.00046, \"direction\": \"supports_prediction\"}, {\"word\": \"گھنٹے\", \"contribution\": 0.00031, \"direction\": \"supports_prediction\"}, {\"word\": \"کر\", \"contribution\": 0.00015, \"direction\": \"supports_prediction\"}, {\"word\": \"کے\", \"contribution\": -0.0001, \"direction\": \"opposes_prediction\"}, {\"word\": \"دو\", \"contribution\": 8e-05, \"direction\": \"supports_prediction\"}, {\"word\": \"کپ\", \"contribution\": -7e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"چاول\", \"contribution\": -7e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"دھو\", \"contribution\": -5e-05, \"direction\": \"opposes_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:18:33.018914Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:33",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-22": {
+   "result": "Pass",
+   "evidence": "abc (3 chars): 201 · unknown · xlmr-roman-urdu · Real 0.9257 · risk 0.0743 · 1 highlights · 0.3 s · id 21 · GET 200 | chars_10000 (10000 chars): 201 · urdu · tfidf-urdu-long-articles · Real 0.8389 · risk 0.1611 · 8 highlights · 2.6 s · id 22 · GET 200",
+   "expected": "both 201 and saved",
+   "notes": "",
+   "raw": {
+    "abc": {
+     "facts": {
+      "status": 201,
+      "id": 21,
+      "language": "unknown",
+      "model": "xlmr-roman-urdu",
+      "label": "Real",
+      "text_prediction": "Real",
+      "confidence": 0.9257,
+      "risk": 0.0743,
+      "processing_status": "completed",
+      "is_news": null,
+      "highlights": [
+       "abc"
+      ],
+      "contributions": [
+       -0.02602
+      ],
+      "summary": "This looks like genuine news. The AI is highly confident (92.6%). The highlighted words below had the biggest effect on this result. The language was not clear, so the text was checked as Roman Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+      "latency_s": 0.27,
+      "highlights_not_in_input": [],
+      "highlights_only_after_cleaning": []
+     },
+     "saved_get": 200,
+     "chars": 3
+    },
+    "chars_10000": {
+     "facts": {
+      "status": 201,
+      "id": 22,
+      "language": "urdu",
+      "model": "tfidf-urdu-long-articles",
+      "label": "Real",
+      "text_prediction": "Real",
+      "confidence": 0.8389,
+      "risk": 0.1611,
+      "processing_status": "completed",
+      "is_news": null,
+      "highlights": [
+       "دیا",
+       "منعقد",
+       "تاکہ",
+       "ہنگامی",
+       "طویل",
+       "شدید",
+       "علاقوں",
+       "مطابق"
+      ],
+      "contributions": [
+       -0.11468,
+       -0.10911,
+       -0.10343,
+       0.09805,
+       0.09432,
+       -0.09136,
+       0.08343,
+       -0.08196
+      ],
+      "summary": "This looks like genuine news. The AI is fairly confident (83.9%). The highlighted words below had the biggest effect on this result. Long articles are checked as a whole. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+      "latency_s": 2.58,
+      "highlights_not_in_input": [],
+      "highlights_only_after_cleaning": []
+     },
+     "saved_get": 200,
+     "chars": 10000
+    }
+   },
+   "run_at": "2026-11-28 00:18:35",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-23": {
+   "result": "Pass",
+   "evidence": "201 · unknown · text-model-unavailable · Uncertain — · risk — · 0 highlights · 0.0 s · id 23",
+   "expected": "201; Uncertain; no confidence or risk",
+   "notes": "Summary: The text has no words to classify (only links, numbers or symbols).",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 23,
+     "language": "unknown",
+     "model": "text-model-unavailable",
+     "label": "Uncertain",
+     "text_prediction": "Uncertain",
+     "confidence": null,
+     "risk": null,
+     "processing_status": "unavailable",
+     "is_news": null,
+     "highlights": [],
+     "contributions": [],
+     "summary": "The text has no words to classify (only links, numbers or symbols).",
+     "latency_s": 0.01
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.01,
+     "body": {
+      "id": 23,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "unknown",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:35.898042Z",
+      "text_submission": {
+       "id": 23,
+       "input_text": "😀😀😀😀",
+       "detected_language": "unknown",
+       "text_prediction": "Uncertain",
+       "text_confidence": null,
+       "created_at": "2026-11-27T19:18:35.899620Z",
+       "processing_status": "unavailable"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 23,
+       "highlighted_words": null,
+       "heatmap_path": null,
+       "explanation_summary": "The text has no words to classify (only links, numbers or symbols).",
+       "model_version": "text-model-unavailable",
+       "created_at": "2026-11-27T19:18:35.899377Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:35",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-24": {
+   "result": "Pass",
+   "evidence": "201 · unknown · text-model-unavailable · Uncertain — · risk — · 0 highlights · 0.0 s · id 24",
+   "expected": "201; Uncertain; no confidence or risk",
+   "notes": "Summary: The text has no words to classify (only links, numbers or symbols).",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 24,
+     "language": "unknown",
+     "model": "text-model-unavailable",
+     "label": "Uncertain",
+     "text_prediction": "Uncertain",
+     "confidence": null,
+     "risk": null,
+     "processing_status": "unavailable",
+     "is_news": null,
+     "highlights": [],
+     "contributions": [],
+     "summary": "The text has no words to classify (only links, numbers or symbols).",
+     "latency_s": 0.01
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.01,
+     "body": {
+      "id": 24,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "unknown",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:35.910607Z",
+      "text_submission": {
+       "id": 24,
+       "input_text": "1234567890",
+       "detected_language": "unknown",
+       "text_prediction": "Uncertain",
+       "text_confidence": null,
+       "created_at": "2026-11-27T19:18:35.912106Z",
+       "processing_status": "unavailable"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 24,
+       "highlighted_words": null,
+       "heatmap_path": null,
+       "explanation_summary": "The text has no words to classify (only links, numbers or symbols).",
+       "model_version": "text-model-unavailable",
+       "created_at": "2026-11-27T19:18:35.911890Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:35",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-25": {
+   "result": "Pass",
+   "evidence": "201 · unknown · text-model-unavailable · Uncertain — · risk — · 0 highlights · 0.0 s · id 25 · summary “The text has no words to classify (only links, numbers or symbols).”",
+   "expected": "record route; no crash; nothing invented",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 25,
+     "language": "unknown",
+     "model": "text-model-unavailable",
+     "label": "Uncertain",
+     "text_prediction": "Uncertain",
+     "confidence": null,
+     "risk": null,
+     "processing_status": "unavailable",
+     "is_news": null,
+     "highlights": [],
+     "contributions": [],
+     "summary": "The text has no words to classify (only links, numbers or symbols).",
+     "latency_s": 0.01
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.01,
+     "body": {
+      "id": 25,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "unknown",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:35.923185Z",
+      "text_submission": {
+       "id": 25,
+       "input_text": "https://example.com/news/12345",
+       "detected_language": "unknown",
+       "text_prediction": "Uncertain",
+       "text_confidence": null,
+       "created_at": "2026-11-27T19:18:35.924704Z",
+       "processing_status": "unavailable"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 25,
+       "highlighted_words": null,
+       "heatmap_path": null,
+       "explanation_summary": "The text has no words to classify (only links, numbers or symbols).",
+       "model_version": "text-model-unavailable",
+       "created_at": "2026-11-27T19:18:35.924522Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:35",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-26": {
+   "result": "Pass",
+   "evidence": "201 · mixed · xlmr-urdu · Fake 0.9997 · risk 0.9997 · 7 highlights · 0.3 s · id 26 · stored exactly as sent=True · web: result shows the text literally=True, history=True, alert fired=False, <script> element injected=False · backend/tests/text_cases/screens/TC-TXT-26_result.png, backend/tests/text_cases/screens/TC-TXT-26_history.png",
+   "expected": "stored exactly; plain text on result and history; no alert",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 26,
+     "language": "mixed",
+     "model": "xlmr-urdu",
+     "label": "Fake",
+     "text_prediction": "Fake",
+     "confidence": 0.9997,
+     "risk": 0.9997,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "alert",
+      "1",
+      "کیا",
+      "حکومت",
+      "اعلان",
+      "نے",
+      "ہے"
+     ],
+     "contributions": [
+      0.9936,
+      0.95674,
+      -0.00013,
+      0.00013,
+      -0.0001,
+      -9e-05,
+      2e-05
+     ],
+     "summary": "This looks like fake or misleading news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. The text mixes Urdu and English script, so it was checked as Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.35,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "stored_equals_sent": true,
+    "stored": "<script>alert(1)</script> حکومت نے اعلان کیا ہے",
+    "response": {
+     "status": 201,
+     "latency_s": 0.35,
+     "body": {
+      "id": 26,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "mixed",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.9997,
+      "final_label": "Fake",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:36.270630Z",
+      "text_submission": {
+       "id": 26,
+       "input_text": "<script>alert(1)</script> حکومت نے اعلان کیا ہے",
+       "detected_language": "mixed",
+       "text_prediction": "Fake",
+       "text_confidence": 0.9997,
+       "created_at": "2026-11-27T19:18:36.272820Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 26,
+       "highlighted_words": "[{\"word\": \"alert\", \"contribution\": 0.9936, \"direction\": \"supports_prediction\"}, {\"word\": \"1\", \"contribution\": 0.95674, \"direction\": \"supports_prediction\"}, {\"word\": \"کیا\", \"contribution\": -0.00013, \"direction\": \"opposes_prediction\"}, {\"word\": \"حکومت\", \"contribution\": 0.00013, \"direction\": \"supports_prediction\"}, {\"word\": \"اعلان\", \"contribution\": -0.0001, \"direction\": \"opposes_prediction\"}, {\"word\": \"نے\", \"contribution\": -9e-05, \"direction\": \"opposes_prediction\"}, {\"word\": \"ہے\", \"contribution\": 2e-05, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like fake or misleading news. The AI is highly confident (100.0%). The highlighted words below had the biggest effect on this result. The text mixes Urdu and English script, so it was checked as Urdu. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-urdu",
+       "created_at": "2026-11-27T19:18:36.272478Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    },
+    "web": {
+     "ok": true,
+     "evidence": "result shows the text literally=True, history=True, alert fired=False, <script> element injected=False · backend/tests/text_cases/screens/TC-TXT-26_result.png, backend/tests/text_cases/screens/TC-TXT-26_history.png",
+     "dialogs": []
+    }
+   },
+   "run_at": "2026-11-28 00:18:36",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-27": {
+   "result": "Pass",
+   "evidence": "201 · roman_urdu · xlmr-roman-urdu · Real 0.9794 · risk 0.0206 · 8 highlights · 9.6 s · id 27 · TC-TXT-04: Real 0.9794 · Δconf 0.0000",
+   "expected": "same route as 04; same label or record the difference",
+   "notes": "",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 27,
+     "language": "roman_urdu",
+     "model": "xlmr-roman-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.9794,
+     "risk": 0.0206,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "Hukoomat",
+      "ke",
+      "ne",
+      "elan",
+      "hai",
+      "kiya",
+      "1",
+      "aaj"
+     ],
+     "contributions": [
+      0.10892,
+      0.043,
+      0.0235,
+      -0.00989,
+      -0.00842,
+      0.0042,
+      -0.00179,
+      0.00062
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (97.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 9.56,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 9.56,
+     "body": {
+      "id": 27,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "roman_urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": 0.0206,
+      "final_label": "Real",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:18:45.841675Z",
+      "text_submission": {
+       "id": 27,
+       "input_text": "Hukoomat  ne​ aaj​ elan kiya hai ke 1 November se tamam  sarkari schools mein muft​kitaabein faraham ki jayengi.",
+       "detected_language": "roman_urdu",
+       "text_prediction": "Real",
+       "text_confidence": 0.9794,
+       "created_at": "2026-11-27T19:18:45.843898Z",
+       "processing_status": "completed"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 27,
+       "highlighted_words": "[{\"word\": \"Hukoomat\", \"contribution\": 0.10892, \"direction\": \"supports_prediction\"}, {\"word\": \"ke\", \"contribution\": 0.043, \"direction\": \"supports_prediction\"}, {\"word\": \"ne\", \"contribution\": 0.0235, \"direction\": \"supports_prediction\"}, {\"word\": \"elan\", \"contribution\": -0.00989, \"direction\": \"opposes_prediction\"}, {\"word\": \"hai\", \"contribution\": -0.00842, \"direction\": \"opposes_prediction\"}, {\"word\": \"kiya\", \"contribution\": 0.0042, \"direction\": \"supports_prediction\"}, {\"word\": \"1\", \"contribution\": -0.00179, \"direction\": \"opposes_prediction\"}, {\"word\": \"aaj\", \"contribution\": 0.00062, \"direction\": \"supports_prediction\"}]",
+       "heatmap_path": null,
+       "explanation_summary": "This looks like genuine news. The AI is highly confident (97.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "model_version": "xlmr-roman-urdu",
+       "created_at": "2026-11-27T19:18:45.843619Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:18:45",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-28": {
+   "result": "Pass",
+   "evidence": "TC-TXT-02×3: Real 0.9984 · highlights identical=True (ids 28, 29) | TC-TXT-04×3: Real 0.9794 · highlights identical=True (ids 30, 31)",
+   "expected": "identical label, confidence and highlights",
+   "notes": "",
+   "raw": {
+    "TC-TXT-02": {
+     "runs": [
+      {
+       "status": 201,
+       "id": 28,
+       "language": "urdu",
+       "model": "xlmr-urdu",
+       "label": "Real",
+       "text_prediction": "Real",
+       "confidence": 0.9984,
+       "risk": 0.0016,
+       "processing_status": "completed",
+       "is_news": null,
+       "highlights": [
+        "کیا",
+        "حکومت",
+        "یکم",
+        "اعلان",
+        "کہ",
+        "نے",
+        "آج",
+        "ہے"
+       ],
+       "contributions": [
+        0.97453,
+        0.00433,
+        0.00381,
+        0.00184,
+        0.0017,
+        0.00142,
+        0.00134,
+        0.00034
+       ],
+       "summary": "This looks like genuine news. The AI is highly confident (99.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "latency_s": 0.6,
+       "highlights_not_in_input": [],
+       "highlights_only_after_cleaning": []
+      },
+      {
+       "status": 201,
+       "id": 29,
+       "language": "urdu",
+       "model": "xlmr-urdu",
+       "label": "Real",
+       "text_prediction": "Real",
+       "confidence": 0.9984,
+       "risk": 0.0016,
+       "processing_status": "completed",
+       "is_news": null,
+       "highlights": [
+        "کیا",
+        "حکومت",
+        "یکم",
+        "اعلان",
+        "کہ",
+        "نے",
+        "آج",
+        "ہے"
+       ],
+       "contributions": [
+        0.97453,
+        0.00433,
+        0.00381,
+        0.00184,
+        0.0017,
+        0.00142,
+        0.00134,
+        0.00034
+       ],
+       "summary": "This looks like genuine news. The AI is highly confident (99.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "latency_s": 0.66,
+       "highlights_not_in_input": [],
+       "highlights_only_after_cleaning": []
+      }
+     ],
+     "earlier": {
+      "status": 201,
+      "id": 1,
+      "language": "urdu",
+      "model": "xlmr-urdu",
+      "label": "Real",
+      "text_prediction": "Real",
+      "confidence": 0.9984,
+      "risk": 0.0016,
+      "processing_status": "completed",
+      "is_news": null,
+      "highlights": [
+       "کیا",
+       "حکومت",
+       "یکم",
+       "اعلان",
+       "کہ",
+       "نے",
+       "آج",
+       "ہے"
+      ],
+      "contributions": [
+       0.97453,
+       0.00433,
+       0.00381,
+       0.00184,
+       0.0017,
+       0.00142,
+       0.00134,
+       0.00034
+      ],
+      "summary": "This looks like genuine news. The AI is highly confident (99.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+      "latency_s": 1.14,
+      "highlights_not_in_input": [],
+      "highlights_only_after_cleaning": []
+     }
+    },
+    "TC-TXT-04": {
+     "runs": [
+      {
+       "status": 201,
+       "id": 30,
+       "language": "roman_urdu",
+       "model": "xlmr-roman-urdu",
+       "label": "Real",
+       "text_prediction": "Real",
+       "confidence": 0.9794,
+       "risk": 0.0206,
+       "processing_status": "completed",
+       "is_news": null,
+       "highlights": [
+        "Hukoomat",
+        "ke",
+        "ne",
+        "elan",
+        "hai",
+        "kiya",
+        "1",
+        "aaj"
+       ],
+       "contributions": [
+        0.10892,
+        0.043,
+        0.0235,
+        -0.00989,
+        -0.00842,
+        0.0042,
+        -0.00179,
+        0.00062
+       ],
+       "summary": "This looks like genuine news. The AI is highly confident (97.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "latency_s": 9.65,
+       "highlights_not_in_input": [],
+       "highlights_only_after_cleaning": []
+      },
+      {
+       "status": 201,
+       "id": 31,
+       "language": "roman_urdu",
+       "model": "xlmr-roman-urdu",
+       "label": "Real",
+       "text_prediction": "Real",
+       "confidence": 0.9794,
+       "risk": 0.0206,
+       "processing_status": "completed",
+       "is_news": null,
+       "highlights": [
+        "Hukoomat",
+        "ke",
+        "ne",
+        "elan",
+        "hai",
+        "kiya",
+        "1",
+        "aaj"
+       ],
+       "contributions": [
+        0.10892,
+        0.043,
+        0.0235,
+        -0.00989,
+        -0.00842,
+        0.0042,
+        -0.00179,
+        0.00062
+       ],
+       "summary": "This looks like genuine news. The AI is highly confident (97.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+       "latency_s": 10.49,
+       "highlights_not_in_input": [],
+       "highlights_only_after_cleaning": []
+      }
+     ],
+     "earlier": {
+      "status": 201,
+      "id": 3,
+      "language": "roman_urdu",
+      "model": "xlmr-roman-urdu",
+      "label": "Real",
+      "text_prediction": "Real",
+      "confidence": 0.9794,
+      "risk": 0.0206,
+      "processing_status": "completed",
+      "is_news": null,
+      "highlights": [
+       "Hukoomat",
+       "ke",
+       "ne",
+       "elan",
+       "hai",
+       "kiya",
+       "1",
+       "aaj"
+      ],
+      "contributions": [
+       0.10892,
+       0.043,
+       0.0235,
+       -0.00989,
+       -0.00842,
+       0.0042,
+       -0.00179,
+       0.00062
+      ],
+      "summary": "This looks like genuine news. The AI is highly confident (97.9%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+      "latency_s": 10.16,
+      "highlights_not_in_input": [],
+      "highlights_only_after_cleaning": []
+     }
+    }
+   },
+   "run_at": "2026-11-28 00:19:07",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-01": {
+   "result": "Pass",
+   "evidence": "201 · urdu · text-model-unavailable · Uncertain — · risk — · 0 highlights · 0.1 s · id 32 · status unavailable · model dir empty (fault-injected) · saved (GET 200)",
+   "expected": "201, saved; Uncertain; no confidence/risk; status unavailable; no highlights",
+   "notes": "Summary: The trained urdu XLM-R classifier is unavailable or incomplete.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 32,
+     "language": "urdu",
+     "model": "text-model-unavailable",
+     "label": "Uncertain",
+     "text_prediction": "Uncertain",
+     "confidence": null,
+     "risk": null,
+     "processing_status": "unavailable",
+     "is_news": null,
+     "highlights": [],
+     "contributions": [],
+     "summary": "The trained urdu XLM-R classifier is unavailable or incomplete.",
+     "latency_s": 0.05
+    },
+    "fault": {
+     "case": "TC-TXT-01",
+     "urdu_model_dir": "C:\\Users\\hp\\AppData\\Local\\Temp\\no-urdu-model-8s4tj5ti",
+     "saved": 200,
+     "logs": []
+    },
+    "response": {
+     "status": 201,
+     "latency_s": 0.05,
+     "body": {
+      "id": 32,
+      "user_id": 1,
+      "submission_type": "text",
+      "detected_language": "urdu",
+      "is_news": null,
+      "news_confidence": null,
+      "combined_risk_score": null,
+      "final_label": "Uncertain",
+      "final_label_source": "AI",
+      "admin_comment": null,
+      "created_at": "2026-11-27T19:19:09.219404Z",
+      "text_submission": {
+       "id": 32,
+       "input_text": "حکومت نے آج نئی سڑک کا افتتاح کیا ہے۔",
+       "detected_language": "urdu",
+       "text_prediction": "Uncertain",
+       "text_confidence": null,
+       "created_at": "2026-11-27T19:19:09.222314Z",
+       "processing_status": "unavailable"
+      },
+      "image_submission": null,
+      "explainability": {
+       "id": 32,
+       "highlighted_words": null,
+       "heatmap_path": null,
+       "explanation_summary": "The trained urdu XLM-R classifier is unavailable or incomplete.",
+       "model_version": "text-model-unavailable",
+       "created_at": "2026-11-27T19:19:09.221630Z"
+      },
+      "gradcam_status": null
+     },
+     "retry_after": null
+    }
+   },
+   "run_at": "2026-11-28 00:19:09",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-31": {
+   "result": "Pass",
+   "evidence": "201 · urdu · text-model-unavailable · Uncertain — · risk — · 0 highlights · 14.8 s · id 33 · status unavailable · log: ERROR app.ai.text.predict: urdu XLM-R inference failed [RuntimeError: injected inference failure (TC-TXT-31)] · next request in same process: 201 · urdu · xlmr-urdu · Real 0.9984 · risk 0.0016 · 8 highlights · 0.7 s · id 34",
+   "expected": "error reported; Uncertain; no score; backend serves next request",
+   "notes": "Summary: The trained urdu classifier could not complete the check.",
+   "raw": {
+    "facts": {
+     "status": 201,
+     "id": 33,
+     "language": "urdu",
+     "model": "text-model-unavailable",
+     "label": "Uncertain",
+     "text_prediction": "Uncertain",
+     "confidence": null,
+     "risk": null,
+     "processing_status": "unavailable",
+     "is_news": null,
+     "highlights": [],
+     "contributions": [],
+     "summary": "The trained urdu classifier could not complete the check.",
+     "latency_s": 14.83
+    },
+    "next": {
+     "status": 201,
+     "id": 34,
+     "language": "urdu",
+     "model": "xlmr-urdu",
+     "label": "Real",
+     "text_prediction": "Real",
+     "confidence": 0.9984,
+     "risk": 0.0016,
+     "processing_status": "completed",
+     "is_news": null,
+     "highlights": [
+      "کیا",
+      "حکومت",
+      "یکم",
+      "اعلان",
+      "کہ",
+      "نے",
+      "آج",
+      "ہے"
+     ],
+     "contributions": [
+      0.97453,
+      0.00433,
+      0.00381,
+      0.00184,
+      0.0017,
+      0.00142,
+      0.00134,
+      0.00034
+     ],
+     "summary": "This looks like genuine news. The AI is highly confident (99.8%). The highlighted words below had the biggest effect on this result. This is an AI estimate, not a fact-check: confirm important news with trusted sources.",
+     "latency_s": 0.73,
+     "highlights_not_in_input": [],
+     "highlights_only_after_cleaning": []
+    },
+    "fault": {
+     "case": "TC-TXT-31",
+     "injected_calls": 1,
+     "logs": [
+      "ERROR app.ai.text.predict: urdu XLM-R inference failed [RuntimeError: injected inference failure (TC-TXT-31)]"
+     ]
+    }
+   },
+   "run_at": "2026-11-28 00:19:28",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-29": {
+   "result": "Pass",
+   "evidence": "15 confident Real (risk ≤ 0.0743): TC-TXT-17 Real 0.9999→risk 0.0001, TC-TXT-18 Real 0.9998→risk 0.0002, TC-TXT-19 Real 0.9998→risk 0.0002 · 9 confident Fake (risk ≥ 0.9810): TC-TXT-26 Fake 0.9997→risk 0.9997, TC-TXT-07 Fake 0.9994→risk 0.9994, TC-TXT-15 Fake 0.9990→risk 0.9990 · risk = P(fake) for all 29: True",
+   "expected": "confident Real → low risk; confident Fake → high risk",
+   "notes": "",
+   "raw": {
+    "rows": [
+     [
+      "TC-TXT-28",
+      1,
+      "Real",
+      0.9984,
+      0.0016
+     ],
+     [
+      "TC-TXT-03",
+      2,
+      "Real",
+      0.6856,
+      0.3144
+     ],
+     [
+      "TC-TXT-28",
+      3,
+      "Real",
+      0.9794,
+      0.0206
+     ],
+     [
+      "TC-TXT-07",
+      4,
+      "Fake",
+      0.9994,
+      0.9994
+     ],
+     [
+      "TC-TXT-08",
+      5,
+      "Real",
+      0.995,
+      0.005
+     ],
+     [
+      "TC-TXT-09",
+      6,
+      "Fake",
+      0.9976,
+      0.9976
+     ],
+     [
+      "TC-TXT-09",
+      7,
+      "Real",
+      0.5867,
+      0.4133
+     ],
+     [
+      "TC-TXT-10",
+      8,
+      "Fake",
+      0.9816,
+      0.9816
+     ],
+     [
+      "TC-TXT-11",
+      9,
+      "Fake",
+      0.9966,
+      0.9966
+     ],
+     [
+      "TC-TXT-11",
+      10,
+      "Real",
+      0.7919,
+      0.2081
+     ],
+     [
+      "TC-TXT-11",
+      11,
+      "Fake",
+      0.9985,
+      0.9985
+     ],
+     [
+      "TC-TXT-13",
+      12,
+      "Real",
+      0.5662,
+      0.4338
+     ],
+     [
+      "TC-TXT-14",
+      13,
+      "Real",
+      0.9996,
+      0.0004
+     ],
+     [
+      "TC-TXT-15",
+      14,
+      "Fake",
+      0.999,
+      0.999
+     ],
+     [
+      "TC-TXT-16",
+      15,
+      "Fake",
+      0.981,
+      0.981
+     ],
+     [
+      "TC-TXT-17",
+      16,
+      "Real",
+      0.9999,
+      0.0001
+     ],
+     [
+      "TC-TXT-18",
+      17,
+      "Real",
+      0.9998,
+      0.0002
+     ],
+     [
+      "TC-TXT-19",
+      18,
+      "Real",
+      0.9998,
+      0.0002
+     ],
+     [
+      "TC-TXT-20",
+      19,
+      "Fake",
+      0.9878,
+      0.9878
+     ],
+     [
+      "TC-TXT-21",
+      20,
+      "Real",
+      0.9997,
+      0.0003
+     ],
+     [
+      "TC-TXT-22",
+      21,
+      "Real",
+      0.9257,
+      0.0743
+     ],
+     [
+      "TC-TXT-22",
+      22,
+      "Real",
+      0.8389,
+      0.1611
+     ],
+     [
+      "TC-TXT-26",
+      26,
+      "Fake",
+      0.9997,
+      0.9997
+     ],
+     [
+      "TC-TXT-27",
+      27,
+      "Real",
+      0.9794,
+      0.0206
+     ],
+     [
+      "TC-TXT-28",
+      28,
+      "Real",
+      0.9984,
+      0.0016
+     ],
+     [
+      "TC-TXT-28",
+      29,
+      "Real",
+      0.9984,
+      0.0016
+     ],
+     [
+      "TC-TXT-28",
+      30,
+      "Real",
+      0.9794,
+      0.0206
+     ],
+     [
+      "TC-TXT-28",
+      31,
+      "Real",
+      0.9794,
+      0.0206
+     ],
+     [
+      "TC-TXT-31",
+      34,
+      "Real",
+      0.9984,
+      0.0016
+     ]
+    ]
+   },
+   "run_at": "2026-11-28 00:19:28",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-30": {
+   "result": "Pass",
+   "evidence": "TC-TXT-02: 8 highlights, all in input=True, max |weight| 0.9745, summary ✓ · TC-TXT-03: 8 highlights, all in input=True, max |weight| 0.2028, summary ✓ · TC-TXT-04: 8 highlights, all in input=True, max |weight| 0.1089, summary ✓",
+   "expected": "1–8 highlights each in input; summary; near-zero weights at very high confidence → Known limitation",
+   "notes": "",
+   "raw": {
+    "TC-TXT-02": {
+     "highlights": [
+      "کیا",
+      "حکومت",
+      "یکم",
+      "اعلان",
+      "کہ",
+      "نے",
+      "آج",
+      "ہے"
+     ],
+     "contributions": [
+      0.97453,
+      0.00433,
+      0.00381,
+      0.00184,
+      0.0017,
+      0.00142,
+      0.00134,
+      0.00034
+     ],
+     "only_after_cleaning": []
+    },
+    "TC-TXT-03": {
+     "highlights": [
+      "دیا",
+      "دوران",
+      "علاقوں",
+      "تاکہ",
+      "شدید",
+      "کہنا",
+      "لینڈ",
+      "حکام"
+     ],
+     "contributions": [
+      -0.20278,
+      0.1547,
+      0.1474,
+      -0.13177,
+      -0.10702,
+      -0.10465,
+      0.09938,
+      -0.09121
+     ],
+     "only_after_cleaning": []
+    },
+    "TC-TXT-04": {
+     "highlights": [
+      "Hukoomat",
+      "ke",
+      "ne",
+      "elan",
+      "hai",
+      "kiya",
+      "1",
+      "aaj"
+     ],
+     "contributions": [
+      0.10892,
+      0.043,
+      0.0235,
+      -0.00989,
+      -0.00842,
+      0.0042,
+      -0.00179,
+      0.00062
+     ],
+     "only_after_cleaning": []
+    }
+   },
+   "run_at": "2026-11-28 00:19:28",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-32": {
+   "result": "Finding",
+   "evidence": "34 items, newest first=True (ids 34…1) · label on every item=True · language in list response=False (in full record 34/34) · TC-TXT-05 inputs present: 0",
+   "expected": "accepted checks, newest first, with label and language; no TC-TXT-05 inputs",
+   "notes": "The history list response (SubmissionListItem) has no language field; the language is only in the full record.",
+   "raw": {
+    "count": 34,
+    "ids": [
+     34,
+     33,
+     32,
+     31,
+     30,
+     29,
+     28,
+     27,
+     26,
+     25,
+     24,
+     23,
+     22,
+     21,
+     20,
+     19,
+     18,
+     17,
+     16,
+     15,
+     14,
+     13,
+     12,
+     11,
+     10,
+     9,
+     8,
+     7,
+     6,
+     5,
+     4,
+     3,
+     2,
+     1
+    ],
+    "list_keys": [
+     "combined_risk_score",
+     "created_at",
+     "dispute_count",
+     "final_label",
+     "final_label_source",
+     "has_image",
+     "id",
+     "submission_type",
+     "text_preview"
+    ]
+   },
+   "run_at": "2026-11-28 00:19:28",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-33": {
+   "result": "Pass",
+   "evidence": "user B GET /submissions/34 → 404 “Submission 34 not found.” · A's text in body=False · id in B's history=False",
+   "expected": "404; none of A's data",
+   "notes": "",
+   "raw": {
+    "status": 404,
+    "body": "{\"detail\":\"Submission 34 not found.\"}"
+   },
+   "run_at": "2026-11-28 00:19:28",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-36": {
+   "result": "Finding",
+   "evidence": "Analyze aria-disabled=true; tap → requests sent 0, history 0→0; message shown: null · backend/tests/text_cases/screens/TC-TXT-36_empty_box.png",
+   "expected": "message “Please enter news content before submitting”; no request",
+   "notes": "No request is sent (Analyze is disabled below 3 characters), but no message is shown; the use case text “Please enter news content before submitting” does not appear.",
+   "raw": {
+    "button": {
+     "text": "\nAnalyze",
+     "ariaDisabled": "true",
+     "disabled": true,
+     "spinner": false,
+     "busy": null
+    },
+    "message": null,
+    "requests": 0
+   },
+   "run_at": "2026-11-28 00:20:51",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-35": {
+   "result": "Pass",
+   "evidence": "two taps 0 ms apart → POSTs 1, saved 1; while busy: spinner=True, aria-disabled=true · backend/tests/text_cases/screens/TC-TXT-35_busy.png",
+   "expected": "spinner; disabled while busy; one submission",
+   "notes": "",
+   "raw": {
+    "busy_state": {
+     "text": "",
+     "ariaDisabled": "true",
+     "disabled": true,
+     "spinner": true,
+     "busy": null
+    },
+    "posts": 1,
+    "saved": 1
+   },
+   "run_at": "2026-11-28 00:32:07",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-37": {
+   "result": "Pass",
+   "evidence": "direction rtl, text-align right, font NotoNastaliqUrdu_400Regular, width 322/390 px, 6 lines, overflow=False · note: the User claim card shows only the first 280 characters, cut mid-word with no ellipsis (lib/SubmissionsContext.tsx textPreview) · backend/tests/text_cases/screens/TC-TXT-37_long_urdu_result.png, backend/tests/text_cases/screens/TC-TXT-37_long_urdu_result_scrolled.png",
+   "expected": "RTL, correct font, wrapping",
+   "notes": "Long text is cut at 280 characters on the result screen with no ellipsis or 'show more'.",
+   "raw": {
+    "style": {
+     "direction": "rtl",
+     "textAlign": "right",
+     "fontFamily": "NotoNastaliqUrdu_400Regular",
+     "writingDirection": "auto",
+     "width": 322,
+     "viewport": 390,
+     "height": 216,
+     "lineHeight": 36,
+     "overflowX": false
+    }
+   },
+   "run_at": "2026-11-28 00:21:56",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-38": {
+   "result": "Pass",
+   "evidence": "result opened after 9.8 s (click to result screen); app analysis timeout ANALYSIS_TIMEOUT_MS = 180000 ms (180 s, lib/api.ts) · backend/tests/text_cases/screens/TC-TXT-38_roman_urdu_result.png",
+   "expected": "completes without timing out; report app timeout",
+   "notes": "",
+   "raw": {
+    "seconds": 9.8,
+    "timeout_ms": 180000
+   },
+   "run_at": "2026-11-28 00:22:13",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-39": {
+   "result": "Pass",
+   "evidence": "message: \"Could not analyze\\n\\nCannot reach the backend at http://127.0.0.1:8001. Check the API URL and that FastAPI is running.\"; no crash, still on the Check screen=True, typed text kept (94 chars) · backend/tests/text_cases/screens/TC-TXT-39_backend_stopped.png",
+   "expected": "“Cannot reach the backend at …”; no crash",
+   "notes": "",
+   "raw": {
+    "message": "Could not analyze\n\nCannot reach the backend at http://127.0.0.1:8001. Check the API URL and that FastAPI is running.",
+    "still_usable": true
+   },
+   "run_at": "2026-11-28 00:22:22",
+   "base_url": "http://127.0.0.1:8001"
+  },
+  "TC-TXT-34": {
+   "result": "Pass",
+   "evidence": "A: 10×201 then 429 at 4.2 s “Too many checks in a short time. Please try again in 56 seconds.” Retry-After 56 · B: 201 · all within 5 s",
+   "expected": "first 10 succeed; 11th 429 with clear message; B unaffected",
+   "notes": "",
+   "raw": {
+    "seq": [
+     {
+      "n": 1,
+      "status": 201,
+      "t": 0.4,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 2,
+      "status": 201,
+      "t": 0.8,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 3,
+      "status": 201,
+      "t": 1.2,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 4,
+      "status": 201,
+      "t": 1.6,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 5,
+      "status": 201,
+      "t": 2.2,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 6,
+      "status": 201,
+      "t": 2.6,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 7,
+      "status": 201,
+      "t": 3.0,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 8,
+      "status": 201,
+      "t": 3.4,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 9,
+      "status": 201,
+      "t": 3.7,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 10,
+      "status": 201,
+      "t": 4.1,
+      "detail": null,
+      "retry_after": null
+     },
+     {
+      "n": 11,
+      "status": 429,
+      "t": 4.2,
+      "detail": "Too many checks in a short time. Please try again in 56 seconds.",
+      "retry_after": "56"
+     }
+    ],
+    "user_b": {
+     "status": 201
+    }
+   },
+   "run_at": "2026-11-28 00:32:17",
+   "base_url": "http://127.0.0.1:8001"
+  }
+ }
+}
