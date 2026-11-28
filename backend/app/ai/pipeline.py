@@ -90,7 +90,8 @@ def run_image_pipeline(image_path: str) -> dict:
     with upright_image(image_path) as upright_path:
         ocr = run_ocr(upright_path)
         text = None
-        if has_usable_text(ocr, settings.OCR_MIN_LETTERS, settings.OCR_MIN_CONFIDENCE):
+        if has_usable_text(ocr, settings.OCR_MIN_LETTERS, settings.OCR_MIN_CONFIDENCE,
+                           settings.OCR_MIN_CONFIDENCE_URDU):
             # Image pair: the same text pipeline as typed text, on the extracted text of this image.
             try:
                 text = run_text_pipeline(ocr["text"], language=ocr.get("language"))

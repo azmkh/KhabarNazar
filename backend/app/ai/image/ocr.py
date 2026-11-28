@@ -58,15 +58,65 @@ def _model_directory() -> Path:
     ).expanduser()
 
 
-def has_usable_text(ocr_result: dict, min_letters: int, min_confidence: float) -> bool:
+def has_usable_text(
+    ocr_result: dict,
+    min_letters: int,
+    min_confidence: float,
+    min_confidence_urdu: float | None = None,
+) -> bool:
     """True when OCR found enough confidently read text to classify (the image-with-text branch).
 
-    A few stray letters (a watermark, a logo) or a low-confidence read do not count.
+    A few stray letters (a watermark, a logo) or a low-confidence read do not count. EasyOCR's
+    Urdu recognizer reports much lower confidence than its Latin one for text it reads correctly,
+    especially in Nastaliq, so Urdu-script text has its own cutoff (min_confidence_urdu).
     """
     text = ocr_result.get("text") or ""
     confidence = ocr_result.get("confidence")
     letters = sum(character.isalpha() for character in text)
-    return letters >= min_letters and confidence is not None and confidence >= min_confidence
+    cutoff = min_confidence
+    if min_confidence_urdu is not None and ocr_result.get("language") == "urdu":
+        cutoff = min_confidence_urdu
+    return letters >= min_letters and confidence is not None and confidence >= cutoff
+
+
+def _is_arabic_script(text: str) -> bool:
+    letters = [character for character in text if character.isalpha()]
+    return bool(letters) and sum("؀" <= c <= "ۿ" or "ݐ" <= c <= "ݿ" or "ﭐ" <= c <= "﻿"
+                                 for c in letters) * 2 > len(letters)
+
+
+def _reading_order(detections: list) -> list[list[tuple[str, float]]]:
+    """Group EasyOCR word boxes into lines, top to bottom, each in reading direction.
+
+    EasyOCR returns boxes roughly top-to-bottom and left-to-right, which reverses the words of
+    an Urdu line and, with tall overlapping Nastaliq lines, interleaves neighbouring lines.
+    A box joins the current line when its vertical centre is within half a typical box height
+    of the line's centre. Urdu lines are then read right to left, others left to right.
+    """
+    boxes = []
+    for item in detections:
+        if len(item) < 3 or not str(item[1]).strip():
+            continue
+        xs = [float(point[0]) for point in item[0]]
+        ys = [float(point[1]) for point in item[0]]
+        boxes.append({"text": str(item[1]).strip(), "conf": float(item[2]),
+                      "x": (min(xs) + max(xs)) / 2, "y": (min(ys) + max(ys)) / 2, "h": max(ys) - min(ys)})
+    if not boxes:
+        return []
+    heights = sorted(box["h"] for box in boxes)
+    tolerance = max(heights[len(heights) // 2], 1.0) / 2
+    lines: list[list[dict]] = []
+    for box in sorted(boxes, key=lambda b: b["y"]):
+        if lines and box["y"] - sum(b["y"] for b in lines[-1]) / len(lines[-1]) <= tolerance:
+            lines[-1].append(box)
+        else:
+            lines.append([box])
+    ordered = []
+    for line in lines:
+        right_to_left = _is_arabic_script(" ".join(b["text"] for b in line))
+        line.sort(key=lambda b: b["x"], reverse=right_to_left)
+        ordered.append([(b["text"], b["conf"]) for b in line])
+    return ordered
 
 
 def run_ocr(image_path: str) -> dict:
@@ -94,9 +144,9 @@ def run_ocr(image_path: str) -> dict:
             "message": "OCR could not process this image. Check the backend log for details.",
         }
 
-    text_parts = [str(item[1]).strip() for item in detections if len(item) >= 3 and str(item[1]).strip()]
-    confidences = [float(item[2]) for item in detections if len(item) >= 3 and str(item[1]).strip()]
-    extracted_text = "\n".join(text_parts) or None
+    lines = _reading_order(detections)
+    confidences = [confidence for line in lines for _, confidence in line]
+    extracted_text = "\n".join(" ".join(text for text, _ in line) for line in lines) or None
     confidence = sum(confidences) / len(confidences) if confidences else None
     return {
         "text": extracted_text,
